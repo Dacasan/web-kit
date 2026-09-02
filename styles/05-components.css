@@ -1,0 +1,800 @@
+/* Componentes base (skill §6) + widget de contacto flotante (§7.7). */
+
+/* ── Botones — tema acero: menos píldora, más filete ── */
+.button {
+  /* inline-flex y NO inline-block: con min-height el sobrante se añadía */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.1rem 2rem;
+  min-height: 44px;
+  font-size: var(--font-size);
+  font-weight: 600;
+  line-height: 1;
+  text-align: center;
+  text-decoration: none;
+  /* TERCIARIO (el caso base) */
+  color: var(--ink-body);
+  background: var(--surface-primary-soft);
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: transform .15s ease, box-shadow .15s ease, background-color .15s ease;
+}
+/* PRIMARIO — la acción que la página existe para provocar */
+.button.primary {
+  color: var(--ink-on-primary);
+  background: var(--cta-bg);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ACENTO — la jerarquía suprema: UN botón por pantalla, el del hero o el del
+   header. Si aparece tres veces deja de destacar y ya solo es otro primario. */
+.button.accent {
+  color: var(--ink-on-accent);
+  background: var(--accent);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Sobre fondo oscuro la placa negra sería un botón invisible: se invierte a */
+:where(.section--cta, .bg-dark) .button.primary {
+  color: var(--ink-body);
+  background: var(--ink-body-on-dark);
+}
+:where(.section--cta, .bg-dark) :where(.card) .button.primary {
+  color: var(--ink-on-primary);
+  background: var(--cta-bg);
+}
+/* ── SECUNDARIO — contorno verde profundo sobre fondo claro ── */
+.button.outline {
+  background: transparent;
+  border-color: var(--border-field);
+  color: var(--ink-body);
+  box-shadow: none;
+}
+
+/* UN SOLO GESTO PARA TODOS LOS BOTONES */
+.button:hover,
+.button:active {
+  background: var(--bg-dark);
+  border-color: var(--bg-dark);
+  color: var(--ink-body-on-dark);
+}
+.button:hover { transform: translateY(-1px); }
+/* Pulsado no levanta: el botón se hunde bajo el dedo. */
+.button:active { transform: none; }
+
+/* .pill es "botón grande" (más aire a los lados). El redondeo ya no lo pone */
+.button.pill { padding: 1.2rem 3rem; }
+.button[disabled] { opacity: .6; cursor: not-allowed; transform: none; }
+.btn-row { display: flex; justify-content: center; gap: 1.2rem; flex-wrap: wrap; }
+
+/* Tarjeta */
+.card {
+  padding: 1.4rem;
+  /* El par completo, no solo el fondo: una tarjeta clara dentro de una
+     sección oscura heredaba --ink-body-on-dark y --ink-title y pintaba blanco
+     sobre blanco. Declarando la tinta junto a la superficie, la ficha se
+     re-declara para todo lo que va dentro. Mismo patrón que .bg-dark. */
+  background: var(--surface-card);
+  color: var(--ink-body);
+  --ink-title: var(--ink-body);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+
+:root { --gap-card: 1.2rem; }
+@media (min-width: 900px) {
+  :root { --gap-card: 1.6rem; }
+}
+
+/* Rejilla de N columnas. No apila en móvil: dos columnas caben en 360px. */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 2), minmax(0, 1fr));
+  gap: var(--gap-card);
+}
+
+/* ── Insignias y micro-elementos ── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+  padding: .6rem 1.6rem;
+  font-size: var(--text-xs);
+  background: var(--bg-page);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+}
+/* Punto de estado dentro de la insignia: "Respondemos ahora" en verde. El */
+.badge__dot {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--dot, var(--primary));
+}
+.icon-circle {
+  display: grid;
+  place-items: center;
+  width: 64px; height: 64px;
+  margin: 0 auto 1.6rem;
+  background: var(--bg-alt);
+  border-radius: 50%;
+}
+.icon-badge {
+  display: grid;
+  place-items: center;
+  width: 38px; height: 38px;
+  background: var(--primary);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Texto de contenido (antes 06-utilities.css) */
+/* Estrellas de valoración */
+.rating {
+  font-size: var(--text-lg);
+  line-height: 1;
+  color: var(--color-star);
+  letter-spacing: .1em;
+}
+.rating__off { color: var(--border-hairline); }
+
+.lead  { font-size: var(--text-lg); color: var(--ink-muted); line-height: var(--leading-normal); }
+.label { text-transform: uppercase; letter-spacing: .1em; font-size: var(--text-xs); color: var(--ink-primary); }
+/* .text-body va PRIMERO y los colores después, y el orden ES la regla:
+   los cuatro pesan (0,1,0), así que con `class="text-body text-white"` gana
+   la última del archivo. Al revés, .text-body pisaba a .text-white y el
+   texto salía verde oscuro sobre fondo verde oscuro: contraste 1:1. */
+.text-body    { font-size: var(--font-size); color: var(--ink-body); line-height: var(--leading-relaxed); }
+.text-primary { color: var(--ink-primary); }
+.text-grey    { color: var(--ink-muted); }
+.text-white   { color: var(--ink-body-on-dark); }
+
+/* Franja de credibilidad */
+.proof-strip { display: flex; flex-direction: column; }
+.proof-strip__item {
+  display: flex; align-items: center;
+  gap: 1.2rem; padding: 1.2rem 2rem;
+  border-bottom: 1px solid var(--border-hairline);
+}
+.proof-strip__item:last-child { border-bottom: 0; }
+.proof-strip__num   { font-size: 2.4rem; font-weight: 700; color: var(--ink-primary); line-height: 1; }
+.proof-strip__label { font-size: var(--text-xs); color: var(--ink-muted); line-height: 1.3; max-width: 120px; }
+
+@media (min-width: 900px) {
+  .proof-strip { flex-direction: row; justify-content: center; align-items: center; }
+  .proof-strip__item {
+    flex: 1; min-width: 180px;
+    justify-content: center;
+    padding: 1.5rem 3rem;
+    border-bottom: 0;
+    border-right: 1px solid var(--border-hairline);
+  }
+  .proof-strip__item:last-child { border-right: 0; }
+}
+
+/* ── Lista de pasos — el número se contornea en vez de rellenarse ── */
+.step-list { display: flex; flex-direction: column; gap: 1.2rem; list-style: none; padding: 0; }
+.step-list li { display: flex; align-items: flex-start; gap: 1.2rem; font-size: var(--text-sm); color: var(--ink-muted); }
+.step-num {
+  display: grid; place-items: center;
+  width: 32px; height: 32px;
+  font-size: var(--text-xs); font-weight: 700;
+  color: var(--ink-primary);
+  background: transparent;
+  border: 1px solid var(--ink-primary);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.step-index { font-family: var(--font-display); font-size: var(--text-2xl); font-weight: 300; color: var(--ink-primary); line-height: 1; font-variant-numeric: tabular-nums; }
+
+/* ── Estadísticas en línea ── */
+.inline-stats { display: flex; gap: 3.2rem; flex-wrap: wrap; }
+.inline-stat  { display: flex; align-items: center; gap: 1rem; }
+.inline-stat__num   { font-size: 2rem; font-weight: 700; line-height: var(--leading-tight); color: var(--ink-primary); }
+.inline-stat__label { font-size: var(--text-xs); color: var(--ink-muted); }
+.stat-num   { font-size: 3.5rem; font-weight: 800; color: var(--ink-primary); line-height: 1; }
+.stat-label { font-size: var(--text-sm); color: var(--ink-muted); margin-top: .5rem; }
+
+/* ── Tablas ── */
+.table { width: 100%; border-collapse: collapse; }
+.table th, .table td {
+  padding: 1.2rem .8rem;
+  font-size: var(--text-sm);
+}
+.table th {
+  text-align: left;
+  border-bottom: 2px solid var(--border-hairline);
+}
+.table td {
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+/* ── Acordeón / preguntas frecuentes (skill §7.1) ── */
+.accordion { border-top: 1px solid var(--border-hairline); }
+.accordion__item { border-bottom: 1px solid var(--border-hairline); }
+.accordion__summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.6rem;
+  padding: 1.6rem 0;
+  min-height: 48px;
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+}
+.accordion__summary::-webkit-details-marker { display: none; }
+.accordion__summary::after {
+  content: '+';
+  flex-shrink: 0;
+  font-size: var(--text-xl);
+  font-weight: 400;
+  color: var(--ink-primary);
+  transition: transform .2s ease;
+}
+.accordion__item[open] > .accordion__summary::after { transform: rotate(45deg); }
+.accordion__panel { padding-bottom: 1.6rem; color: var(--ink-muted); }
+
+/* Formulario */
+.field { margin-bottom: 1.6rem; }
+
+/* Etiqueta de campo: versalitas, gris a 5:1. */
+.form-label {
+  display: block;
+  margin-bottom: .8rem;
+  font-size: var(--text-xs);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--ink-muted);
+}
+
+/* Prefijo pegado a un campo: el +1 del teléfono, el $ del presupuesto. */
+.form-prefix { display: flex; align-items: stretch; gap: .8rem; }
+.form-prefix__sign {
+  flex-shrink: 0;
+  justify-content: center;
+  min-width: 56px;
+  font-size: var(--text-sm);
+  color: var(--ink-muted);
+}
+
+/* Consentimiento: obligatorio en todos los formularios. */
+.form-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin: 1.6rem 0 2.4rem;
+  font-size: var(--text-xs);
+  font-weight: 400;
+  line-height: var(--leading-normal);
+  color: var(--ink-muted);
+  cursor: pointer;
+}
+.form-consent input {
+  width: 20px; height: 20px;
+  flex-shrink: 0;
+  margin-top: .2rem;
+  accent-color: var(--ink-strong);
+}
+
+.form__error {
+  padding: 1.2rem;
+  margin-bottom: 1.2rem;
+  font-size: var(--text-sm);
+  color: var(--color-error);
+  background: color-mix(in srgb, var(--color-error) 8%, transparent);
+  border-radius: var(--radius);
+}
+/* [hidden] explícito: la capa de componentes gana al display del navegador. */
+.form__error[hidden] { display: none; }
+
+.form__trust {
+  margin: .8rem 0 0;
+  text-align: center;
+  color: var(--ink-muted);
+}
+
+.form .button { width: 100%; }
+.form--compact .field { margin-bottom: .8rem; }
+
+/* Campo trampa: fuera de pantalla y fuera del orden de tabulación. */
+.form__trap {
+  position: absolute;
+  left: -9999px;
+  width: 1px; height: 1px;
+  overflow: hidden;
+}
+
+/* Widget de contacto flotante (skill §7.7) — cero JavaScript. */
+.launcher {
+  position: fixed;
+  right: 16px;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  z-index: 120;
+}
+
+/* Casillas: invisibles pero enfocables con teclado */
+.lx-state {
+  position: absolute;
+  width: 1px; height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ── Píldora ── */
+.lx-pill {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .5rem 1.25rem .5rem .5rem;
+  background: var(--surface-card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: transform .18s ease, opacity .18s ease;
+}
+.lx-pill:hover { transform: translateY(-2px); }
+
+.lx-pill__icon {
+  position: relative;
+  display: grid; place-items: center;
+  width: 48px; height: 48px;
+  flex-shrink: 0;
+  color: var(--ink-body-on-dark);
+  background: var(--color-whatsapp);
+  border-radius: 50%;
+}
+/* Punto de aviso */
+.lx-pill__icon::after {
+  content: '';
+  position: absolute;
+  top: 2px; right: 2px;
+  width: 10px; height: 10px;
+  background: var(--color-error);
+  border: 2px solid var(--surface-card);
+  border-radius: 50%;
+}
+
+.lx-pill__body { display: grid; gap: .1rem; }
+.lx-pill__status {
+  display: flex; align-items: center; gap: .35rem;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--color-success-ink);
+}
+.lx-pill__status::before {
+  content: '';
+  width: 7px; height: 7px;
+  background: currentColor;
+  border-radius: 50%;
+  animation: lx-pulse 2.4s ease-in-out infinite;
+}
+.lx-pill__label { font-size: var(--text-sm); color: var(--ink-body); }
+
+@keyframes lx-pulse {
+  50% { opacity: .35; }
+}
+
+/* Panel */
+.lx-panel {
+  position: fixed;
+  right: 8px; left: 8px;
+  bottom: max(8px, env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  max-height: min(640px, calc(100dvh - 5rem));
+  background: var(--bg-alt);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px) scale(.98);
+  transition: opacity .18s ease, transform .18s ease, visibility 0s .18s;
+}
+
+.lx-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: var(--color-whatsapp);
+  color: var(--ink-body-on-dark);
+}
+.lx-head__title { margin: 0; font-size: var(--text-lg); font-weight: 700; }
+.lx-x {
+  display: grid; place-items: center;
+  width: 44px; height: 44px;
+  margin: -.5rem -.75rem -.5rem 0;
+  color: inherit;
+  cursor: pointer;
+  border-radius: var(--radius);
+}
+.lx-x:hover { background: rgb(0 0 0 / .12); }
+
+.lx-body {
+  padding: 1.5rem 1.25rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.lx-prompt {
+  margin: 0 0 1.25rem;
+  text-align: center;
+  font-size: var(--text-sm);
+  color: var(--ink-muted);
+}
+
+/* ── Opciones ── */
+.lx-option {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  padding: 1rem;
+  margin-bottom: .75rem;
+  min-height: 48px;
+  background: var(--surface-card);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: border-color .15s ease, background .15s ease;
+}
+.lx-option:hover {
+  border-color: var(--color-success);
+  background: var(--color-success-soft);
+}
+.lx-option__icon {
+  display: grid; place-items: center;
+  width: 42px; height: 42px;
+  flex-shrink: 0;
+  color: var(--color-success);
+  background: var(--color-success-soft);
+  border-radius: var(--radius);
+}
+.lx-option__text { display: grid; gap: .15rem; min-width: 0; }
+.lx-option__text strong { font-size: var(--text-sm); color: var(--ink-body); }
+.lx-option__text span   { font-size: var(--text-xs); color: var(--ink-muted); }
+.lx-option__chevron { margin-left: auto; color: var(--ink-muted); }
+
+.lx-back {
+  display: inline-block;
+  margin-bottom: 1rem;
+  font-size: var(--text-sm);
+  color: var(--ink-muted);
+  cursor: pointer;
+}
+
+/* ── Máquina de estados ── */
+.lx-view--support { display: none; }
+
+#lx-open:checked ~ .lx-pill {
+  opacity: 0;
+  transform: scale(.9);
+  pointer-events: none;
+}
+#lx-open:checked ~ .lx-panel {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition: opacity .18s ease, transform .18s ease, visibility 0s;
+}
+#lx-support:checked ~ .lx-panel .lx-view--menu    { display: none; }
+#lx-support:checked ~ .lx-panel .lx-view--support { display: block; }
+
+/* Foco visible sobre el control real, no sobre la casilla oculta */
+#lx-open:focus-visible ~ .lx-pill,
+#lx-support:focus-visible ~ .lx-panel .lx-option:first-of-type {
+  /* -ink y no --color-accent: un anillo de foco es un componente de interfaz */
+  outline: 3px solid var(--ink-on-primary);
+  outline-offset: 2px;
+}
+
+@media (min-width: 900px) {
+  .launcher { right: 24px; bottom: 24px; }
+  .lx-panel {
+    position: absolute;
+    right: 0; left: auto; bottom: 0;
+    width: 400px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lx-pill,
+  .lx-panel { transition: none; }
+  .lx-pill__status::before { animation: none; }
+}
+
+/* Fachada de video (skill §12.1) — el sistema real es YouTubeLite.astro */
+
+/* .rail — carril horizontal en móvil, columnas en escritorio. */
+.rail {
+  display: flex;
+  gap: var(--grid-gutter);
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  /* El deslizamiento se detiene encuadrando cada tarjeta. */
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: calc(var(--grid-gutter) / 2);
+
+  /* Sangrado a los bordes de la pantalla: el carril se sale del container */
+  padding-inline: calc(var(--grid-gutter) / 2);
+  margin-inline: calc(var(--grid-gutter) / -2);
+  padding-block: .4rem;
+
+  /* Que el gesto no dispare el "atrás" del navegador ni arrastre la página. */
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+
+  /* Ocultar la barra en los tres motores. */
+  scrollbar-width: none;        /* Firefox */
+  -ms-overflow-style: none;     /* Edge antiguo */
+}
+
+/* Pista visual opcional bajo el carril, solo en móvil. */
+.rail-hint {
+  margin-top: .8rem;
+  font-size: var(--text-xs);
+  color: var(--ink-muted);
+  text-align: center;
+}
+@media (min-width: 900px) {
+  .rail-hint { display: none; }
+}
+
+/* .chips — fila de píldoras que se desliza */
+.chips {
+  display: flex;
+  gap: .8rem;
+  overflow-x: auto;
+  padding-inline: calc(var(--grid-gutter) / 2);
+  margin-inline: calc(var(--grid-gutter) / -2);
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.chips::-webkit-scrollbar { display: none; }
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;          /* sin esto flex las encoge y deja de haber carril */
+  padding: .8rem 1.8rem;
+  min-height: 44px;        /* objetivo táctil mínimo (WCAG 2.5.8) */
+  white-space: nowrap;
+  font-size: var(--text-sm);
+  color: var(--ink-body);
+  text-decoration: none;
+  background: var(--surface-card);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-pill);
+}
+/* El estado activo lo marca aria-current, no una clase. */
+.chip[aria-current]:not([aria-current='false']) {
+  background: var(--ink-strong);
+  border-color: transparent;
+  color: var(--ink-body-on-dark);
+}
+
+/* Vídeo — MOBILE FIRST: vertical 9:16 por defecto. */
+.youtube-video {
+  position: relative;
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  background: var(--ink-strong);
+  border-radius: var(--radius-media);
+  /* .frame — proporción + techo de altura. --frame y --frame-max. */
+  --frame: 9/16;
+}
+
+/* Forzados, cuando la sección lo pide */
+.youtube-video.ratio-horizontal { --frame: 16/9; }
+
+.youtube-video picture { position: absolute; inset: 0; display: block; }
+.youtube-video img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* Vertical sin recorte: se ve el encuadre completo. */
+.youtube-video.ratio-vertical img {
+  object-fit: contain;
+  background: var(--ink-strong);
+}
+
+.youtube-video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.youtube-iframe { position: absolute; inset: 0; width: 100%; height: 100%; }
+/* El disparador es un <button> de verdad para que funcione con teclado: hay */
+.play-button { appearance: none; border: 0; padding: 0; font: inherit; color: inherit; cursor: pointer; }
+
+/* Solo el que NO declara proporción pasa a horizontal en escritorio. */
+@media (min-width: 900px) {
+  .youtube-video:not(.ratio-vertical):not(.ratio-horizontal) { --frame: 16/9; }
+}
+
+/* Galería 3x3 + lightbox — portado de chota-god.css:253-261. */
+.gallery-3x3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+.gallery-3x3 a { display: block; overflow: hidden; }
+.gallery-3x3 img { width: 100%; height: 100%; object-fit: cover; transition: transform .3s ease; }
+.gallery-3x3 a:hover img { transform: scale(1.05); }
+
+.lightbox {
+  position: fixed; inset: 0;
+  background: rgb(0 0 0 / .92);
+  z-index: 9999;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity .2s ease;
+  padding: 1rem;
+  overflow-y: auto;
+}
+.lightbox:target { opacity: 1; pointer-events: auto; }
+.lightbox img { max-width: 90vw; max-height: 85vh; object-fit: contain; border-radius: var(--radius); }
+.lightbox-close {
+  position: absolute; top: 1.5rem; right: 1.5rem;
+  color: var(--ink-body-on-dark); font-size: 3rem; text-decoration: none;
+  width: 44px; height: 44px;
+  display: grid; place-items: center; line-height: 1;
+}
+/* Variante del lightbox que contiene un formulario, no una imagen. */
+.lightbox__panel {
+  width: min(480px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  background: var(--surface-card);
+  border-radius: var(--radius);
+  padding: 3.2rem;
+}
+@media (prefers-reduced-motion: reduce) {
+  .lightbox { transition: none; }
+  .gallery-3x3 img { transition: none; }
+}
+
+/* Scroller infinito — portado de chota-god.css:264-310. */
+.scroller {
+  overflow: hidden;
+  --gap: var(--grid-gutter);
+  --speed: 30s;
+  /* Centrado. Sin esto el carril nace pegado al borde izquierdo del viewport */
+  width: 90%;
+  max-width: 1536px;
+  margin-inline: auto;
+}
+
+/* El fundido de los extremos. */
+.scroller--h {
+  mask-image: linear-gradient(to right, transparent, #000 20%, #000 80%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 20%, #000 80%, transparent);
+}
+.scroller-track { display: flex; gap: var(--gap); will-change: transform; }
+.scroller--h .scroller-track { width: max-content; animation: scroll-h var(--speed) linear infinite; }
+.scroller--v .scroller-track { flex-direction: column; height: max-content; animation: scroll-v var(--speed) linear infinite; }
+.scroller:hover .scroller-track { animation-play-state: paused; }
+.scroller-item { flex-shrink: 0; }
+.scroller-item img { display: block; width: 100%; object-fit: cover; }
+.scroller-col .scroller-track { animation: scroll-v var(--speed) linear infinite; }
+.scroller-item--text {
+  padding: 1rem 2.4rem;
+  background: var(--bg-alt);
+  border-radius: var(--radius);
+  white-space: nowrap; font-weight: 600; font-size: var(--text-sm);
+}
+.scroller--fast { --speed: 15s; }
+.scroller--slow { --speed: 60s; }
+
+/* Sin !important: esta regla va después, así que gana por orden. */
+@media (prefers-reduced-motion: reduce) {
+  .scroller-track { animation: none; }
+}
+@keyframes scroll-h { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@keyframes scroll-v { from { transform: translateY(0); } to { transform: translateY(-50%); } }
+
+/* Envoltorio de tabla — portado de chota-god.css:597-607. */
+.table-wrap { margin-bottom: 2.4rem; overflow-x: auto; }
+.pricing-table { width: 100%; border-collapse: separate; border-spacing: 0 5px; font-size: var(--text-sm); }
+.pricing-table caption {
+  background: var(--primary); color: var(--ink-body);
+  padding: 1rem; font-weight: 700; font-size: var(--text-lg);
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+/* Tema acero: reglas horizontales, ninguna fila rellena. */
+.pricing-table thead th {
+  color: var(--ink-primary);
+  padding: .8rem .6rem; text-align: left;
+  font-size: var(--text-xs); text-transform: uppercase; letter-spacing: .08em;
+  border-bottom: 2px solid var(--ink-primary);
+}
+.pricing-table thead th:last-child { text-align: right; }
+.pricing-table tbody td { padding: .8rem .6rem; border-bottom: 1px solid var(--border-hairline); }
+.pricing-table tbody td:last-child { text-align: left; font-weight: 600; }
+.pricing-table-category td {
+  color: var(--ink-primary);
+  font-weight: 700; padding-top: 1.5rem;
+  border-bottom: 1px solid var(--ink-primary);
+}
+
+/* ── Micro-elementos que faltaban ── */
+.circle {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px;
+  background: var(--primary); color: var(--ink-body);
+  border-radius: 50%; font-weight: 700; font-size: var(--text-xs);
+  flex-shrink: 0;
+}
+.text-quote { font-size: var(--text-sm); font-style: italic; }
+
+/* Hero: insignia de disponibilidad y tarjeta flotante */
+.hero-avail-badge {
+  display: inline-flex; align-items: center; gap: .6rem;
+  padding: .5rem 1.2rem; margin-bottom: 1.6rem;
+  font-family: var(--font-family-sans);
+  font-size: var(--text-xs); font-weight: 600; line-height: 1;
+  text-transform: uppercase; letter-spacing: .14em;
+  background: var(--bg-alt); color: var(--ink-muted);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius);
+}
+.hero-avail-badge__dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--primary);
+  animation: lx-pulse 2.4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-avail-badge__dot { animation: none; }
+}
+
+/* ── Fake h1: el claim grande se comporta 100% como un h1 real ── */
+.hero-title {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(4rem, 7vw, 8rem);
+  line-height: .95;
+  letter-spacing: -.038em;
+  color: var(--ink-body);
+  margin: 0;
+}
+.hero-title.tinted { color: #55534E; }  /* hex dedicado — JAMÁS opacity */
+.hero-title.color  { color: var(--ink-primary); }
+.hero-title em { font-style: italic; color: var(--ink-primary); }
+.bg-dark .hero-title { color: var(--ink-title-on-dark); }
+.bg-dark .hero-title.tinted { color: rgba(245,239,230,0.6); }
+
+/* Hero title sobre video/fondo oscuro: compacto, <em> dorado. */
+.hero-title--video {
+  font-size: 3rem;
+  color: var(--ink-body-on-dark);
+}
+.hero-title--video em {
+  font-style: italic;
+  color: var(--ink-primary-on-dark);
+}
+
+@media (min-width: 900px) {
+  .hero-title--video {
+    font-size: 5rem;
+  }
+}
+.bg-dark .tinted { color: rgba(245,239,230,0.6); }
+.bg-dark .tinted.gold { color: var(--ink-primary-on-dark); }
+
+/* ── Micro-texto legal y de navegación: 12px fijo, nunca 11px ── */
+.footer-legal, .crumbs, .table-note, .pricing-note, .cta-note,
+.form__trust, .proof-strip__label, .inline-stat__label {
+  font-size: 1.2rem;
+}
+
+/* MOBILE FIRST: las tarjetas flotantes se apilan bajo la imagen; solo a */
+.hero-col-img { position: relative; }
+

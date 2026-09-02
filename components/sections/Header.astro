@@ -1,0 +1,260 @@
+---
+// Cabecera con menú móvil y popup de formulario — cero JavaScript.
+//
+// Dos trucos, ninguno con JS:
+//   · El menú es `input:checked ~ .nav-center` (casilla oculta + label).
+//   · El popup de "Agenda tu cita" es el MISMO `.lightbox:target` que la
+//     galería. Una clase, dos componentes.
+import ContactForm from '../ContactForm.astro';
+import { site, PRIMARY_CTA, MENU_LINKS, TOPBAR, whatsappHref } from '@agenciaweb/kit-site';
+
+interface Props {
+  /**
+   * Las dos barras del sitio, y la diferencia es de intención, no de estilo:
+   *
+   *   'money' — página a la que se paga tráfico. CERO enlaces: cada uno es
+   *             una salida de la página por la que ya se pagó. A cambio
+   *             lleva la línea de confianza arriba (teléfono,"desde 2019").
+   *   'seo'   — página que se alcanza por búsqueda. Cuatro enlaces reales,
+   *             porque aquí el visitante llega frío y hay que dejarle
+   *             recorrer el sitio.
+   *
+   * `links` y `topbar` siguen existiendo para casos sueltos: si se pasan,
+   * mandan sobre la variante.
+   */
+  variant?: 'money' | 'seo';
+  links?: { href: string; text: string }[];
+  cta?: string;
+  ratingText?: string;
+  topbar?: string[];
+}
+
+const {
+  variant = 'seo',
+  cta = PRIMARY_CTA,
+  // El default de antes ("500+ 5 Star Reviews") contradecía la cifra real
+  // que sale en el resto del sitio y en el JSON-LD.
+  ratingText = `${site.rating.value}/5 from ${Number(site.rating.count).toLocaleString('en-US')} reviews`,
+} = Astro.props;
+
+const links = Astro.props.links ?? (variant === 'money' ? [] : MENU_LINKS);
+const topbar = Astro.props.topbar ?? (variant === 'money' ? TOPBAR : undefined);
+---
+
+{topbar && topbar.length > 0 && (
+  <div class="topbar">
+    <div class="container topbar__inner">
+      {topbar.map((t) => <span>{t}</span>)}
+    </div>
+  </div>
+)}
+
+<header class="nav">
+  <div class="container nav__inner">
+    {/* La marca es el logotipo, no el nombre en texto. La barra ahora es
+        --brand-ink, así que va la versión para fondo oscuro — y con fondo
+        TRANSPARENTE, sin el rectángulo pegado que traía el PNG anterior.
+        width/height reales del archivo para que el navegador reserve el
+        hueco y la cabecera no salte al cargar. */}
+    <a href="/" class="nav__brand">
+      <img
+        src="/logo-a4-dark.png"
+        alt={site.name}
+        width="520"
+        height="147"
+        decoding="sync"
+      />
+    </a>
+
+    {links.length > 0 && (
+      <>
+        <input type="checkbox" id="nav-toggle" class="nav-toggle" aria-label="Open menu" />
+        <label for="nav-toggle" class="nav-toggle-label" aria-hidden="true"><span></span></label>
+
+        <nav class="nav-center" aria-label="Main">
+          <ul>
+            {links.map((l) => <li><a href={l.href}>{l.text}</a></li>)}
+          </ul>
+        </nav>
+      </>
+    )}
+
+    {/* Sello de reputación: columna propia entre el menú y el CTA (desktop). */}
+    <div class="nav-rating" aria-label={`Top rated team in Mexico, ${ratingText}`}>
+      <span class="nav-rating__stars" aria-hidden="true">★★★★★</span>
+      <span class="nav-rating__text">
+        <strong>TOP RATED team in Mexico</strong>
+        <span>{ratingText}</span>
+      </span>
+    </div>
+    {/* Sin .pill: la barra es la pieza más compacta del sitio y el botón
+        grande no cabe. El radio lo pone .button (--radius). */}
+    <a href="#form-popup" class="button primary nav__cta">{cta}</a>
+  </div>
+</header>
+
+{/* El popup: mismo mecanismo que el lightbox de la galería. */}
+<div class="lightbox" id="form-popup">
+  <a href="#!" class="lightbox-close" aria-label="Close">&times;</a>
+  <div class="lightbox__panel">
+    <h2 class="popup-title">{cta}</h2>
+    <p class="popup-sub">We'll contact you by WhatsApp within 24 hours.</p>
+    <ContactForm formId="popup" cta={cta} />
+    <p class="popup-note text-center">
+      <a href={whatsappHref} target="_blank" rel="noopener" data-wa-cta>or message us on WhatsApp</a>
+    </p>
+  </div>
+</div>
+
+<style>
+  /* Topbar: línea de confianza encima del header (landings SEM).
+     Va en el mismo --brand-ink que la barra de navegación: la guía pide
+     header sólido, y ese par es el de mayor contraste. En --brand-primary-on-dark
+     este texto de 13px se quedaba por debajo de AA. El filete inferior
+     separa las dos franjas sin romper el bloque. */
+  .topbar {
+    background: var(--bg-dark);
+    color: var(--ink-body-on-dark);
+    border-bottom: 1px solid rgb(255 255 255 / .14);
+    font-size: 1.3rem;
+    padding-block: .6rem;
+  }
+  .topbar__inner {
+    display: flex; flex-wrap: wrap; justify-content: center;
+    gap: .8rem 2rem;
+  }
+  /*"24/7 Patient Coordinator" — dot verde pulsante de disponible */
+  .topbar__inner > span:last-child {
+    display: inline-flex;
+    align-items: center;
+    gap: .6rem;
+  }
+  .topbar__inner > span:last-child::before {
+    content: '';
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--color-whatsapp);
+    box-shadow: 0 0 0 2px var(--ink-body-on-dark);
+    flex-shrink: 0;
+    animation: lx-pulse 2.4s ease-in-out infinite;
+  }
+
+  /* MOBILE FIRST: el menú está oculto y se despliega con la casilla. A 900px
+     se convierte en barra horizontal y el botón hamburguesa desaparece. */
+  .nav {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--bg-dark);
+    border-bottom: 1px solid rgb(255 255 255 / .12);
+    color: var(--ink-body-on-dark);
+  }
+  .nav__inner {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 1.2rem;
+    min-height: 60px;
+    flex-wrap: wrap;
+  }
+  /* La altura la manda el alto, no el ancho: así el logotipo ocupa siempre
+     la misma franja de la barra aunque cambie la proporción del archivo. */
+  .nav__brand { display: flex; align-items: center; flex-shrink: 0; }
+  .nav__brand img { display: block; width: auto; height: 34px; }
+  .nav-toggle { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  .nav-toggle-label {
+    order: 2;
+    width: 44px; height: 44px;
+    display: grid; place-items: center;
+    cursor: pointer;
+  }
+  .nav-toggle-label span,
+  .nav-toggle-label span::before,
+  .nav-toggle-label span::after {
+    content: ''; display: block;
+    width: 22px; height: 2px;
+    background: var(--ink-body-on-dark);
+    position: relative;
+  }
+  .nav-toggle-label span::before { position: absolute; top: -7px; }
+  .nav-toggle-label span::after  { position: absolute; top: 7px; }
+
+  .nav-center { display: none; order: 4; width: 100%; }
+  .nav-toggle:checked ~ .nav-center { display: block; }
+  .nav-center ul { list-style: none; margin: 0; padding: 0 0 1.2rem; }
+  .nav-center a {
+    display: block; padding: 1rem 0;
+    color: var(--ink-body-on-dark); font-weight: 500;
+    border-bottom: 1px solid rgb(255 255 255 / .14);
+  }
+  .nav-center li:last-child a { border-bottom: 0; }
+  /* min-height 44px lo hereda de .button (objetivo táctil); el padding
+     lateral es lo único que se aprieta. El centrado vertical ya no depende
+     del padding: .button es inline-flex. */
+  .nav__cta {
+    order: 3;
+    padding-inline: 2rem;
+    font-size: 1.4rem;
+    white-space: nowrap;
+  }
+
+  /* Sello de reputación: oculto en móvil (el caso base), visible ≥900px. */
+  .nav-rating {
+    display: none;
+    align-items: center;
+    gap: .8rem;
+    margin-right: 1.2rem;
+  }
+  .nav-rating__stars {
+    color: var(--color-star);
+    font-size: 1.4rem;
+    letter-spacing: .08em;
+    line-height: 1;
+  }
+  .nav-rating__text { display: grid; line-height: 1.2; }
+  .nav-rating__text strong {
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
+  /* El gris del sistema (#6B6B6B) es para fondo claro: sobre el verde
+     profundo cae a 1.5:1. Aquí manda la tinta clara al 72%. */
+  .nav-rating__text span {
+    font-size: 1.1rem;
+    color: rgb(255 255 255 / .72);
+  }
+
+  /* Popup del formulario: encabezado, subtítulo y nota legal. */
+  .popup-title {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    line-height: 1.3;
+    font-weight: 400;
+    margin: .35em 0 1.6rem;
+  }
+  .popup-sub {
+    font-size: 1.4rem;
+    color: var(--ink-muted);
+    margin: 0 0 1.6rem;
+  }
+  .popup-note {
+    font-size: 1.1rem;
+    margin-top: 1.6rem;
+  }
+
+  .nav-toggle:focus-visible ~ .nav-toggle-label {
+    outline: 2px solid var(--ink-body-on-dark); outline-offset: 2px;
+  }
+
+  @media (min-width: 900px) {
+    .nav__brand img { height: 42px; }
+    .nav-toggle-label { display: none; }
+    .nav-center { display: block; order: 2; width: auto; }
+    .nav-center ul { display: flex; gap: 2.4rem; padding: 0; }
+    .nav-center a { padding: 0; border-bottom: 0; }
+    .nav-rating { order: 3; display: flex; }
+    .nav__cta { order: 4; }
+    /* 4 columnas en una sola línea: brand · menú · rating · CTA */
+    .nav__inner { flex-wrap: nowrap; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .topbar__inner > span:last-child::before { animation: none; }
+  }
+</style>

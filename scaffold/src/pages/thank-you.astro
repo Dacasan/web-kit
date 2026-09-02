@@ -1,0 +1,20 @@
+---
+import BaseLayout from '@agenciaweb/kit/layouts/BaseLayout.astro';
+import Section from '@agenciaweb/kit/components/Section.astro';
+import Card from '@agenciaweb/kit/components/blocks/Card.astro';
+import Text from '@agenciaweb/kit/components/blocks/Text.astro';
+import '../styles/index.css';
+---
+
+<BaseLayout title="Gracias — recibimos tu solicitud" description="Tu solicitud fue recibida." noindex>
+  <Section>
+    <div class="row">
+      <div class="col-12">
+        <Card>
+          <Text kind="h1">Thank you</Text>
+          <Text>[BRAND] Confirmación de lead. La conversión se cuenta AQUÍ, no en el submit (SITIO.md §2).</Text>
+        </Card>
+      </div>
+    </div>
+  </Section>
+</BaseLayout>

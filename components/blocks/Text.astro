@@ -1,0 +1,35 @@
+---
+// Text — titular y texto. El átomo más usado del sitio.
+//
+// No trae ni una línea de CSS propio: el titular usa la escala de h1-h3 de
+// la capa base y el párrafo la clase .text-body que ya existe. La separación
+// entre los dos sale del margen de .7em que la capa base da a los
+// encabezados. Nada que mantener.
+interface Props {
+  /** Titular. Admite <em> — el italic turquesa es un recurso de marca. */
+  title?: string;
+  /** h1, h2 o h3. El 1 solo en el hero: un documento tiene un solo h1. */
+  level?: 1 | 2 | 3;
+  /** Párrafo. Admite <strong>/<em>. */
+  text?: string;
+  /** Alineación. Sin valor, hereda la de la sección. */
+  align?: 'left' | 'center' | 'right';
+  /** Texto claro: el bloque vive sobre fondo oscuro. */
+  onDark?: boolean;
+  class?: string;
+}
+
+const ALIGN = { left: 'text-left', center: 'text-center', right: 'text-right' } as const;
+
+const { title, level = 2, text, align, onDark = false, class: cls } = Astro.props;
+
+const Heading = `h${level}` as 'h1' | 'h2' | 'h3';
+---
+
+<div class:list={[align && ALIGN[align], cls]}>
+  {title && <Heading set:html={title} />}
+  {text && <p class:list={['text-body', onDark && 'text-white']} set:html={text} />}
+  {/* Para un botón, una lista o cualquier cosa que no sea el párrafo.
+      Los botones son clases del sistema: <a class="button primary pill">. */}
+  <slot />
+</div>

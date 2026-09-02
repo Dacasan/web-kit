@@ -1,0 +1,9 @@
+/* Estilos del demo del kit: los defaults del kit, sin capa de marca. */
+@layer reset, tokens, base, layout, components, utilities;
+
+@import '../../../styles/01-reset.css' layer(reset);
+@import '../../../styles/tokens.css' layer(tokens);
+@import '../../../styles/03-base.css' layer(base);
+@import '../../../styles/04-layout.css' layer(layout);
+@import '../../../styles/05-components.css' layer(components);
+@import '../../../styles/07-motion.css';

@@ -1,0 +1,419 @@
+---
+// HeroVideo — hero a pantalla completa con vídeo de fondo AUTOPLAY.
+//
+// VÍDEO PROPIO, NO YOUTUBE. Y eso es la mitad del componente.
+// ════════════════════════════════════════════════════════════════
+// La versión con YouTube arrastraba cuatro fallos que ya no existen:
+//
+//   1. god.js (el script del CRM) tiene un `wireHeroVideo` que busca
+//      `[data-hero-video]` y le pasa el nodo a `new YT.Player(el)`. La
+//      IFrame API SUSTITUYE el elemento que le das: se llevaba por delante
+//      el frame y el póster, y el iframe resultante nacía sin el
+//      `data-astro-cid-*` de Astro, así que ni el CSS le aplicaba.
+//      → Sin iframe no hay nada que secuestrar. Aun así los ganchos se
+//        llaman `data-bg-*` y NO deben renombrarse a `data-hero-*`.
+//   2. El autoplay dependía de que YouTube lo concediera.
+//   3. ~540 KB y 8+ conexiones a Google compitiendo con el LCP.
+//   4. Los bloqueadores cortan el embed y el hero se quedaba vacío.
+//
+// Ahora son dos <video> muted en el marcado. El navegador concede el
+// autoplay silencioso siempre, pesa lo que pese el archivo, y no hay
+// terceros. Es el patrón de letigre.run.
+// ════════════════════════════════════════════════════════════════
+//
+// LA REGLA (la misma que YouTubeLite): MOBILE FIRST.
+// El vídeo BASE es el VERTICAL 9:16. El horizontal es la EXCEPCIÓN de
+// escritorio y solo entra si se declara `srcDesktop`.
+//
+// EL TRUCO DEL LCP
+// ─────────────────────────────────────────────────────────────
+//   · El póster es el LCP: <img fetchpriority="high"> ENCIMA del vídeo.
+//     Es una <img> propia y no el atributo `poster` del <video>: en Mobile
+//     Safari ese atributo se quita al llamar play() ANTES del primer frame
+//     → parpadeo negro.
+//   · `preload="none"`: el <video> está en el marcado pero no descarga un
+//     byte hasta que el script llama a play(), ya pasado el LCP.
+//   · El póster se oculta SOLO con frame real —`requestVideoFrameCallback`
+//     cuando existe, si no el evento `playing`.
+//   · Si el archivo falta o el autoplay se bloquea, el póster se queda y
+//     el hero sigue siendo correcto. Nunca hay hueco negro.
+//   · Con saveData / 2g / prefers-reduced-motion ni se intenta.
+//   · En pestaña oculta se pausa: gastar batería para nadie no tiene
+//     sentido.
+//
+// Patrón de encabezado (decidido con el dueño):
+//   - El H1 real es la chapita "Now accepting patients"
+//   - El claim grande es un <p class="hero-title">, no un heading
+import HalftoneFade from '../HalftoneFade.astro';
+import { site, PRIMARY_CTA, whatsappHref } from '@agenciaweb/kit-site';
+
+interface Props {
+  /**
+   * Vídeo VERTICAL (móvil) — el base. Ruta bajo /public, SIN extensión.
+   *   src="/video/hero"  →  /video/hero.webm  +  /video/hero.mp4
+   * Si no existe el archivo, se queda el póster. No rompe nada.
+   */
+  src?: string;
+  /** Vídeo HORIZONTAL (escritorio). Opcional; si falta se usa el vertical. */
+  srcDesktop?: string;
+  /** Póster vertical (móvil). ES EL LCP: que sea WebP y local. */
+  poster?: string;
+  /** Póster horizontal (escritorio). Si falta se usa el vertical. */
+  posterDesktop?: string;
+  /** H1 real (chapita) */
+  badge?: string;
+  /** Claim visible — es un <p> bold, no un encabezado. */
+  displayTitle?: string;
+  subtitle?: string;
+}
+
+const {
+  src = site.heroVideo.mobile,
+  srcDesktop = site.heroVideo.desktop,
+  poster = site.heroVideo.poster,
+  posterDesktop = site.heroVideo.posterDesktop,
+  badge = 'Now accepting patients',
+  displayTitle = 'Fixed teeth in one day. All-on-4 dental implants.',
+  subtitle = 'A full arch of permanent-looking teeth on just 4 implants. Free consultation with 3D scan and written plan.',
+} = Astro.props;
+
+// El breakpoint estructural único del sistema.
+const BP = 900;
+
+const stripExt = (p: string) => p.replace(/\.(mp4|webm)$/i, '');
+const base = stripExt(src);
+// ¿Hay pieza horizontal de verdad? Gobierna la proporción del recorte en
+// escritorio. Sin ella, escritorio reutiliza el vertical Y MANTIENE 9:16:
+// recortar un vertical con matemática de 16:9 dejaría bandas.
+const hasDesktop = Boolean(srcDesktop) && stripExt(srcDesktop) !== base;
+const wide = hasDesktop ? stripExt(srcDesktop) : base;
+
+// <source> mobile-first. El navegador elige con `media` — cero JavaScript
+// en la selección. webm primero (pesa menos), mp4 como red de seguridad.
+const sources = [
+  ...(hasDesktop
+    ? [
+        { src: `${wide}.webm`, type: 'video/webm', media: `(min-width: ${BP}px)` },
+        { src: `${wide}.mp4`, type: 'video/mp4', media: `(min-width: ${BP}px)` },
+      ]
+    : []),
+  { src: `${base}.webm`, type: 'video/webm', media: undefined },
+  { src: `${base}.mp4`, type: 'video/mp4', media: undefined },
+];
+
+const posterWide = posterDesktop || poster;
+const stats = site.proof.slice(0, 3);
+---
+
+<header id="home" class="hero-video" itemscope itemtype="https://schema.org/WPHeader">
+  {/* Fondo. El póster va ENCIMA del vídeo y es el LCP.
+      Ganchos `data-bg-*` — ver el aviso de arriba sobre god.js. */}
+  <div class="hero-video__media" aria-hidden="true" data-bg-video data-bg-has-desktop={hasDesktop ? '' : undefined}>
+    <div class="hero-video__frame">
+      <video muted loop playsinline preload="none" tabindex="-1" data-bg-el>
+        {sources.map((s) => <source src={s.src} type={s.type} media={s.media} />)}
+      </video>
+    </div>
+
+    <picture class="hero-video__poster" data-bg-poster>
+      {posterWide !== poster && (
+        <source media={`(min-width: ${BP}px)`} srcset={posterWide} />
+      )}
+      <img src={poster} alt="" fetchpriority="high" decoding="async" draggable="false" />
+    </picture>
+  </div>
+
+  {/* Tramado de puntos que disuelve el vídeo en el fondo sólido.
+      Aquí SÍ va el hex literal y no var(--bg-dark): el color entra
+      dentro de un <svg> serializado en un data: URI, y ahí una custom
+      property no se resuelve — saldría el atributo fill="var(...)" tal cual
+      y los puntos se pintarían negros. Debe seguir a --bg-dark. */}
+  <HalftoneFade direction="bottom" color="#101010" class="hero-video__fade" />
+
+  <div class="container hero-video__content">
+    {/* H1 real: la chapita de disponibilidad, con su dot pulsante. */}
+    <h1 class="hero-avail-badge" itemprop="headline">
+      <span class="hero-avail-badge__dot" aria-hidden="true"></span>
+      {badge}
+    </h1>
+
+    {/* El claim visible NO es un encabezado: <p> con .hero-title (4rem→7rem,
+        tinta blanca sobre fondo oscuro — lo da la capa de componentes). */}
+    <p class="hero-title hero-title--video">{displayTitle}</p>
+    <p class="lead hero-video__lead">{subtitle}</p>
+
+    <div class="btn-row hero-video__btn-row">
+      <a href="#consulta" class="button accent pill">{PRIMARY_CTA}</a>
+      <a href={whatsappHref} class="button outline pill" target="_blank" rel="noopener" data-wa-cta>
+        WhatsApp
+      </a>
+    </div>
+
+    {/* Datos clave del tratamiento: dl con borde superior. */}
+    <dl class="hero-video__stats">
+      {stats.map((p) => (
+        <div class="hero-video__stat">
+          <dt class="hero-video__stat-label">{p.label}</dt>
+          <dd class="hero-video__stat-value">{p.num}</dd>
+        </div>
+      ))}
+    </dl>
+  </div>
+</header>
+
+<script>
+  // ══════════════════════════════════════════════════════════════
+  // Arranque del vídeo de fondo. ~40 líneas, sin terceros.
+  // Orden: primer pintado → load → idle → play(). El póster (LCP) ya
+  // está pintado antes de que esto pida un solo byte.
+  // ══════════════════════════════════════════════════════════════
+
+  type Conn = { saveData?: boolean; effectiveType?: string };
+  type FrameVideo = HTMLVideoElement & {
+    requestVideoFrameCallback?: (cb: () => void) => number;
+  };
+
+  function shouldSkip(): boolean {
+    // Sin animación, sin datos o con red mala: el póster se queda como
+    // imagen fija. Es una decisión de respeto, no una degradación.
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return true;
+    const c = (navigator as Navigator & { connection?: Conn }).connection;
+    if (!c) return false;
+    if (c.saveData) return true;
+    return c.effectiveType === 'slow-2g' || c.effectiveType === '2g';
+  }
+
+  function start(media: HTMLElement) {
+    const video = media.querySelector<FrameVideo>('[data-bg-el]');
+    const poster = media.querySelector<HTMLElement>('[data-bg-poster]');
+    if (!video) return;
+
+    if (shouldSkip()) { media.dataset.bgState = 'poster'; return; }
+    media.dataset.bgState = 'starting';
+
+    // El póster se va SOLO con frame real. requestVideoFrameCallback
+    // dispara cuando hay un fotograma compuesto de verdad; `playing` solo
+    // dice que arrancó, que en Safari es antes de tener imagen.
+    const reveal = () => {
+      if (poster) poster.hidden = true;
+      media.dataset.bgState = 'playing';
+    };
+    if (typeof video.requestVideoFrameCallback === 'function') {
+      video.requestVideoFrameCallback(() => requestAnimationFrame(reveal));
+    } else {
+      video.addEventListener('playing', () => requestAnimationFrame(reveal), { once: true });
+    }
+    // Falta el archivo o formato no soportado: se queda el póster.
+    video.addEventListener('error', () => { media.dataset.bgState = 'failed'; }, { once: true });
+
+    video.preload = 'auto';
+    // Autoplay bloqueado: se queda el póster. No se insiste.
+    void video.play().catch(() => { media.dataset.bgState = 'blocked'; });
+
+    // Un fondo corriendo en una pestaña que nadie mira solo gasta batería.
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) video.pause();
+      else if (media.dataset.bgState === 'playing') void video.play().catch(() => {});
+    });
+  }
+
+  function boot() {
+    document.querySelectorAll<HTMLElement>('[data-bg-video]').forEach((media) => {
+      if (!media.dataset.bgState) start(media);
+    });
+  }
+
+  // Después del primer pintado Y del load: el vídeo jamás compite con el
+  // LCP. `requestIdleCallback` con techo por si el hilo nunca queda libre.
+  const idle = (fn: () => void) =>
+    'requestIdleCallback' in window
+      ? (window as Window & { requestIdleCallback: (cb: () => void, o?: { timeout: number }) => void })
+          .requestIdleCallback(fn, { timeout: 2500 })
+      : setTimeout(fn, 300);
+
+  if (document.readyState === 'complete') idle(boot);
+  else window.addEventListener('load', () => idle(boot), { once: true });
+</script>
+
+<style>
+  .hero-video {
+    position: relative;
+    isolation: isolate;
+    min-height: 100svh;
+    overflow: hidden;
+    /* Token, no hex suelto: el mismo negro que .bg-dark y section--cta. */
+    background: var(--bg-dark);
+    color: var(--ink-body-on-dark);
+  }
+
+  /* ── Fondo: media (vídeo + póster) ──
+     Pila explícita y positiva: media 0 · tramado 1 · contenido 2. */
+  .hero-video__media {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .hero-video__frame {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+
+    /* ── MOBILE FIRST: el vídeo base es VERTICAL ──
+       Misma regla que .youtube-video en 05-components.css. Solo pasa a
+       horizontal en escritorio y SOLO si hay pieza horizontal declarada;
+       si no la hay, escritorio reutiliza el vertical y debe seguir
+       recortándolo con 9:16 o saldrían bandas a los lados.
+
+       OJO con el calc(): tiene que ir DENTRO de la variable. Si se
+       escribiera `--cover-ratio: 9 / 16` (como `--frame`), la división de
+       más abajo se expandiría a `100vw / 9 / 16` — dividir dos veces— en
+       vez de multiplicar por 16/9, y el alto saldría 144 veces menor. */
+    --cover-ratio: calc(9 / 16);
+  }
+  @media (min-width: 900px) {
+    .hero-video__media[data-bg-has-desktop] .hero-video__frame {
+      --cover-ratio: calc(16 / 9);
+    }
+  }
+
+  /* Cover real: el vídeo se escala al menor tamaño que cubre la pantalla y
+     se centra; lo que sobra lo recorta el overflow del frame.
+     `object-fit: cover` por sí solo no basta cuando el vídeo y la pantalla
+     tienen proporciones muy distintas y el elemento mide 100%: esta
+     matemática garantiza que SIEMPRE cubre, sin bandas. */
+  .hero-video__frame > video {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: max(100vw, calc(100svh * var(--cover-ratio)));
+    height: max(100svh, calc(100vw / var(--cover-ratio)));
+    border: 0;
+    object-fit: cover;
+    pointer-events: none;
+    background: transparent;
+  }
+
+  /* El póster: LCP, encima del vídeo hasta que haya frame real. */
+  .hero-video__poster {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+  /* `hidden` en un <picture> necesita ayuda: la capa base le da
+     `display:block` y ganaría al display:none del atributo. */
+  .hero-video__poster[hidden] {
+    display: none;
+  }
+  .hero-video__poster img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* ── Velos de legibilidad ──
+     La primitiva --veil del sistema (la de .card--veil), aplicada en los
+     pseudo-elementos del contenedor de medios. Dos <div> menos en el DOM
+     y el gradiente deja de estar escrito a mano con el hex repetido. */
+  .hero-video__media::before,
+  .hero-video__media::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background: var(--veil);
+  }
+  .hero-video__media::before {
+    --veil: linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--bg-dark) 75%, transparent),
+      color-mix(in srgb, var(--bg-dark) 35%, transparent),
+      transparent
+    );
+  }
+  .hero-video__media::after {
+    --veil: linear-gradient(
+      to right,
+      color-mix(in srgb, var(--bg-dark) 80%, transparent),
+      color-mix(in srgb, var(--bg-dark) 25%, transparent),
+      transparent
+    );
+  }
+
+  /* Tramado de puntos: ocupa el 80% inferior, se disuelve en el token. */
+  .hero-video__fade {
+    z-index: 1;
+    height: 80%;
+  }
+
+  /* ── Contenido ── */
+  .hero-video__content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 100svh;
+    /* --hero-y es el ritmo vertical del sistema. --space-8 no existe en
+       02-tokens.css: el valor real siempre era el literal del fallback. */
+    padding-block: var(--hero-y);
+  }
+
+  /* El H1 real sobre vídeo: normalizar el reset base que da margen y
+     letter-spacing de h1 genérico. La tipografía la hereda de
+     .hero-avail-badge (05-components.css). */
+  .hero-video h1.hero-avail-badge {
+    margin: 0 0 1.6rem;
+    letter-spacing: 0;
+  }
+
+  .hero-video__lead {
+    max-width: 44ch;
+    margin-top: 1.6rem;
+    margin-bottom: 2.4rem;
+    color: rgb(255 255 255 / 0.65);
+  }
+
+  .hero-video__btn-row {
+    justify-content: flex-start;
+  }
+  /* Botón outline sobre vídeo: filete sutil y tinta blanca. El hover lo
+     gobierna el sistema: dorado, como todos los botones del sitio. */
+  .hero-video .button.outline {
+    border-color: rgb(255 255 255 / 0.35);
+    color: var(--ink-body-on-dark);
+  }
+
+  /* ── Stats (dl con borde superior) ── */
+  .hero-video__stats {
+    display: grid;
+    grid-template-columns: repeat(2, auto);
+    gap: 2rem 2.8rem;
+    margin: 3.2rem 0 0;
+    padding-top: 2rem;
+    border-top: 2px solid rgb(255 255 255 / 0.25);
+  }
+  .hero-video__stat {
+    display: flex;
+    flex-direction: column;
+  }
+  .hero-video__stat-label {
+    font-size: var(--text-xs);
+    color: rgb(255 255 255 / 0.45);
+  }
+  .hero-video__stat-value {
+    margin: 0;
+    font-size: var(--text-2xl);
+    font-weight: 800;
+    line-height: 1;
+    color: var(--ink-body-on-dark);
+  }
+
+  @media (min-width: 900px) {
+    .hero-video__stats {
+      grid-template-columns: repeat(3, auto);
+    }
+  }
+</style>

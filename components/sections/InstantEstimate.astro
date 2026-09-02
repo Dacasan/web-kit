@@ -1,0 +1,329 @@
+---
+// InstantEstimate — el formulario largo: cuestionario + datos.
+//
+// Mismo bloque de datos que el resto del sitio (ContactFields.astro) más las
+// cuatro preguntas que hacen falta para poner una cifra: arcadas, situación,
+// hueso y cuándo quiere viajar, con el presupuesto de EE. UU. que convierte
+// el ahorro en una resta y no en una promesa.
+//
+// El cuestionario y los datos van dentro del MISMO <form> — un envío, un
+// lead. Por eso los campos vienen de ContactFields y no de ContactForm: un
+// <form> no se puede anidar dentro de otro.
+//
+// El estimado YA NO se revela aquí. Se entrega en /thank-you, igual que
+// cualquier otro envío del sitio: un solo camino, una sola página donde se
+// registra la conversión, y el visitante que refresca no pierde el
+// resultado. Las respuestas viajan por sessionStorage (lead-form.ts), nunca
+// por la URL.
+//
+// MOBILE FIRST: una columna; a 900px el cuestionario y la tarjeta de datos
+// se reparten mitad y mitad (.row + .col-6-md, como LeadSection).
+//
+// NADA DE ESTILOS NUEVOS: superficies con .card, botones con .button,
+// pastillas con .badge, campos con .field/.form-label/.form-prefix. El
+// scoped de abajo solo resuelve el estado "opción marcada", que el sistema
+// no tenía.
+import ContactFields from '../ContactFields.astro';
+import { site, PLANS, type ArchKey } from '@agenciaweb/kit-site';
+
+interface ArchOption {
+  value: ArchKey;
+  label: string;
+  /** Segunda línea de la opción. Si falta, se usa el precio del plan. */
+  note?: string;
+}
+
+interface Props {
+  id?: string;
+  /** Sufijo de los id de campo: dos instancias en la página no chocan. */
+  formId?: string;
+  label?: string;
+  title?: string;
+  /** Cola del titular, en cursiva. */
+  titleAccent?: string;
+  sub?: string;
+  cardTitle?: string;
+  cardSub?: string;
+  cta?: string;
+  arches?: ArchOption[];
+  situations?: string[];
+  boneOptions?: string[];
+  timeframes?: string[];
+  fine?: string;
+}
+
+const {
+  id = 'estimate',
+  formId = 'estimate',
+  label = 'Instant estimate',
+  title = 'Quick details for your estimate.',
+  titleAccent = '2 minutes.',
+  sub = 'We use this only to calculate your travel-included cost.',
+  cardTitle = 'Where do we send it?',
+  cardSub = 'We show your estimate on the next page. Private — no spam.',
+  cta = 'See my instant estimate',
+  arches = [
+    { value: 'both', label: 'Both arches', note: 'Upper + lower' },
+    { value: 'upper', label: 'One arch — upper' },
+    { value: 'lower', label: 'One arch — lower' },
+  ],
+  situations = ['Failing teeth', 'Loose dentures', 'Missing all teeth'],
+  boneOptions = ['Severe bone loss', 'Sinus lift needed', 'Not sure'],
+  timeframes = ['In 1–3 months', 'In 3–6 months', 'In 6+ months', 'Just researching'],
+  fine = 'HIPAA-aware intake. Your data is used only for your estimate.',
+} = Astro.props;
+
+const fid = (name: string) => `${formId}-${name}`;
+const usd = (n: number) => `$${n.toLocaleString('en-US')}`;
+
+/** Inicial del apellido para el avatar ("Dr. Ana Torrens " →"T"). */
+const doctorInitial = site.author.name.trim().split(/\s+/).pop()?.charAt(0) ?? '';
+/**"Dr. Ana Torrens " →"Dr. Torrens": en una línea de confianza sobra el nombre. */
+const doctorShort = `Dr. ${site.author.name.trim().split(/\s+/).pop() ?? ''}`;
+
+/** Precio de referencia por arcada del plan destacado (1 viaje). */
+const archNote = (value: ArchKey): string => {
+  const p = PLANS[0]?.price?.[value];
+  return typeof p === 'number' ? usd(p) : '';
+};
+---
+
+<section id={id} class="section">
+  <div class="container">
+    <form
+      id={`lead-form-${formId}`}
+      class="row"
+      data-lead-form
+      data-thank-you="/thank-you"
+      novalidate
+    >
+      <div class="col-6-md">
+        <p class="label">{label}</p>
+        <h2 class="est-title">
+          {title} <em>{titleAccent}</em>
+        </h2>
+        <p class="lead est-sub">{sub}</p>
+
+        {/* Arcadas — la marcada se rellena en oscuro. */}
+        <fieldset class="est-fieldset">
+          <legend class="form-label est-legend">How many arches?</legend>
+          {/* MOBILE FIRST: apiladas; la fila de tres es la excepción de 900px.
+              --cols lo pone el scoped, no el atributo style: un style inline
+              le ganaría al media query y la fila nunca se abriría. */}
+          <div class="grid est-arches">
+            {arches.map((a, i) => (
+              <label class="card est-opt est-opt--fill">
+                <input
+                  type="radio"
+                  name="arches"
+                  value={a.value}
+                  checked={i === 0}
+                  class="est-opt__input"
+                />
+                <span class="est-opt__label">{a.label}</span>
+                <span class="est-opt__note">{a.note ?? archNote(a.value)}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
+        {/* Situación — lista apilada con punto de radio visible. */}
+        <fieldset class="est-fieldset">
+          <legend class="form-label est-legend">Current situation?</legend>
+          <div class="est-stack">
+            {situations.map((s, i) => (
+              <label class="card est-opt">
+                <input
+                  type="radio"
+                  name="situation"
+                  value={s}
+                  checked={i === 0}
+                  class="est-opt__input"
+                />
+                <span class="est-opt__dot" aria-hidden="true"></span>
+                <span class="est-opt__label">{s}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
+        {/* Pérdida ósea — chips de selección múltiple sobre .badge. */}
+        <fieldset class="est-fieldset">
+          <legend class="form-label est-legend">Bone loss?</legend>
+          <div class="est-chips">
+            {boneOptions.map((b) => (
+              <label class="badge est-chip">
+                <input type="checkbox" name="bone" value={b} class="est-opt__input" />
+                <span>{b}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
+        <div class="row">
+          <div class="col-6-md">
+            <label class="form-label" for={fid('quote')}>Your US quote amount $</label>
+            <div class="form-prefix">
+              <span class="badge form-prefix__sign" aria-hidden="true">$</span>
+              <input
+                id={fid('quote')}
+                name="us_quote"
+                type="text"
+                inputmode="numeric"
+                autocomplete="off"
+                maxlength="9"
+                placeholder="56000"
+              />
+            </div>
+          </div>
+          <div class="col-6-md">
+            <label class="form-label" for={fid('timeframe')}>When would you like to travel?</label>
+            <select id={fid('timeframe')} name="timeframe">
+              <option value="">Select timeframe</option>
+              {timeframes.map((t) => <option value={t}>{t}</option>)}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* Tarjeta de datos: el estimado se entrega a cambio de esto. */}
+      <div class="col-6-md">
+        <div class="card">
+          <h3 class="est-card-title">{cardTitle}</h3>
+          <p class="est-card-sub text-grey">{cardSub}</p>
+
+          <ContactFields
+            formId={formId}
+            selectLabel="Treatment"
+          />
+
+          <button type="submit" class="button primary">{cta}</button>
+
+          <div class="est-sep"></div>
+          <p class="est-micro">Secure preview · Takes 30s · No credit card</p>
+          <p class="est-doctor">
+            <span class="circle" aria-hidden="true">{doctorInitial}</span>
+            <span><strong>{doctorShort}</strong> review included · Response in 2h</span>
+          </p>
+        </div>
+        <p class="est-fine text-grey">{fine}</p>
+      </div>
+    </form>
+  </div>
+</section>
+
+<style>
+  /* ── Titular ── */
+  .est-title { margin-top: 0; }
+  .est-sub { margin-bottom: 3.2rem; max-width: 38ch; }
+
+  /* ── Cuestionario ── */
+  /* min-width: 0 — el fieldset trae min-inline-size: min-content del
+     navegador y desborda la rejilla en pantallas estrechas. */
+  .est-fieldset { border: 0; padding: 0; margin: 0 0 2.4rem; min-width: 0; }
+  .est-legend { padding: 0; }
+  .est-stack { display: grid; gap: .8rem; }
+  .est-arches { --cols: 1; align-items: stretch; }
+
+  /* Opción = etiqueta con radio dentro. El radio real se queda para el
+     teclado y los lectores de pantalla; lo que se ve es la caja.
+     Superficie, filete, radio y el hover dorado los pone `card card--link`
+     en el marcado: aquí solo queda la maqueta de la fila y el estado
+     marcado. Antes esto redeclaraba fondo, borde y radio por su cuenta —
+     tres propiedades copiadas del sistema que ya iban por libre. */
+  .est-opt {
+    position: relative;   /* el radio oculto se queda dentro de su caja */
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-height: 48px;
+    padding: 1.2rem 1.6rem;
+    margin: 0;
+    font-weight: 400;
+    cursor: pointer;
+    transition: border-color .15s ease, background .15s ease, color .15s ease;
+  }
+  /* El control real sigue ahí para teclado y lector de pantalla; lo que se
+     ve es la caja. El anillo de foco se traslada a la caja. */
+  .est-opt__input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  .est-opt:has(.est-opt__input:focus-visible),
+  .est-chip:has(.est-opt__input:focus-visible) {
+    outline: 2px solid var(--border-field);
+    outline-offset: 3px;
+  }
+  .est-opt__label { font-size: var(--text-sm); }
+  .est-opt__note {
+    margin-left: auto;
+    font-size: var(--text-xs);
+    color: var(--ink-muted);
+  }
+
+  /* Punto de radio dibujado (lista de situación). */
+  .est-opt__dot {
+    width: 20px; height: 20px;
+    flex-shrink: 0;
+    border: 1px solid var(--ink-muted);
+    border-radius: 50%;
+  }
+  /* Marcada = filete dorado doblado. Antes era negro sobre negro (borde +
+     inset del mismo color), que se leía como un 2px de reja y era justo lo
+     que hacía pesado el formulario. El dorado dice lo mismo sin gritar, y
+     es el mismo color con el que responde todo lo pulsable del sitio. */
+  .est-opt:has(.est-opt__input:checked) {
+    border-color: var(--primary);
+    box-shadow: inset 0 0 0 1px var(--primary);
+  }
+  .est-opt:has(.est-opt__input:checked) .est-opt__dot {
+    background:
+      radial-gradient(circle at center, var(--ink-strong) 0 4px, transparent 5px);
+  }
+
+  /* Variante rellena: la arcada elegida se pinta en oscuro. */
+  .est-opt--fill { align-items: flex-start; flex-direction: column; gap: .4rem; }
+  .est-opt--fill .est-opt__note { margin-left: 0; }
+  .est-opt--fill:has(.est-opt__input:checked) {
+    background: var(--bg-dark);
+    border-color: var(--bg-dark);
+    color: var(--ink-body-on-dark);
+    box-shadow: none;
+  }
+  .est-opt--fill:has(.est-opt__input:checked) .est-opt__note { color: var(--ink-title-on-dark); }
+
+  /* Chips de pérdida ósea, sobre .badge. */
+  .est-chips { display: flex; flex-wrap: wrap; gap: .8rem; }
+  .est-chip {
+    position: relative;
+    margin: 0;
+    font-weight: 400;
+    cursor: pointer;
+    transition: background .15s ease, color .15s ease, border-color .15s ease;
+  }
+  .est-chip:has(.est-opt__input:checked) {
+    background: var(--bg-dark);
+    border-color: var(--bg-dark);
+    color: var(--ink-body-on-dark);
+  }
+
+  /* ── Tarjeta de datos ── */
+  .est-card-title { margin: 0 0 .8rem; font-size: var(--text-2xl); }
+  .est-card-sub { font-size: var(--text-sm); margin-bottom: 2.4rem; }
+  .est-sep { border-top: 1px solid var(--border-hairline); margin: 2.4rem 0 1.2rem; }
+  .est-micro { margin: 0; font-size: var(--text-xs); color: var(--ink-muted); }
+  .est-doctor {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 1.2rem 0 0;
+    font-size: var(--text-xs);
+    color: var(--ink-muted);
+  }
+  .est-fine { margin: 1.2rem 0 0; font-size: var(--text-xs); }
+
+  @media (min-width: 900px) {
+    .est-arches { --cols: 3; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .est-opt, .est-chip { transition: none; }
+  }
+</style>

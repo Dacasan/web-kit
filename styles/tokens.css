@@ -1,0 +1,118 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   TOKENS DEL KIT (skill §3.2)
+
+   DOS NIVELES, y la diferencia importa:
+
+   1. PRIMITIVAS de marca (--brand-*). Los 7 colores y 2 familias que hacen
+      que un sitio se vea como SU cliente. Aquí van con valores neutros;
+      cada cliente los sobrescribe en su brand.css y no toca nada más.
+
+   2. TOKENS SEMÁNTICOS. Todo lo demás. Derivan de las primitivas con
+      var(--brand-x, fallback), así que un cliente que cambia --brand-dark
+      cambia de golpe el fondo oscuro, el CTA, la tinta, la tarjeta y el
+      velo. Antes eran 5 valores sueltos que había que acertar uno por uno.
+
+   Cambiar un token semántico aquí afecta a TODOS los sitios: eso es el
+   punto del kit. Cambiar una primitiva es cosa del cliente, en su repo.
+   ═══════════════════════════════════════════════════════════════════════ */
+:root {
+  /* ── 1. PRIMITIVAS — lo único que un cliente sobrescribe ────────────── */
+  --brand-dark:            #1A1A1A;  /* 60% · fondos oscuros, tinta del cuerpo, bordes, velo */
+  --brand-light:           #FFFFFF;  /* fondo de página, superficies, tinta sobre oscuro */
+  --brand-neutral:         #F0EDE5;  /* franja alterna: el segundo fondo claro */
+  --brand-primary:         #2F6F6B;  /* 30% · el color de la marca: superficies y filetes */
+  --brand-primary-strong:  #245551;  /* el primario que aguanta texto SOBRE claro · >=4.5:1 */
+  --brand-primary-on-dark: #4FA9A2;  /* el primario que se lee SOBRE oscuro · >=4.5:1 */
+  --brand-primary-soft:    #E6EFEE;  /* tinte del primario: superficie suave, títulos sobre oscuro */
+
+  /* EL ACENTO — la jerarquía suprema. Es SUPERFICIE, no tinta: fondo del CTA
+     del hero, del header, del botón que la página existe para que pulses.
+     No tiene que pasar contraste él mismo: lo que debe pasarlo es
+     --ink-on-accent ENCIMA de él (>=4.5:1). Por eso un naranja vivo vale
+     aquí y no valdría como texto.
+     Por defecto = el primario reforzado: sin acento propio, .button.accent
+     se comporta como .button.primary y nada cambia. Un cliente que quiera
+     jerarquía suprema pone aquí un color ajeno a la familia del primario. */
+  --brand-accent:          var(--brand-primary-strong);
+  --brand-ink-on-accent:   var(--brand-light);
+
+  --brand-font-body:       system-ui, -apple-system, sans-serif;
+  --brand-font-display:    Georgia, serif;
+  /* ── 2. SEMÁNTICOS — derivados. No se tocan por cliente. ───────────── */
+  /* ── Superficies y neutrales — paleta mínima: 2 fondos + 2 colores + B/N ── */
+  --bg-page: var(--brand-light);
+  --bg-alt: var(--brand-neutral);
+  --bg-soft: var(--brand-primary-soft);
+  --surface-card: var(--brand-light);
+  /* Fondos del sistema: normal, dark y cta. */
+  --bg-dark: var(--brand-dark);
+  --bg-cta: var(--brand-dark);
+  /* Dos fichas de borde, y la distinción es funcional (WCAG 1.4.11 exige 3:1 */
+  --border-hairline: color-mix(in srgb, var(--brand-primary) 18%, var(--brand-light)); /* filete decorativo */
+  --border-field: var(--brand-dark);       /* interfaz real: borde de campos */
+  --ink-muted: #6B6B6B;          /* 5:1 sobre el fondo */
+  --ink-strong: var(--brand-dark);
+  --color-error: #d43939;
+  --color-star: #FBBC04;          /* estrellas: amarillo Google (única excepción) */
+  --color-whatsapp: #25d366;
+
+  /* Pares superficie / tinta */
+  --color-success: #1FA34A;
+  --color-success-ink: #157D3C;
+  --color-success-soft: #EAF4EE;
+
+  /* Marca — se sobrescriben por sitio desde BaseLayout */
+  --primary: var(--brand-primary);
+  /* Un punto más oscuro que --brand-primary: debe cumplir AA sobre las tres superficies claras. */
+  --cta-bg: var(--brand-primary-strong);
+  --accent:            var(--brand-accent);        /* superficie del CTA supremo */
+  --ink-on-accent:     var(--brand-ink-on-accent); /* tinta ENCIMA del acento · >=4.5:1 */
+  --ink-primary: var(--brand-primary-strong);
+  --surface-primary-soft: var(--brand-primary-soft);
+  --ink-on-primary: var(--brand-light);
+
+  /* Sobre fondo oscuro — sistema básico de tintas: título claro, texto */
+  --ink-body-on-dark: var(--brand-light);
+  --ink-title-on-dark: var(--brand-primary-soft);
+  /* Sobre oscuro el acento es el turquesa claro; el vistoso se apaga. */
+  --ink-primary-on-dark: var(--brand-primary-on-dark);
+  /* Velo de legibilidad sobre foto: sólido al 60%, según la guía. */
+  --veil-solid: color-mix(in srgb, var(--brand-dark) 60%, transparent);
+
+  /* ── Tipografía ── */
+  --font-family-sans: var(--brand-font-body);
+  --font-display: var(--brand-font-display);
+  --ink-body: var(--brand-dark);
+  --font-size: 1.7rem;
+
+  --text-xs:  1.1rem;
+  --text-sm:  1.5rem;
+  --text-lg:  2rem;
+  --text-xl:  2.4rem;
+  --text-2xl: 2.8rem;
+
+  --leading-tight:   1.1;
+  --leading-normal:  1.6;
+  --leading-relaxed: 1.7;
+
+  --section-y: clamp(6.4rem, 5.5vw, 12.8rem);
+  --hero-y: clamp(5.6rem, 6vw, 10.4rem);   /* ritmo vertical unificado */
+
+  /* ── Grilla ── */
+  --grid-maxWidth: 128rem;
+  --grid-gutter: 2rem;
+
+  /* Techo de los bloques verticales */
+  --v-block: 75vh;
+  --v-block: 75svh;
+  /* Lo que se reserva para el texto de DEBAJO del vídeo (cita + nombre) */
+  --v-caption: 13rem;
+
+  /* ── Radios — todo el sistema redondea igual: 20px ── */
+  --radius: 4px;
+  --radius-media: 2px;
+  --radius-pill: 999px;
+
+  /* ── Elevación — sin sombras: la separación la hace el filete ── */
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / .05), 0 4px 10px rgb(0 0 0 / .04);
+}

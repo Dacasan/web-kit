@@ -1,0 +1,12 @@
+/* Capas del sitio. brand.css va DESPUÉS de los tokens del kit: si esta marca
+   overridea una variable, gana por orden de fuente. Sin overrides, los
+   defaults del kit aplican. */
+@layer reset, tokens, base, layout, components, utilities;
+
+@import '@agenciaweb/kit/styles/01-reset.css' layer(reset);
+@import '@agenciaweb/kit/styles/tokens.css' layer(tokens);
+@import './brand.css' layer(tokens);
+@import '@agenciaweb/kit/styles/03-base.css' layer(base);
+@import '@agenciaweb/kit/styles/04-layout.css' layer(layout);
+@import '@agenciaweb/kit/styles/05-components.css' layer(components);
+@import '@agenciaweb/kit/styles/07-motion.css';

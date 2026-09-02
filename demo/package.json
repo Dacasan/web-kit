@@ -1,0 +1,14 @@
+{
+  "name": "@agenciaweb/kit-demo",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Banco de pruebas del kit: /atomos (piezas) y /showcase (recetas). El catálogo vive aquí y en ningún otro sitio.",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build"
+  },
+  "dependencies": {
+    "astro": "^7.1.6"
+  }
+}

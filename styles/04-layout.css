@@ -1,0 +1,137 @@
+/* Layout y grilla (skill §4). */
+.container {
+  width: 100%;
+  max-width: var(--grid-maxWidth);
+  margin-inline: auto;
+  padding-inline: calc(var(--grid-gutter) / 2);
+}
+/* A sangre: el contenido pierde el techo de ancho. */
+.container--full { max-width: none; }
+
+.row {
+  display: flex;
+  flex-flow: row wrap;
+  margin-inline: calc(var(--grid-gutter) / -2);
+}
+
+.col,
+[class*="col-"] {
+  /* El ancho descuenta el gutter; si no, la fila se sale por la derecha. */
+  flex: 0 1 calc(100% - var(--grid-gutter));
+  max-width: calc(100% - var(--grid-gutter));
+  margin: 0 calc(var(--grid-gutter) / 2) var(--grid-gutter);
+}
+
+/* ORDEN CRÍTICO: .row--scroll va ENTRE .col y el @media 900px. Mismo peso (0,1,0): gana la última. Moverlo deja el carril a 105px sin scroll. */
+/* La MISMA fila, pero en móvil se desliza en vez de apilarse. */
+.row--scroll {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  /* El deslizamiento se detiene encuadrando cada columna. */
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: calc(var(--grid-gutter) / 2);
+  padding-block: .4rem;
+
+  /* Que el gesto no dispare el "atrás" del navegador ni arrastre la página. */
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+
+  /* Ocultar la barra en los tres motores. */
+  scrollbar-width: none;        /* Firefox */
+  -ms-overflow-style: none;     /* Edge antiguo */
+}
+.row--scroll::-webkit-scrollbar { display: none; }  /* WebKit / Blink */
+
+.row--scroll > * {
+  /* Menos del 100% A PROPÓSITO: que asome la siguiente pieza es lo único */
+  flex: 0 0 var(--rail-item, 78%);
+  scroll-snap-align: start;
+}
+
+/* Secciones — ritmo vertical fluido único. */
+.section { padding-block: var(--section-y); }
+.section + .section { border-top: 1px solid var(--border-hairline); }
+.hero { padding-block: var(--hero-y); }
+.section--tight { padding-block: clamp(3.6rem, 4vw, 4.8rem); }
+.section--flush { padding-block: 0; }
+/* Sección del CTA: su propio fondo (--bg-cta). Título lila, texto */
+.section--cta {
+  background: var(--bg-cta);
+  color: var(--ink-body-on-dark);
+  --ink-title: var(--ink-title-on-dark);
+  text-align: center;
+}
+/* Sobre fondo oscuro los títulos usan --ink-title-on-dark. */
+.section--cta :is(h1, h2, h3) { color: var(--ink-title, var(--ink-title-on-dark)); }
+.section-header { text-align: center; margin-bottom: 3.2rem; }
+
+.bg-white     { background: var(--bg-page); }
+.bg-secondary { background: var(--bg-alt); }
+.bg-soft      { background: var(--bg-soft); }
+.bg-dark      { background: var(--bg-dark); color: var(--ink-body-on-dark); --ink-title: var(--ink-title-on-dark); }
+.bg-dark :is(h1, h2, h3) { color: var(--ink-title, var(--ink-title-on-dark)); }
+.bordered {
+  border-top: 1px solid var(--border-hairline);
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+/* ── Único breakpoint estructural ── */
+@media (min-width: 900px) {
+  .col    { flex: 1; }
+  .col-5-md { flex: 0 0 calc(41.666% - var(--grid-gutter)); max-width: calc(41.666% - var(--grid-gutter)); }
+  .col-6-md { flex: 0 0 calc(50%     - var(--grid-gutter)); max-width: calc(50%     - var(--grid-gutter)); }
+  .col-7-md { flex: 0 0 calc(58.333% - var(--grid-gutter)); max-width: calc(58.333% - var(--grid-gutter)); }
+
+  /* Los cuatro repartos, en doceavos. Solo escritorio: en móvil .col ya es ancho completo. */
+  .col-3  { flex: 0 0 calc(25%     - var(--grid-gutter)); max-width: calc(25%     - var(--grid-gutter)); }
+  .col-4  { flex: 0 0 calc(33.333% - var(--grid-gutter)); max-width: calc(33.333% - var(--grid-gutter)); }
+  .col-6  { flex: 0 0 calc(50%     - var(--grid-gutter)); max-width: calc(50%     - var(--grid-gutter)); }
+  .col-12 { flex: 0 0 calc(100%    - var(--grid-gutter)); max-width: calc(100%    - var(--grid-gutter)); }
+
+  /* Fuera del carril la fila vuelve a ser una fila. */
+  .row--scroll { flex-wrap: wrap; overflow: visible; padding-block: 0; }
+
+  /* Intercambia los lados solo en escritorio; en móvil manda el marcado. */
+  .row--reverse { flex-direction: row-reverse; }
+}
+
+/* Área segura en iPhone: hueco para que el widget flotante no tape el CTA. */
+main { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
+@media (min-width: 900px) {
+  main { padding-bottom: calc(.8rem + env(safe-area-inset-bottom)); }
+}
+
+/* .frame — proporción + techo de altura. --frame y --frame-max. */
+.mx-auto { margin-inline: auto; }
+.text-center { text-align: center; }
+.text-left   { text-align: left; }
+.text-right  { text-align: right; }
+.is-vertical-align { display: flex; align-items: center; }
+.flex-col        { display: flex; flex-direction: column; }
+.h-100           { height: 100%; }
+.is-full-width   { width: 100%; }
+.obj-cover       { object-fit: cover; }
+.obj-contain     { object-fit: contain; }
+.radius-20       { border-radius: var(--radius-media); }
+
+/* Tipografía de sección contextual */
+
+/* .frame — proporción + techo de altura. --frame y --frame-max. */
+.frame {
+  aspect-ratio: var(--frame, 1);
+  max-height: var(--frame-max, var(--v-block));
+}
+.frame--exact {
+  max-height: none;
+  max-width: calc(var(--frame-max, var(--v-block)) * var(--frame, 1));
+  margin-inline: auto;
+}
+
+/* Solo para lectores de pantalla */
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}

@@ -1,0 +1,147 @@
+---
+// ContactFields — los campos de datos, SIN el <form> alrededor.
+//
+// Existe por una razón concreta: el estimado necesita que su cuestionario y
+// los datos de contacto viajen en el MISMO <form> (un solo envío, un solo
+// lead), y un <form> no se puede anidar dentro de otro. Si este bloque
+// viviera dentro de ContactForm.astro, el estimado tendría que copiarlo —
+// y una copia es cómo dos formularios acaban divergiendo sin que nadie lo
+// note: obligatoriedad distinta, consentimiento en uno sí y en otro no,
+// nombres de campo que bailan.
+//
+// Aquí está el contrato con el CRM: los `name` de los campos, el campo
+// trampa y los ocultos de atribución que rellena god.js. Quien monte esto
+// dentro de un <form data-lead-form> hereda el comportamiento completo.
+import { TREATMENT_OPTIONS, site } from '@agenciaweb/kit-site';
+
+interface SelectOption { value: string; label: string }
+
+interface Props {
+  /** Sufijo de los id: dos formularios en el mismo documento no colisionan. */
+  formId: string;
+  selectLabel?: string;
+  selectOptions?: SelectOption[];
+  /** Texto de la casilla de consentimiento. */
+  consentText?: string;
+}
+
+const {
+  formId,
+  selectLabel ="Treatment",
+  selectOptions = TREATMENT_OPTIONS,
+  // Lenguaje de consentimiento exigido por la verificación A2P 10DLC de
+  // Twilio: consentimiento explícito, frecuencia variable, tarifas y
+  // opt-out STOP. Los enlaces a /privacy-policy/ y /terms/ se añaden
+  // debajo — ambas páginas existen y están enlazadas en el footer.
+  //
+  // La redacción vive en el site.ts del CLIENTE (smsConsentText, con {name})
+  // — el kit no lleva datos de negocio. {name} se sustituye aquí por el
+  // nombre real de la cuenta.
+  consentText,
+} = Astro.props;
+
+const consent = (consentText ?? site.smsConsentText).replace("{name}", site.name);
+
+const id = (name: string) => `${formId}-${name}`;
+---
+
+<p class="form__error" id={id("error")} role="alert" tabindex="-1" hidden></p>
+
+<div class="field">
+  <label class="form-label" for={id("name")}>Name *</label>
+  <input
+    id={id("name")}
+    name="name"
+    type="text"
+    autocomplete="name"
+    maxlength="80"
+    required
+    placeholder="Alex Rivera"
+  />
+</div>
+
+<div class="field">
+  <label class="form-label" for={id("email")}>Email *</label>
+  <input
+    id={id("email")}
+    name="email"
+    type="email"
+    autocomplete="email"
+    inputmode="email"
+    maxlength="120"
+    required
+    placeholder="alex@email.com"
+  />
+</div>
+
+<div class="field">
+  <label class="form-label" for={id("phone")}>Phone *</label>
+  <div class="form-prefix">
+    <span class="badge form-prefix__sign" aria-hidden="true">+1</span>
+    <input
+      id={id("phone")}
+      name="phone"
+      type="tel"
+      autocomplete="tel"
+      inputmode="tel"
+      maxlength="24"
+      required
+      placeholder="(555) 000-0000"
+    />
+  </div>
+</div>
+
+<div class="field">
+  <label class="form-label" for={id("package")}>{selectLabel}</label>
+  <select id={id("package")} name="package">
+    {selectOptions.map((o) => <option value={o.value}>{o.label}</option>)}
+  </select>
+</div>
+
+<label class="form-consent" for={id("consent")}>
+  <input id={id("consent")} name="consent" type="checkbox" required />
+  <span>
+    {consent}
+    See our <a href="/privacy-policy/">Privacy Policy</a> and <a href="/terms/">Terms</a>.
+  </span>
+</label>
+
+{/* Campo trampa: oculto y fuera del orden de tabulación (skill §20). */}
+<div class="form__trap" aria-hidden="true">
+  <label for={id("company_website")}>Do not fill</label>
+  <input id={id("company_website")} name="company_website" type="text" tabindex="-1" autocomplete="off" />
+</div>
+
+{/* Campos ocultos que rellena god.js antes del envío. */}
+<input type="hidden" name="utm_source" />
+<input type="hidden" name="utm_medium" />
+<input type="hidden" name="utm_campaign" />
+<input type="hidden" name="utm_term" />
+<input type="hidden" name="utm_content" />
+<input type="hidden" name="gclid" />
+<input type="hidden" name="gbraid" />
+<input type="hidden" name="wbraid" />
+<input type="hidden" name="fbclid" />
+<input type="hidden" name="msclkid" />
+<input type="hidden" name="ttclid" />
+<input type="hidden" name="li_fat_id" />
+<input type="hidden" name="gad_source" />
+<input type="hidden" name="landing_slug" />
+<input type="hidden" name="ref_code" />
+<input type="hidden" name="event_id" />
+<input type="hidden" name="channel" />
+<input type="hidden" name="medium" />
+<input type="hidden" name="visitor_id" />
+{/* Señal Meta: fbc/fbp los planta god.js desde cookies _fbc/_fbp (hoy
+    vacíos — no hay píxel, DEF-6) y referrer desde document.referrer. El
+    servidor sintetiza fbc desde fbclid cuando la cookie no existe. */}
+<input type="hidden" name="fbc" />
+<input type="hidden" name="fbp" />
+<input type="hidden" name="referrer" />
+
+<script>
+  // Astro deduplica este import aunque el bloque se monte varias veces: el
+  // módulo se empaqueta una sola vez y gobierna todos los [data-lead-form]
+  // del documento, incluido el del estimado.
+  import"../scripts/lead-form";
+</script>

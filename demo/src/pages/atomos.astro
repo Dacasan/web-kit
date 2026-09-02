@@ -1,0 +1,622 @@
+---
+import '../styles/index.css';
+// Laboratorio del sistema atómico.
+//
+// Dos trabajos:
+//   1. Probar cada componente nuevo en todos sus casos, sin trucos: lo que
+//      se ve aquí sale del componente, no de CSS escrito para esta página.
+//   2. Llevar la cuenta de lo que falta para poder borrar sections/.
+//
+// El inventario de abajo NO está escrito a mano: se lee de las carpetas con
+// import.meta.glob, así que no puede quedarse desfasado.
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Header from '../../../components/sections/Header.astro';
+import Section from '../../../components/Section.astro';
+
+import Card from '../../../components/blocks/Card.astro';
+import Text from '../../../components/blocks/Text.astro';
+import Image from '../../../components/blocks/Image.astro';
+import Stars from '../../../components/blocks/Stars.astro';
+import HeroLede from '../../../components/blocks/HeroLede.astro';
+import Marquee from '../../../components/blocks/Marquee.astro';
+import Gallery from '../../../components/blocks/Gallery.astro';
+import BookCover from '../../../components/blocks/BookCover.astro';
+import YouTubeLite from '../../../components/YouTubeLite.astro';
+import ContactForm from '../../../components/ContactForm.astro';
+import { getCollection } from 'astro:content';
+
+const nombre = (p: string) => p.replace(/^.*\//, '').replace(/\.astro$/, '');
+const nuevos = Object.keys(import.meta.glob('../../../components/blocks/*.astro')).map(nombre).sort();
+const viejos = Object.keys(import.meta.glob('../../../components/sections/*.astro'))
+  .map(nombre)
+  // Cromo del sitio: no son bloques de contenido y se quedan donde están.
+  .filter((n) => !['Header', 'Footer', 'Breadcrumb', 'Divider'].includes(n))
+  .sort();
+// El índice sale de la colección, que lo lee de lo que exporta cada página.
+const PAGES = (await getCollection('paginas'))
+  .map((e) => e.data)
+  .sort((a, b) => (a.order ?? 999) - (b.order ?? 999) || a.href.localeCompare(b.href));
+const conMeta = PAGES.length;
+const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
+---
+
+<BaseLayout title="Sistema atómico — laboratorio" description="Banco de pruebas de los componentes atómicos." path="/atomos" noindex>
+  <Header />
+
+  {/* ═══ HERO — HeroLede + Image + Stars ═══════════════════════ */}
+  <Section pad="hero" align itemtype="https://schema.org/WPHeader">
+    <div class="col-7-md">
+      <HeroLede
+        badge="Now accepting patients"
+        displayTitle="<em>Fixed Teeth</em>, All-Inclusive — From $14,990."
+        subtitle="Full-arch implant treatment for patients traveling from the US and Canada."
+        cta="Get My Quote"
+      />
+    </div>
+    <div class="col-5-md">
+      <Image
+        src="/gallery/gallery-1.webp"
+        desktop="/gallery/gallery-5.webp"
+        alt="Patient smiling after full mouth dental implants"
+        ratio="4/5"
+        width={480}
+        height={580}
+        priority
+      />
+      <Stars n={5} score="4.9" count="1,247 reviews" />
+    </div>
+  </Section>
+
+  {/* ═══ MARQUEE — a sangre, se mueve solo ════════════════════ */}
+  <Section pad="tight" bg="secondary" bordered full label="Certifications">
+    <div class="col-12">
+      <Marquee
+        items={['Nobel Biocare', 'Straumann', '3D CT-guided surgery', 'In-house lab', '8,000+ patients treated']}
+        label="Certifications"
+      />
+    </div>
+  </Section>
+
+  {/* ═══ INVENTARIO ═══════════════════════════════════════════ */}
+  <Section
+    heading="Dónde vamos"
+    sub="Leído de las carpetas en cada build: esta cuenta no se puede quedar vieja."
+  >
+    <div class="col-4">
+      <Card background="primary">
+        <Text level={3} title={`${nuevos.length} átomos`} text="Componentes nuevos en blocks/, sin sección ni fondo propios." />
+        <p class="text-body">{nuevos.join(' · ')}</p>
+      </Card>
+    </div>
+    <div class="col-4">
+      <Card featured>
+        <Text level={3} title={`${viejos.length} por migrar`} text="Siguen en sections/ con su fondo y sus columnas dentro. Cuando llegue a cero, la carpeta se borra." />
+        <p class="text-body">{viejos.join(' · ')}</p>
+      </Card>
+    </div>
+    <div class="col-4">
+      <Card background="soft">
+        <Text level={3} title={`${conMeta} de ${totalPaginas} páginas`} text="Con `export const meta`, así que entran solas en el enlazado interno." />
+        <p class="text-body">Las demás siguen enlazándose a mano.</p>
+      </Card>
+    </div>
+  </Section>
+
+  {/* ═══ COLUMNAS ═════════════════════════════════════════════ */}
+  <Section bg="secondary" heading="Columnas" sub="col-12 · col-6 · col-4 · col-3. En móvil todo es ancho completo.">
+    <div class="col-6"><Card><Text level={3} title="col-6" /></Card></div>
+    <div class="col-6"><Card><Text level={3} title="col-6" /></Card></div>
+    <div class="col-4"><Card><Text level={3} title="col-4" /></Card></div>
+    <div class="col-4"><Card><Text level={3} title="col-4" /></Card></div>
+    <div class="col-4"><Card><Text level={3} title="col-4" /></Card></div>
+    <div class="col-3"><Card><Text level={3} title="col-3" /></Card></div>
+    <div class="col-3"><Card><Text level={3} title="col-3" /></Card></div>
+    <div class="col-3"><Card><Text level={3} title="col-3" /></Card></div>
+    <div class="col-3"><Card><Text level={3} title="col-3" /></Card></div>
+  </Section>
+
+  <Section align heading="Texto e imagen" sub="Con foto distinta en escritorio: la elige el navegador con <source media>.">
+    <div class="col-6">
+      <Text
+        level={3}
+        title="Why the 3D scan comes before the surgery"
+        text="Placing implants without a CT scan is like building a house without a floor plan. Your written plan comes out of that scan, not out of a generic protocol."
+      />
+    </div>
+    <div class="col-6">
+      <Image src="/gallery/gallery-2.webp" desktop="/gallery/gallery-4.webp" alt="" ratio="4/5" />
+    </div>
+  </Section>
+
+  <Section align reverse bg="soft" heading="reverse" sub="Intercambia los lados solo a partir de 900px. En móvil manda el marcado.">
+    <div class="col-6">
+      <Text level={3} title="El texto va primero en el marcado" text="Porque es lo que hay que leer primero en un teléfono. En escritorio la foto pasa a la izquierda." />
+    </div>
+    <div class="col-6">
+      <Image src="/gallery/gallery-3.webp" alt="" ratio="4/5" />
+    </div>
+  </Section>
+
+  {/* ═══ CARD: QUÉ LE METES DENTRO ════════════════════════════ */}
+  <Section heading="Card — qué le metes dentro" sub="No sabe qué lleva: es un slot. Texto, estrellas, un vídeo, una tabla, un formulario.">
+    <div class="col-4">
+      <Card>
+        <Text level={3} title="Solo texto" text="Una Card con un Text dentro. El relleno, el filete y la sombra vienen de .card." />
+      </Card>
+    </div>
+    <div class="col-4">
+      <Card itemtype="https://schema.org/Review">
+        <Stars n={5} />
+        <Text level={3} text="I was terrified of the surgery and it was nothing. Sedation, woke up with teeth, done." />
+        <p class="text-body"><strong>Susan W.</strong></p>
+      </Card>
+    </div>
+    <div class="col-4">
+      <Card>
+        <Image src="/gallery/gallery-2.webp" alt="" ratio="16/9" />
+        <Text level={3} title="Imagen y texto" text="La foto va dentro, como un componente más." />
+        <a href="#consulta" class="button primary pill">Get My Quote</a>
+      </Card>
+    </div>
+  </Section>
+
+  <Section
+    scroll
+    item="80%"
+    hint="Swipe to see more →"
+    bg="secondary"
+    heading="Card + vídeo"
+    sub="Antes era VideoTestimonials, un componente entero. Ahora es una Card con un YouTubeLite dentro."
+  >
+    <div class="col-4">
+      <Card itemtype="https://schema.org/Review">
+        <YouTubeLite id="3H-6gGOO_QI" ratio="vertical" playlabel="Testimonial from Robert K." />
+        <Text level={3} text="“I ate a steak a week after surgery. I hadn’t done that in years.”" />
+        <p class="text-body"><strong>Robert K.</strong></p>
+      </Card>
+    </div>
+    <div class="col-4">
+      <Card itemtype="https://schema.org/Review">
+        <YouTubeLite id="iORLYp3xEGA" ratio="vertical" playlabel="Testimonial from Linda M." />
+        <Text level={3} text="“They rebuilt my whole smile in one day. I can’t stop smiling.”" />
+        <p class="text-body"><strong>Linda M.</strong></p>
+      </Card>
+    </div>
+    <div class="col-4">
+      <Card itemtype="https://schema.org/Review">
+        <YouTubeLite id="RvN_pudEBt4" ratio="vertical" playlabel="Testimonial from James T." />
+        <Text level={3} text="“The plan was written, priced and explained before a single drill.”" />
+        <p class="text-body"><strong>James T.</strong></p>
+      </Card>
+    </div>
+  </Section>
+
+  <Section heading="Una tabla y un formulario" sub="Cualquier marcado vale: la tarjeta no lo inspecciona.">
+    <div class="col-6">
+      <Card>
+        <Text level={3} title="Qué incluye el precio" />
+        <div class="table-wrap">
+          <table class="table">
+            <tbody>
+              <tr><th>Implantes</th><td>4 por arcada</td></tr>
+              <tr><th>Sedación IV</th><td>Incluida</td></tr>
+              <tr><th>Escáner CBCT</th><td>Incluido</td></tr>
+              <tr><th>Hotel</th><td>6 noches, 2 personas</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </Card>
+    </div>
+    <div class="col-6">
+      <Card>
+        <Text level={3} title="Un formulario" text="Entero, dentro de la tarjeta." />
+        <ContactForm formId="atomos-card" />
+      </Card>
+    </div>
+  </Section>
+
+  {/* ═══ CARD: FONDOS ═════════════════════════════════════════ */}
+  <Section
+    bg="secondary"
+    heading="background"
+    sub="Una ruta es una foto y lleva velo. Los otros cuatro son los fondos que ya tiene el sistema."
+  >
+    <div class="col-3">
+      <Card background="/gallery/gallery-1.webp" alt="" ratio="4/5">
+        <Text level={3} title="foto" text="Velo automático." />
+      </Card>
+    </div>
+    <div class="col-3">
+      <Card background="primary" ratio="4/5"><Text level={3} title="primary" text="Blanco encima: 5.52:1." /></Card>
+    </div>
+    <div class="col-3">
+      <Card background="dark" ratio="4/5"><Text level={3} title="dark" text="Blanco encima: 11.99:1." /></Card>
+    </div>
+    <div class="col-3">
+      <Card background="soft" ratio="4/5"><Text level={3} title="soft" text="Fondo claro: la tinta va oscura." /></Card>
+    </div>
+  </Section>
+
+  {/* ═══ CARD: RATIO ══════════════════════════════════════════ */}
+  <Section heading="ratio" sub="Los cuatro del sistema. Sin ratio, la altura la pone el contenido.">
+    <div class="col-3"><Card background="/gallery/gallery-2.webp" alt="" ratio="1"><Text level={3} title="1" /></Card></div>
+    <div class="col-3"><Card background="/gallery/gallery-3.webp" alt="" ratio="4/5"><Text level={3} title="4/5" /></Card></div>
+    <div class="col-3"><Card background="/gallery/gallery-4.webp" alt="" ratio="9/16"><Text level={3} title="9/16" /></Card></div>
+    <div class="col-3"><Card background="/gallery/gallery-7.webp" alt="" ratio="16/9"><Text level={3} title="16/9" /></Card></div>
+  </Section>
+
+  {/* ═══ CARD: FEATURED Y RIBBON ══════════════════════════════ */}
+  <Section bg="soft" heading="featured y ribbon" sub="Lo único que cambia featured es el filete: color de marca en vez de gris.">
+    <div class="col-4">
+      <Card>
+        <Text level={3} title="Normal" text="Filete gris, el de siempre." />
+        <p class="text-body"><strong>$9,000</strong> · una arcada</p>
+      </Card>
+    </div>
+    <div class="col-4">
+      <Card featured ribbon="Más elegido">
+        <Text level={3} title="Destacada" text="Filete de marca y cinta cabalgando el borde." />
+        <p class="text-body"><strong>$14,990</strong> · dos arcadas</p>
+      </Card>
+    </div>
+    <div class="col-4">
+      <Card featured>
+        <Text level={3} title="Solo featured" text="Sin cinta: la cinta es una prop aparte." />
+        <p class="text-body"><strong>$19,800</strong> · todo incluido</p>
+      </Card>
+    </div>
+  </Section>
+
+  {/* ═══ REJILLA 3x3 CON LIGHTBOX ═════════════════════════════ */}
+  <Section
+    heading="Gallery — mosaico 3x3"
+    sub="Lightbox con :target, cero JavaScript. 3 columnas desde el móvil: nueve fotos apiladas son nueve pantallas."
+  >
+    <div class="col-12">
+      <Gallery
+        id="lb-atomos"
+        images={[
+          { src: '/gallery/gallery-1.webp', alt: 'All-on-4 patient result 1' },
+          { src: '/gallery/gallery-2.webp', alt: 'All-on-4 patient result 2' },
+          { src: '/gallery/gallery-3.webp', alt: 'All-on-4 patient result 3' },
+          { src: '/gallery/gallery-4.webp', alt: 'All-on-4 patient result 4' },
+          { src: '/gallery/gallery-5.webp', alt: 'All-on-4 patient result 5' },
+          { src: '/gallery/gallery-6.webp', alt: 'All-on-4 patient result 6' },
+          { src: '/gallery/gallery-7.webp', alt: 'All-on-4 patient result 7' },
+          { src: '/gallery/gallery-8.webp', alt: 'All-on-4 patient result 8' },
+          { src: '/gallery/gallery-9.webp', alt: 'All-on-4 patient result 9' },
+        ]}
+      />
+    </div>
+  </Section>
+
+  {/* ═══ BOOKCOVER ════════════════════════════════════════════ */}
+  <Section
+    align
+    bg="secondary"
+    heading="BookCover — la portada en 3D"
+    sub="Grosor, brillo y flotado. Se recuperó de git cuando el borrado de LeadMagnet se llevó su <style> por delante."
+  >
+    <div class="col-5-md">
+      <BookCover title="The Dental Vacation Guide 2026" />
+    </div>
+    <div class="col-7-md">
+      <Text
+        level={3}
+        title="Tres cosas que parecen capricho"
+        text="La perspectiva vive en el ESCENARIO, no en el libro. La inclinación va en transform y el flotado en translate/rotate: si el flotado animara transform, el libro se aplanaría en el primer fotograma. Y el brillo usa mix-blend-mode, que aplana su contenedor, así que no puede ir dentro del elemento con preserve-3d."
+      />
+    </div>
+  </Section>
+
+  {/* ═══ COLOR — EL BRAND GUIDE VIVO ═══════════════════════════
+      Las muestras pintan var(--brand-*), no hexadecimales escritos: esta
+      página enseña la paleta de la marca que esté cargada. Un cliente nuevo
+      cambia su brand.css y este catálogo se actualiza solo. */}
+  <Section
+    heading="Color"
+    sub="Siete primitivas. Es lo único que un cliente sobrescribe en su brand.css; todo lo demás el kit lo deriva."
+  >
+    <div class="col-12">
+      <div class="sw-grid">
+        <div class="sw"><div class="sw__chip" style="background:var(--brand-dark)"></div>
+          <b>--brand-dark</b><span class="sw__pct">60%</span>
+          <p>Fondos oscuros, tinta del cuerpo, borde de campo, velo sobre foto.</p></div>
+
+        <div class="sw"><div class="sw__chip" style="background:var(--brand-primary)"></div>
+          <b>--brand-primary</b><span class="sw__pct">30%</span>
+          <p>El color de la marca. Superficies y filetes, no texto pequeño.</p></div>
+
+        <div class="sw"><div class="sw__chip" style="background:var(--brand-primary-strong)"></div>
+          <b>--brand-primary-strong</b>
+          <p>El primario que aguanta texto <strong>sobre claro</strong>. Botón primario y enlaces.</p></div>
+
+        <div class="sw"><div class="sw__chip" style="background:var(--brand-primary-on-dark)"></div>
+          <b>--brand-primary-on-dark</b>
+          <p>El primario que se lee <strong>sobre oscuro</strong>. Acento tipográfico en secciones oscuras.</p></div>
+
+        <div class="sw"><div class="sw__chip" style="background:var(--brand-accent);color:var(--brand-ink-on-accent)">Aa</div>
+          <b>--brand-accent</b><span class="sw__pct sw__pct--acc">10%</span>
+          <p>El CTA del hero. <strong>Uno por pantalla.</strong> La tinta de encima es <code>--brand-ink-on-accent</code>.</p></div>
+
+        <div class="sw"><div class="sw__chip" style="background:var(--brand-primary-soft)"></div>
+          <b>--brand-primary-soft</b>
+          <p>Tinte del primario: superficie suave y títulos sobre oscuro.</p></div>
+
+        <div class="sw"><div class="sw__chip" style="background:var(--brand-neutral)"></div>
+          <b>--brand-neutral</b>
+          <p>Franja alterna. El segundo fondo claro, para que dos secciones seguidas no se fundan.</p></div>
+
+        <div class="sw"><div class="sw__chip sw__chip--bordered" style="background:var(--brand-light)"></div>
+          <b>--brand-light</b>
+          <p>Fondo de página y superficies. También es la tinta sobre oscuro.</p></div>
+      </div>
+    </div>
+
+    <div class="col-12">
+      <Card>
+        <Text
+          level={3}
+          title="Los pares que hay que verificar"
+          text="Tres primitivas llevan texto encima y por eso se eligen a mano: <code>-strong</code> sobre claro, <code>-on-dark</code> sobre oscuro, y la tinta sobre el acento. Los otros cuatro son superficie y no prometen contraste. Un color derivado con color-mix no puede prometer un ratio."
+        />
+        <div class="pair-row">
+          <span class="pair" style="background:var(--brand-light);color:var(--brand-primary-strong)">primary-strong sobre light</span>
+          <span class="pair" style="background:var(--brand-dark);color:var(--brand-primary-on-dark)">primary-on-dark sobre dark</span>
+          <span class="pair" style="background:var(--brand-dark);color:var(--brand-primary-soft)">primary-soft sobre dark</span>
+          <span class="pair" style="background:var(--brand-accent);color:var(--brand-ink-on-accent)">ink-on-accent sobre accent</span>
+        </div>
+      </Card>
+    </div>
+  </Section>
+
+  {/* ═══ TIPOGRAFÍA ════════════════════════════════════════════ */}
+  <Section
+    bg="secondary"
+    heading="Tipografía"
+    sub="Dos familias y una escala de cinco pasos. Las familias salen de brand.css; la escala es del kit y no cambia por cliente."
+  >
+    <div class="col-12">
+      <Card>
+        <p class="ty-label">--brand-font-display · títulos</p>
+        <p class="ty-display">Fixed teeth in one trip</p>
+        <p class="ty-note">La cara de display carga el carácter de la marca. Solo en <code>h1</code>–<code>h3</code> y en la cursiva de acento. Nunca en párrafos: a tamaño de cuerpo cansa.</p>
+      </Card>
+    </div>
+
+    <div class="col-12">
+      <Card>
+        <p class="ty-label">--brand-font-body · cuerpo</p>
+        <p class="ty-body">Allon4DentalCenter es un centro especializado en implantes dentales. Hacemos una cosa: tratamiento de arcada completa para pacientes que viajan desde Estados Unidos y Canadá.</p>
+        <p class="ty-note">Máximo 62 caracteres por línea. Más ancho y el ojo pierde el renglón al volver.</p>
+      </Card>
+    </div>
+
+    <div class="col-12">
+      <Card>
+        <p class="ty-label">La escala — cinco pasos, sin valores sueltos</p>
+        <div class="ty-scale">
+          <div><span>--text-2xl</span><p style="font-size:var(--text-2xl)">2.8rem</p></div>
+          <div><span>--text-xl</span><p style="font-size:var(--text-xl)">2.4rem</p></div>
+          <div><span>--text-lg</span><p style="font-size:var(--text-lg)">2rem</p></div>
+          <div><span>--font-size</span><p style="font-size:var(--font-size)">1.7rem · cuerpo</p></div>
+          <div><span>--text-sm</span><p style="font-size:var(--text-sm)">1.5rem</p></div>
+          <div><span>--text-xs</span><p style="font-size:var(--text-xs)">1.1rem · pies y etiquetas</p></div>
+        </div>
+        <p class="ty-note">Si un tamaño no está aquí, no existe. Un <code>font-size: 17px</code> suelto es lo que delata una plantilla.</p>
+      </Card>
+    </div>
+  </Section>
+
+  {/* ═══ BOTONES — LAS CUATRO VARIANTES Y CUÁNDO USAR CADA UNA ══ */}
+  <Section
+    heading="Botones"
+    sub="Cuatro variantes. La jerarquía la lleva el color de la superficie, no el tamaño."
+  >
+    <div class="col-12">
+      <Card>
+        <div class="btn-row" style="flex-wrap:wrap;gap:1.2rem;align-items:center">
+          <a href="#consulta" class="button accent pill">Get My Quote</a>
+          <a href="#consulta" class="button primary pill">Get My Quote</a>
+          <a href="#consulta" class="button outline pill">See Prices</a>
+          <a href="#consulta" class="button pill">Learn more</a>
+        </div>
+      </Card>
+    </div>
+
+    <div class="col-6-md">
+      <Card>
+        <Text
+          level={3}
+          title="accent — la jerarquía suprema"
+          text="El CTA del hero. <strong>Uno por pantalla.</strong> Es el único botón que usa --accent como superficie; si aparece tres veces deja de destacar y ya solo es otro primario. HeroLede y HeroVideo lo piden solos: no hay que ponerlo a mano."
+        />
+      </Card>
+    </div>
+
+    <div class="col-6-md">
+      <Card>
+        <Text
+          level={3}
+          title="primary — todo lo demás"
+          text="El botón de cada Section, el de la cabecera y el de los formularios. Es el que se repite: quince veces en una landing típica. Por eso no puede ser el acento."
+        />
+      </Card>
+    </div>
+
+    <div class="col-12">
+      <Card>
+        <Text
+          level={3}
+          title="El acento es superficie, no tinta"
+          text="Por eso puede ser chillante: no tiene que pasar contraste él mismo — lo que debe pasarlo es --ink-on-accent <em>encima</em> de él, con 4.5:1 mínimo. Un naranja vivo vale aquí y sería ilegible como texto. Si una marca no tiene un cuarto color, --brand-accent hereda el primario y este botón se ve igual que el de al lado: el hueco no cuesta nada."
+        />
+      </Card>
+    </div>
+  </Section>
+
+  {/* ═══ SECTION cta — CIERRE CON LLAMADA A LA ACCIÓN ══════════ */}
+  <Section
+    heading="Section cta"
+    sub="Todas las secciones de venta cierran con botón, y el botón abre el modal del formulario. Es una prop, no marcado suelto: escrito a mano son 237 sitios donde el destino puede divergir."
+    cta="Get My Quote"
+  >
+    <div class="col-12">
+      <Card>
+        <Text level={3} title="El botón de abajo es esta prop" text="cta=&quot;Get My Quote&quot; en la Section. Por defecto apunta a #form-popup, el mismo .lightbox:target que abre la cabecera. Se puede cambiar con ctaHref." />
+      </Card>
+    </div>
+  </Section>
+
+  {/* ═══ CARD-LINK DESDE EL ÍNDICE DE PÁGINAS ═════════════════ */}
+  <Section
+    heading="Enlazado interno"
+    sub="Ni un título escrito a mano: sale de lo que cada página exporta en su `meta`."
+  >
+    {PAGES.slice(0, 3).map((p) => (
+      <div class="col-4">
+        <Card href={p.href} background={p.image} alt="" ratio="4/5">
+          <Text level={3} title={p.title} text={p.excerpt} />
+        </Card>
+      </div>
+    ))}
+    {PAGES.slice(3, 6).map((p) => (
+      <div class="col-4">
+        <Card href={p.href}>
+          <Text level={3} title={p.title} text={p.excerpt} />
+        </Card>
+      </div>
+    ))}
+  </Section>
+
+  {/* ═══ UNA CARD DE 12 COLUMNAS ES LA SECCIÓN TARJETA ════════ */}
+  <Section bg="soft" pad="tight">
+    <div class="col-12">
+      <Card background="soft">
+        <Text align="center" level={3} title="Una Card de 12 columnas" text="Esto es la sección tarjeta. Mismo componente, otra columna." />
+      </Card>
+    </div>
+  </Section>
+
+  <Section id="consulta" bg="dark" align>
+    <div class="col-6">
+      <Text title="Get your written quote" text="Send your case and get an all-inclusive written quote within 24 hours." onDark />
+    </div>
+    <div class="col-6">
+      <Card><ContactForm formId="atomos" /></Card>
+    </div>
+  </Section>
+</BaseLayout>
+
+<style>
+  /* Cromo del laboratorio, no componentes del sistema.
+     Estas clases solo existen en /atomos para poder ENSEÑAR los tokens:
+     muestras de color, pares de contraste y la escala tipográfica. Todas
+     pintan var(--brand-*) o var(--text-*), nunca un valor propio, así que
+     la página muestra la marca que esté cargada. No copies nada de aquí a
+     una landing: si una sección lo necesita, es un componente del kit. */
+
+  /* ── Muestras de color ── */
+  .sw-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--grid-gutter);
+  }
+  .sw { min-width: 0; }
+  .sw__chip {
+    height: 88px;
+    border-radius: var(--radius);
+    display: grid;
+    place-items: center;
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+  }
+  .sw__chip--bordered { border: 1px solid var(--border-hairline); }
+  .sw b {
+    display: block;
+    margin-top: .8rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: var(--text-xs);
+    color: var(--ink-body);
+  }
+  .sw p {
+    margin: .4rem 0 0;
+    font-size: var(--text-xs);
+    line-height: var(--leading-normal);
+    color: var(--ink-muted);
+  }
+  .sw__pct {
+    display: inline-block;
+    margin-top: .4rem;
+    padding: .1rem .5rem;
+    border-radius: var(--radius-pill);
+    background: var(--surface-primary-soft);
+    color: var(--ink-primary);
+    font-size: var(--text-xs);
+    font-weight: 600;
+  }
+  .sw__pct--acc { background: var(--accent); color: var(--ink-on-accent); }
+
+  /* ── Pares de contraste ── */
+  .pair-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .8rem;
+    margin-top: 1.6rem;
+  }
+  .pair {
+    padding: .9rem 1.4rem;
+    border-radius: var(--radius);
+    font-size: var(--text-xs);
+    font-weight: 600;
+  }
+
+  /* ── Tipografía ── */
+  .ty-label {
+    margin: 0 0 1.2rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--ink-muted);
+  }
+  .ty-display {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    line-height: var(--leading-tight);
+    color: var(--ink-body);
+  }
+  .ty-body {
+    margin: 0;
+    max-width: 62ch;
+    font-size: var(--font-size);
+    line-height: var(--leading-normal);
+    color: var(--ink-body);
+  }
+  .ty-note {
+    margin: 1.2rem 0 0;
+    font-size: var(--text-xs);
+    line-height: var(--leading-normal);
+    color: var(--ink-muted);
+  }
+  .ty-scale > div {
+    display: flex;
+    align-items: baseline;
+    gap: 1.6rem;
+    padding: .6rem 0;
+    border-top: 1px solid var(--border-hairline);
+  }
+  .ty-scale > div:first-child { border-top: 0; }
+  .ty-scale span {
+    flex: 0 0 9rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: var(--text-xs);
+    color: var(--ink-muted);
+  }
+  .ty-scale p {
+    margin: 0;
+    line-height: var(--leading-tight);
+    color: var(--ink-body);
+  }
+</style>

@@ -1,0 +1,64 @@
+/* Base (skill §3.3). */
+body {
+  background: var(--bg-page);
+  color: var(--ink-body);
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size);
+  line-height: var(--leading-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: var(--leading-tight);
+  letter-spacing: -.01em;
+  margin: .35em 0 .7em;
+}
+/* Jerarquía por escala y peso, no por color: la tinta es casi-negra. */
+h1, h2, h3 { color: var(--ink-body); }
+h1 em, h2 em { font-style: italic; color: var(--ink-primary); }
+/* Fraunces 300/400, fluido sin breakpoint tipográfico. */
+h1 { font-weight: 300; font-size: clamp(4rem, 7vw, 8rem); line-height: .95; letter-spacing: -.038em; }
+h2 { font-weight: 300; font-size: clamp(3rem, 4.2vw, 5rem); line-height: 1; letter-spacing: -.03em; }
+h3 { font-weight: 400; font-size: clamp(2rem, 2.2vw, 2.8rem); line-height: 1.15; letter-spacing: -.015em; }
+h4 { font-size: clamp(1.6rem, 1.5vw, 2rem); }
+h5 { font-size: clamp(1.4rem, 1.2vw, 1.7rem); }
+h6 { font-size: clamp(1.3rem, 1vw, 1.5rem); }
+
+p { margin-top: 0; }
+a { color: var(--ink-primary); text-decoration: none; }
+a:hover:not(.button) {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: .25em;
+}
+
+/* Anillo de foco visible para teclado, invisible para ratón. */
+a:focus-visible, button:focus-visible, summary:focus-visible {
+  outline: 2px solid var(--border-field); /* oscuro: visible sobre cualquier fondo */
+  outline-offset: 3px;
+}
+:focus:not(:focus-visible) { outline: none; }
+
+/* Controles de formulario. */
+input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]),
+select, textarea {
+  width: 100%;
+  display: block;
+  padding: .8rem 1rem;
+  min-height: 48px;
+  font-size: 16px;
+  /* --ink-muted y no --border-field (#1A1A1A): un filete negro puro sobre */
+  border: 1px solid var(--ink-muted);
+  border-radius: var(--radius);
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--border-field); /* oscuro: indicador de foco visible */
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 18%, transparent);
+}
+label { display: block; margin-bottom: .4rem; font-weight: 500; }

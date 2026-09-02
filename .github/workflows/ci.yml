@@ -1,0 +1,18 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  demo-build:
+    runs-on: ubuntu-latest
+    env:
+      LANDING_API_URL: https://crm.example.com
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 11 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 24, cache: pnpm, cache-dependency-path: demo/pnpm-lock.yaml }
+      - run: pnpm --dir demo install --no-frozen-lockfile
+      - run: pnpm --dir demo build

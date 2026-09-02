@@ -1,0 +1,21 @@
+---
+import BaseLayout from '@agenciaweb/kit/layouts/BaseLayout.astro';
+import Section from '@agenciaweb/kit/components/Section.astro';
+import Card from '@agenciaweb/kit/components/blocks/Card.astro';
+import Text from '@agenciaweb/kit/components/blocks/Text.astro';
+import { site } from '../data/site';
+import '../styles/index.css';
+---
+
+<BaseLayout title={`Privacy Policy — ${site.name}`} description={`Cómo ${site.name} trata tus datos.`} noindex>
+  <Section>
+    <div class="row">
+      <div class="col-12">
+        <Card>
+          <Text kind="h1">Privacy Policy</Text>
+          <Text>[BRAND] Política de privacidad del responsable del sitio.</Text>
+        </Card>
+      </div>
+    </div>
+  </Section>
+</BaseLayout>

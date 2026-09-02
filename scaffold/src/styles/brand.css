@@ -1,0 +1,48 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   MARCA — [BRAND] reemplaza los nueve valores
+
+   Nueve valores. Nada más. Todo lo demás (fondos, tintas, bordes, velos,
+   estados) el kit lo deriva de aquí con var(--brand-*): cambia
+  --brand-dark:            #1A1A1A;  /* 60% · fondos oscuros, tinta del cuerpo, bordes, velo */
+  --brand-light:           #FFFFFF;  /* fondo de página, superficies, tinta sobre oscuro */
+  --brand-neutral:         #F0EDE5;  /* franja alterna: el segundo fondo claro */
+  --brand-primary:         #2F6F6B;  /* 30% · el color de la marca: superficies y filetes */
+  --brand-primary-strong:  #245551;  /* el primario que aguanta texto SOBRE claro · >=4.5:1 */
+  --brand-primary-soft:    #E6EFEE;  /* tinte del primario: superficie suave, títulos sobre oscuro */
+  --brand-primary-on-dark: #4FA9A2;  /* el primario que se lee SOBRE oscuro · >=4.5:1 */
+
+  /* [BRAND] EL ACENTO — jerarquía suprema: fondo del CTA del hero o del
+     header. Es SUPERFICIE, no tinta: no tiene que pasar contraste él mismo,
+     lo que debe pasarlo es --brand-ink-on-accent ENCIMA (>=4.5:1). Por eso
+     un naranja vivo vale aquí y no valdría como texto.
+     Déjalo heredando el primario si esta marca no tiene un acento propio. */
+  --brand-accent:          var(--brand-primary-strong);
+  --brand-ink-on-accent:   var(--brand-light);
+                                       no un cuarto color de relleno. Verifica >=4.5:1 si lleva texto */
+
+  --brand-font-body:      system-ui, -apple-system, sans-serif;   /* [BRAND] */
+  --brand-font-display:   Georgia, serif;                          /* [BRAND] */
+:root {
+  --brand-dark:            #1A1A1A;  /* 60% · fondos oscuros, tinta del cuerpo, bordes, velo */
+  --brand-primary:         #2F6F6B;  /* 30% · el color de la marca: superficies y filetes */
+  --brand-primary-strong:  #245551;  /* el primario que aguanta texto SOBRE claro · >=4.5:1 */
+  --brand-primary-on-dark: #4FA9A2;  /* el primario que se lee SOBRE oscuro · >=4.5:1 */
+  --brand-primary-soft:    #E6EFEE;  /* tinte del primario: superficie suave, títulos sobre oscuro */
+  --brand-neutral:         #F0EDE5;  /* franja alterna: el segundo fondo claro */
+  --brand-light:           #FFFFFF;  /* fondo de página, superficies, tinta sobre oscuro */
+
+  --brand-font-body:    system-ui, -apple-system, sans-serif;   /* [BRAND] */
+  --brand-font-display: Georgia, serif;                          /* [BRAND] */
+}
+
+/* [BRAND] Fuentes self-hosted: pon los .woff2 en public/fonts/ y
+   declara aquí un @font-face por familia, peso y estilo. Ejemplo:
+
+@font-face {
+  font-family: 'TuFuente';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/tufuente-400.woff2') format('woff2');
+}
+*/

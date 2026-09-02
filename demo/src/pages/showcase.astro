@@ -1,0 +1,281 @@
+---
+import '../styles/index.css';
+// showcase.astro — recetario del sistema atómico.
+//
+// /atomos enseña las PIEZAS (Section, Card, Text, Image…). Esto enseña las
+// RECETAS: cómo se monta con esas piezas cada bloque del catálogo viejo.
+// Es el compañero práctico de docs/PLAN-MIGRACION.md §3.
+//
+// Cada apartado lleva el nombre del componente que sustituye, para poder
+// buscarlo cuando toque migrar una página.
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Header from '../../../components/sections/Header.astro';
+import Breadcrumb from '../../../components/sections/Breadcrumb.astro';
+import Section from '../../../components/Section.astro';
+import Card from '../../../components/blocks/Card.astro';
+import Text from '../../../components/blocks/Text.astro';
+import Image from '../../../components/blocks/Image.astro';
+import Stars from '../../../components/blocks/Stars.astro';
+import Gallery from '../../../components/blocks/Gallery.astro';
+import BookCover from '../../../components/blocks/BookCover.astro';
+import HeroLede from '../../../components/blocks/HeroLede.astro';
+import Marquee from '../../../components/blocks/Marquee.astro';
+import YouTubeLite from '../../../components/YouTubeLite.astro';
+import ContactForm from '../../../components/ContactForm.astro';
+import { site } from '@agenciaweb/kit-site';
+
+const nombre = (p: string) => p.replace(/^.*\//, '').replace(/\.astro$/, '');
+const atomos = Object.keys(import.meta.glob('../../../components/blocks/*.astro')).map(nombre).sort();
+const viejos = Object.keys(import.meta.glob('../../../components/sections/*.astro'))
+  .map(nombre)
+  .filter((n) => !['Header', 'Footer', 'Breadcrumb', 'Divider'].includes(n))
+  .sort();
+---
+
+<BaseLayout
+  title="Showcase — recetario del sistema"
+  description="Cada bloque del catálogo viejo, montado con los componentes atómicos."
+  path="/showcase/"
+  noindex
+>
+  <Header />
+  <Breadcrumb items={[{ name: 'Home', href: '/' }, { name: 'Showcase' }]} />
+
+  <Section pad="hero" center>
+    <div class="col-12">
+      <Text
+        align="center"
+        level={1}
+        title="Recetario del sistema"
+        text="Cada bloque del catálogo viejo, montado con Section + columnas + átomos. Las piezas sueltas están en /atomos."
+      />
+    </div>
+  </Section>
+
+  <Section pad="tight" bg="secondary" bordered heading="Dónde vamos" sub="Leído de las carpetas en cada build: esta cuenta no se puede quedar vieja.">
+    <div class="col-6">
+      <Card class="h-100">
+        <Text level={3} title={`${atomos.length} átomos`} text={atomos.join(' · ')} />
+      </Card>
+    </div>
+    <div class="col-6">
+      <Card featured class="h-100">
+        <Text level={3} title={`${viejos.length} viejos en sections/`} text={viejos.join(' · ')} />
+      </Card>
+    </div>
+  </Section>
+
+  {/* ── HeroFakeH1 ── */}
+  <Section heading="HeroFakeH1" sub="Section pad=&quot;hero&quot; align + HeroLede + Image + Stars" bg="soft" />
+  <Section pad="hero" align>
+    <div class="col-7-md">
+      <HeroLede
+        level={2}
+        badge="Now accepting patients"
+        displayTitle="El titular grande va como <em>párrafo</em>, no como encabezado."
+        subtitle="El h1 real es la chapita de arriba: es la primera línea que se lee y lleva la consulta SEO."
+        cta="Get My Quote"
+      />
+    </div>
+    <div class="col-5-md">
+      <Image src="/gallery/gallery-1.webp" alt="" ratio="4/5" width={480} height={580} />
+      <Stars n={5} score="4.9" count="1,247 reviews" />
+    </div>
+  </Section>
+
+  {/* ── SocialProof ── */}
+  <Section heading="SocialProof" sub="Section pad=&quot;tight&quot; bordered + col-3 + .stat-num / .stat-label" bg="soft" />
+  <Section pad="tight" bordered center label="Our numbers">
+    {site.proof.slice(0, 4).map((p) => (
+      <div class="col-3">
+        <p class="stat-num">{p.num}</p>
+        <p class="stat-label">{p.label}</p>
+      </div>
+    ))}
+  </Section>
+
+  {/* ── Scroller ── */}
+  <Section heading="Scroller" sub="Section full + Marquee. Se mueve sola en bucle; no la desliza el usuario." bg="soft" />
+  <Section pad="tight" bg="secondary" bordered full label="Certifications">
+    <div class="col-12">
+      <Marquee label="Certifications" items={['Nobel Biocare', 'Straumann', 'Navident', 'Prettau lab', 'IAOMS', 'ICOI']} />
+    </div>
+  </Section>
+
+  {/* ── Features / Specialties ── */}
+  <Section heading="Features · Specialties" sub="Section + col-3 o col-4 + Card + Text" bg="soft" />
+  <Section>
+    <div class="col-3"><Card class="h-100"><Text level={3} title="Cuatro en cuartos" text="col-3. Quitar uno y pasar a col-4 deja tres tercios." /></Card></div>
+    <div class="col-3"><Card class="h-100"><Text level={3} title="La tarjeta no sabe" text="qué lleva dentro. Es un slot." /></Card></div>
+    <div class="col-3"><Card class="h-100"><Text level={3} title="h-100" text="iguala alturas en la fila." /></Card></div>
+    <div class="col-3"><Card class="h-100"><Text level={3} title="Con precio" text="Specialties es esto con una cifra en el slot." /><p class="text-body"><strong>$9,000</strong></p></Card></div>
+  </Section>
+
+  {/* ── Comparison ── */}
+  <Section heading="Comparison" sub="Section + dos col-6 + Card (la buena con featured) + ul.step-list" bg="soft" />
+  <Section>
+    <div class="col-6">
+      <Card featured class="h-100">
+        <Text level={3} title="Lo que sí" />
+        <ul class="step-list">
+          <li><span aria-hidden="true">✓</span> La columna buena lleva `featured`</li>
+          <li><span aria-hidden="true">✓</span> Filete de marca, nada más cambia</li>
+          <li><span aria-hidden="true">✓</span> Las viñetas son .step-list</li>
+        </ul>
+      </Card>
+    </div>
+    <div class="col-6">
+      <Card class="h-100">
+        <Text level={3} title="Lo que no" />
+        <ul class="step-list">
+          <li><span aria-hidden="true">·</span> La otra columna es una Card normal</li>
+          <li><span aria-hidden="true">·</span> Sin rojo ni tachado: se lee sola</li>
+          <li><span aria-hidden="true">·</span> Mismo ancho, col-6</li>
+        </ul>
+      </Card>
+    </div>
+  </Section>
+
+  {/* ── PricingTable / DataTable ── */}
+  <Section heading="PricingTable · DataTable" sub="Section + col-12 + Card + table.table dentro de .table-wrap" bg="soft" />
+  <Section>
+    <div class="col-12">
+      <Card>
+        <div class="table-wrap">
+          <table class="table">
+            <thead><tr><th>Treatment</th><th>Demo City</th><th>USA</th></tr></thead>
+            <tbody>
+              <tr><td>Full mouth, 2 trips</td><td><strong>$19,800</strong></td><td>$56,000+</td></tr>
+              <tr><td>One Trip, both arches</td><td><strong>$14,990</strong></td><td>$40,000+</td></tr>
+              <tr><td>Single tooth implant</td><td><strong>$1,600</strong></td><td>$8,000+</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </Card>
+    </div>
+  </Section>
+
+  {/* ── HowItWorks ── */}
+  <Section heading="HowItWorks" sub="Section scroll + Card + .step-index + Text" bg="soft" />
+  <Section scroll item="80%" hint="Swipe →" label="Process">
+    {site.steps.slice(0, 4).map((s, i) => (
+      <div class="col-4">
+        <Card class="h-100">
+          <p class="step-index" aria-hidden="true">{String(i + 1).padStart(2, '0')}</p>
+          <Text level={3} title={s.title} text={s.text} />
+        </Card>
+      </div>
+    ))}
+  </Section>
+
+  {/* ── VideoTestimonials ── */}
+  <Section heading="VideoTestimonials" sub="Section scroll + Card + YouTubeLite ratio=&quot;vertical&quot;" bg="soft" />
+  <Section scroll item="80%" hint="Swipe →" label="Video testimonials">
+    <div class="col-4"><Card class="h-100" itemtype="https://schema.org/Review"><YouTubeLite id="3H-6gGOO_QI" ratio="vertical" playlabel="Testimonial 1" /><Text level={3} text="“La cita va debajo del vídeo, dentro de la misma Card.”" /><p class="text-body"><strong>Texas</strong></p></Card></div>
+    <div class="col-4"><Card class="h-100" itemtype="https://schema.org/Review"><YouTubeLite id="iORLYp3xEGA" ratio="vertical" playlabel="Testimonial 2" /><Text level={3} text="“Cero iframes hasta que alguien pulsa play.”" /><p class="text-body"><strong>California</strong></p></Card></div>
+    <div class="col-4"><Card class="h-100" itemtype="https://schema.org/Review"><YouTubeLite id="RvN_pudEBt4" ratio="vertical" playlabel="Testimonial 3" /><Text level={3} text="“En móvil se desliza; en escritorio son tres columnas.”" /><p class="text-body"><strong>Florida</strong></p></Card></div>
+  </Section>
+
+  {/* ── Reviews ── */}
+  <Section heading="Reviews" sub="Section scroll + Card + Stars" bg="soft" />
+  <Section scroll item="80%" hint="Swipe →" label="Reviews">
+    <div class="col-4"><Card class="h-100" itemtype="https://schema.org/Review"><Stars n={5} /><Text level={3} text="Las estrellas son un átomo: Stars n={5}." /><p class="text-body"><strong>Susan W.</strong></p></Card></div>
+    <div class="col-4"><Card class="h-100" itemtype="https://schema.org/Review"><Stars n={5} /><Text level={3} text="Con score y count sale la ficha de Google." /><p class="text-body"><strong>Michael R.</strong></p></Card></div>
+    <div class="col-4"><Card class="h-100" itemtype="https://schema.org/Review"><Stars n={4} /><Text level={3} text="Las apagadas se pintan en gris de filete: se lee 4 de 5." /><p class="text-body"><strong>David L.</strong></p></Card></div>
+  </Section>
+
+  {/* ── Cards con fondo ── */}
+  <Section heading="Cards · CardItem" sub="Card con background: una ruta es foto (lleva velo), un nombre es color" bg="soft" />
+  <Section>
+    <div class="col-3"><Card background="/gallery/gallery-2.webp" alt="" ratio="4/5"><Text level={3} title="foto" /></Card></div>
+    <div class="col-3"><Card background="primary" ratio="4/5"><Text level={3} title="primary" /></Card></div>
+    <div class="col-3"><Card background="dark" ratio="4/5"><Text level={3} title="dark" /></Card></div>
+    <div class="col-3"><Card background="soft" ratio="4/5"><Text level={3} title="soft" text="Fondo claro: la tinta se invierte sola." /></Card></div>
+  </Section>
+
+  {/* ── TextSection / Video ── */}
+  <Section heading="TextSection · Video" sub="Section align (+ reverse) + Text + Image o YouTubeLite" bg="soft" />
+  <Section align>
+    <div class="col-6"><Text level={2} title="Texto e imagen" text="align centra las columnas entre sí. reverse intercambia los lados solo a partir de 900px: en móvil manda el marcado." /></div>
+    <div class="col-6"><Image src="/gallery/gallery-3.webp" desktop="/gallery/gallery-4.webp" alt="" ratio="4/5" /></div>
+  </Section>
+  <Section align reverse bg="secondary">
+    <div class="col-6"><Text level={2} title="El mismo, con reverse" text="El texto sigue primero en el marcado. La foto se va a la izquierda solo en escritorio." /><a href="#consulta" class="button primary pill">Get My Quote</a></div>
+    <div class="col-6"><YouTubeLite ratio="auto" playlabel="Demo" /></div>
+  </Section>
+
+  {/* ── Gallery ── */}
+  <Section heading="Gallery" sub="Section + col-12 + Gallery. Mosaico 3x3 y lightbox con :target, cero JS." bg="soft" />
+  <Section>
+    <div class="col-12">
+      <Gallery
+        id="lb-showcase"
+        images={[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => ({
+          src: `/gallery/gallery-${n}.webp`,
+          alt: `Patient result ${n}`,
+        }))}
+      />
+    </div>
+  </Section>
+
+  {/* ── About ── */}
+  <Section heading="About" sub="Section align + Image + Text + ul.step-list" bg="soft" />
+  <Section align itemtype="https://schema.org/Person">
+    <div class="col-5-md"><Image src="/equipo.webp" alt="" ratio="4/5" /></div>
+    <div class="col-7-md">
+      <Text level={2} title="Autoridad (E-E-A-T)" text="Nombre, credenciales y áreas. El itemtype va en la Section, no en un componente aparte.">
+        <ul class="step-list">
+          <li><span aria-hidden="true">·</span> <span itemprop="knowsAbout">All-on-4 / All-on-6</span></li>
+          <li><span aria-hidden="true">·</span> <span itemprop="knowsAbout">Zygomatic implants</span></li>
+          <li><span aria-hidden="true">·</span> <span itemprop="knowsAbout">Sinus lift &amp; bone grafting</span></li>
+        </ul>
+      </Text>
+    </div>
+  </Section>
+
+  {/* ── Faq ── */}
+  <Section heading="Faq" sub="Section + col-12 + details.accordion__item. Nativo, sin JavaScript." bg="soft" />
+  <Section>
+    <div class="col-12">
+      <div class="accordion mx-auto">
+        {site.faq.slice(0, 4).map((f) => (
+          <details class="accordion__item">
+            <summary class="accordion__summary">{f.q}</summary>
+            <div class="accordion__panel"><p>{f.a}</p></div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </Section>
+
+  {/* ── LeadSection / LeadMagnet ── */}
+  <Section heading="LeadSection · LeadMagnet" sub="Section align + Text + Card + ContactForm. El imán añade BookCover y cambia thankYou." bg="soft" />
+  <Section align bg="secondary">
+    <div class="col-5-md"><BookCover title="The Dental Vacation Guide 2026" /></div>
+    <div class="col-7-md">
+      <Text level={2} title="Imán de leads" text="La portada en 3D a un lado, el argumento al otro y el formulario debajo con su propio thankYou, para que la descarga no se mezcle con una petición comercial en el informe de adquisición." />
+    </div>
+    <div class="col-12"><Card><ContactForm formId="showcase-magnet" cta="Send me the guide" thankYou="/thank-you-download" /></Card></div>
+  </Section>
+  <Section id="consulta" bg="dark" align>
+    <div class="col-6"><Text title="Captación" text="El formulario entero dentro de una Card. formId único por documento: de ahí salen los id de los campos." onDark /></div>
+    <div class="col-6"><Card><ContactForm formId="showcase" /></Card></div>
+  </Section>
+
+  {/* ── Cta ── */}
+  <Section heading="Cta" sub="Section bg=&quot;dark&quot; center + Text + .btn-row. Y toda sección de venta cierra con la prop cta, que abre el modal." bg="soft" cta="Get My Quote" />
+  <Section bg="dark" center>
+    <div class="col-12">
+      <Text align="center" title="Cierre" text="Los botones son clases del sistema, no un átomo." onDark />
+      <div class="btn-row"><a href="#consulta" class="button primary pill">Get My Quote</a></div>
+    </div>
+  </Section>
+
+  {/* ── RelatedPages ── */}
+  <Section heading="RelatedPages" sub="Section + col-4 + Card href. Los textos salen del meta de cada página." bg="soft" />
+  <Section>
+    <div class="col-4"><Card class="h-100" href="/atomos"><Text level={3} title="Las piezas →" text="Section, Card, Text, Image, Stars, Gallery, Marquee, HeroLede." /></Card></div>
+    <div class="col-4"><Card class="h-100" href="/landing-final-copy/"><Text level={3} title="Una landing entera →" text="22 secciones montadas solo con átomos." /></Card></div>
+    <div class="col-4"><Card class="h-100" href="/"><Text level={3} title="Home →" text="La página principal del sitio." /></Card></div>
+  </Section>
+</BaseLayout>

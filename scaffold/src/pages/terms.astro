@@ -1,0 +1,21 @@
+---
+import BaseLayout from '@agenciaweb/kit/layouts/BaseLayout.astro';
+import Section from '@agenciaweb/kit/components/Section.astro';
+import Card from '@agenciaweb/kit/components/blocks/Card.astro';
+import Text from '@agenciaweb/kit/components/blocks/Text.astro';
+import { site } from '../data/site';
+import '../styles/index.css';
+---
+
+<BaseLayout title={`Terms — ${site.name}`} description={`Términos y condiciones de ${site.name}.`} noindex>
+  <Section>
+    <div class="row">
+      <div class="col-12">
+        <Card>
+          <Text kind="h1">Terms &amp; Conditions</Text>
+          <Text>[BRAND] Términos y condiciones del servicio.</Text>
+        </Card>
+      </div>
+    </div>
+  </Section>
+</BaseLayout>

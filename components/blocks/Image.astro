@@ -1,0 +1,130 @@
+---
+// Image — una imagen del sitio, con todo lo que una imagen necesita.
+//
+// No es "poner un <img>". Un <img> suelto trae tres problemas que hay que
+// resolver siempre, y que si no los resuelve el componente acaban resueltos
+// a medias en cada página:
+//
+// 1. LA FOTO NO ES LA MISMA EN MÓVIL Y EN ESCRITORIO. Un retrato 4:5 que
+//    funciona en un teléfono, en escritorio se ve como una columna
+//    estrecha; un apaisado en móvil deja la cara del tamaño de un sello.
+//    Se resuelve con <picture> + <source media>: elige el navegador, cero
+//    JavaScript. Es lo que ya hacen YouTubeLite y HeroVideo en este repo.
+//
+// 2. LA IMAGEN QUE SE VE SIN SCROLL ES EL LCP. Necesita tres cosas, no una:
+//    no diferirla (loading=eager), pedirla con prioridad alta
+//    (fetchpriority=high) y anunciarla ANTES de que el parser llegue al
+//    marcado (<link rel=preload>). Eso es lo que hace `priority`.
+//
+// 3. RESERVAR EL SITIO, o la página salta cuando la imagen entra (CLS).
+//    Hay dos formas de reservarlo y vale cualquiera: `ratio` (que pone
+//    aspect-ratio vía .frame) o `width`+`height` reales. Sin ninguna de las
+//    dos el componente rompe el build — no hay medidas por defecto, porque
+//    unas medidas inventadas mienten sobre la foto y reservan el hueco
+//    equivocado, que es peor que no reservar nada.
+//
+// `priority` VA EN UNA SOLA IMAGEN POR PÁGINA. En dos, compiten por el
+// ancho de banda y el LCP empeora: es peor que no ponerlo en ninguna.
+interface Props {
+  /** La de móvil. Va en el <img>, así que es la obligatoria. */
+  src: string;
+  /** La de escritorio. Sin ella, la de móvil sirve para las dos. */
+  desktop?: string;
+  /** Vacío SOLO si es decorativa y el texto de al lado ya lo dice todo. */
+  alt?: string;
+  /** Medidas REALES del archivo. Obligatorias si no pasas `ratio`. */
+  width?: number;
+  height?: number;
+  /** Cómo llena su caja. `contain` para logos: un logo no se recorta. */
+  fit?: 'cover' | 'contain';
+  /** Ocupa todo el ancho disponible. Falso para logos e iconos, que miden
+      lo que miden. */
+  full?: boolean;
+  /** La imagen es el FONDO de su contenedor y es el contenedor quien reserva
+      el sitio (una <Card ratio>, por ejemplo). Exime de `ratio`/medidas
+      porque el hueco ya está reservado por otro. */
+  fill?: boolean;
+  /** Ficha --frame de .frame: 1 · 4/5 · 3/2 · 16/9. Sin ella, la natural. */
+  ratio?: string;
+  /** Esta es la imagen del hero: preload + prioridad alta + sin diferir. */
+  priority?: boolean;
+  rounded?: boolean;
+  class?: string;
+}
+
+// El único breakpoint del sitio. Los dos preloads tienen que ser
+// MUTUAMENTE EXCLUYENTES o el navegador se descarga las dos imágenes y el
+// preload acaba costando más de lo que ahorra — de ahí el max-width de
+// abajo, que es el complemento exacto del min-width y no una media query
+// de maqueta.
+const BP = 900;
+
+const {
+  src,
+  desktop,
+  alt = '',
+  width,
+  height,
+  fit = 'cover',
+  full = true,
+  fill = false,
+  ratio,
+  priority = false,
+  rounded = true,
+  class: cls,
+} = Astro.props;
+
+// Sin defaults silenciosos: o hay proporción, o hay medidas, o el
+// contenedor ya reservó el sitio (`fill`).
+if (!fill && !ratio && (width == null || height == null)) {
+  throw new Error(
+    `[Image] ${src} necesita \`ratio\` o \`width\`+\`height\`. Sin una de las dos ` +
+      'la página salta cuando la imagen entra (CLS), y unas medidas inventadas ' +
+      'reservan el hueco equivocado.',
+  );
+}
+
+// Sin variante de escritorio no se emite <source>: un source que apunta a
+// la misma imagen es una línea de HTML que no decide nada.
+const hasDesktop = Boolean(desktop) && desktop !== src;
+
+// EL PRELOAD NO SE EMITE AQUÍ. Un <link rel=preload> pegado al <img> que
+// precarga no adelanta nada: el parser llega a los dos en el mismo
+// instante. Donde sirve es en el <head>, antes de que el cuerpo empiece a
+// leerse — y a la cabecera no se llega desde aquí.
+//
+// Así que el componente se ANUNCIA: deja su ficha en Astro.locals y
+// BaseLayout, que renderiza el cuerpo antes que la cabecera justamente
+// para esto, se la pasa a SeoHead. La página no repite ninguna URL.
+if (priority) {
+  Astro.locals.heroImage = {
+    mobile: src,
+    desktop: hasDesktop ? (desktop as string) : src,
+    breakpoint: BP,
+  };
+}
+---
+
+<picture>
+  {/* Mobile-first también en el marcado: el <img> lleva la de MÓVIL y el
+      <source> la de escritorio, que solo entra a partir del breakpoint. */}
+  {hasDesktop && <source media={`(min-width: ${BP}px)`} srcset={desktop} />}
+  <img
+    src={src}
+    alt={alt}
+    width={width}
+    height={height}
+    class:list={[
+      full && 'is-full-width',
+      fill && 'h-100',
+      `obj-${fit}`,
+      rounded && 'radius-20',
+      ratio && 'frame',
+      cls,
+    ]}
+    style={ratio ? `--frame:${ratio}` : undefined}
+    loading={priority ? 'eager' : 'lazy'}
+    fetchpriority={priority ? 'high' : undefined}
+    decoding={priority ? 'sync' : 'async'}
+  />
+</picture>

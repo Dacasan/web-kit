@@ -1,0 +1,126 @@
+---
+// SeoHead — componente SEO centralizado. Todas las páginas comparten este
+// <head>: metas, og, canonical, preloads y JSON-LD vía buildGraph.
+// Los schemas son siempre iguales (FAQPage, HowTo, BreadcrumbList, Dentist)
+// salvo el producto que cambia por página.
+import { site } from '@agenciaweb/kit-site';
+import { CRM_URL } from"../lib/crm-url";
+import { buildGraph } from"../lib/schema";
+
+interface Props {
+  title: string;
+  description: string;
+  /** Ruta relativa con barra final. Default "/". */
+  path?: string;
+  /** OG image custom. Default site.ogImage. */
+  ogImage?: string;
+  /** OG type. Default "website". */
+  ogType?: string;
+  noindex?: boolean;
+  preloadHero?: { mobile: string; desktop: string; breakpoint: number };
+  hasVideo?: boolean;
+  faq?: readonly { q: string; a: string }[];
+  steps?: readonly { title: string; text: string }[];
+  breadcrumb?: { name: string; item?: string }[];
+  /** Producto/tratamiento de la página → nodo con rating + precio. */
+  product?: {
+    name: string;
+    description?: string;
+    price?: string;
+    ratingValue?: string;
+    ratingCount?: string;
+  };
+}
+
+const {
+  title,
+  description,
+  path ="/",
+  ogImage = site.ogImage,
+  ogType ="website",
+  noindex = false,
+  preloadHero,
+  hasVideo = false,
+  faq,
+  steps,
+  breadcrumb,
+  product,
+} = Astro.props;
+
+const canonical = `${site.baseUrl}${path}`;
+const robots = noindex || !site.indexable
+  ?"noindex, nofollow"
+  :"index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1";
+
+const ogFullUrl = ogImage.startsWith("http") ? ogImage : `${site.baseUrl}${ogImage}`;
+
+const graph = buildGraph({
+  url: canonical,
+  title,
+  description,
+  faq,
+  steps,
+  breadcrumb,
+  product,
+});
+
+
+
+---
+
+<title>{title}</title>
+<meta name="description" content={description} />
+<meta name="robots" content={robots} />
+<link rel="canonical" href={canonical} />
+<link rel="icon" href="/favicon.ico" sizes="any" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+<meta property="og:type" content={ogType} />
+<meta property="og:site_name" content={site.name} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={ogFullUrl} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:locale" content="en_US" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogFullUrl} />
+
+{/* Precarga de la imagen del hero. Normalmente no la pasa la página: la
+    pone <Image priority> desde el cuerpo a través de Astro.locals.
+
+    Los dos `media` son MUTUAMENTE EXCLUYENTES —max-width: BP-1 es el
+    complemento exacto de min-width: BP— porque si los dos casaran el
+    navegador se descargaría las dos fotos y el preload costaría más de lo
+    que ahorra. Ese max-width es aritmética de precarga, no una media query
+    de maqueta.
+
+    Con una sola foto para todo va UN link y sin `media`: dos links a la
+    misma URL no eligen nada. */}
+{preloadHero && (
+  preloadHero.mobile === preloadHero.desktop ? (
+    <link rel="preload" as="image" href={preloadHero.mobile} fetchpriority="high" />
+  ) : (
+    <>
+      <link rel="preload" as="image" href={preloadHero.mobile} media={`(max-width: ${preloadHero.breakpoint - 1}px)`} fetchpriority="high" />
+      <link rel="preload" as="image" href={preloadHero.desktop} media={`(min-width: ${preloadHero.breakpoint}px)`} fetchpriority="high" />
+    </>
+  )
+)}
+
+{hasVideo && (
+  <>
+    <link rel="preconnect" href="https://www.youtube.com" />
+    <link rel="preconnect" href="https://www.youtube-nocookie.com" />
+  </>
+)}
+
+<script type="application/ld+json" is:inline set:html={JSON.stringify(graph)}></script>
+
+<script is:inline define:vars={{ siteUrl: site.baseUrl, apiUrl: CRM_URL }}>
+  window.__WACRM_SITE_URL__ = siteUrl;
+  window.__WACRM_API_URL__ = apiUrl;
+</script>

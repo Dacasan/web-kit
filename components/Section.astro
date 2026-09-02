@@ -1,0 +1,169 @@
+---
+// Section — sección, contenedor y fila en un solo componente.
+//
+// Antes cada bloque de sections/ traía cocido dentro su <section>, su fondo,
+// su .container y su .row con columnas fijas. Un bloque ocupaba una franja
+// entera de la página POR DEFINICIÓN: no se podía decidir cuántos poner, ni
+// ponerlos lado a lado, ni reutilizar la mitad.
+//
+// Aquí no hay sistema nuevo. Es 04-layout.css tal cual —.section, .container,
+// .row— envuelto en props. Las columnas van sueltas en el marcado con las
+// clases de siempre:
+//
+//   <Section bg="white" scroll>
+//     <div class="col-12"><Text center …/></div>
+//     <div class="col-4"><Video …/></div>
+//     <div class="col-4"><Video …/></div>
+//     <div class="col-4"><Video …/></div>
+//   </Section>
+//
+// `scroll` ES LA DECISIÓN QUE MÁS CAMBIA LA PÁGINA, y es la que antes estaba
+// enterrada dentro de cada componente: los mismos tres vídeos apilados son
+// tres pantallas de scroll antes del CTA; deslizándose son una.
+import type { HTMLAttributes } from 'astro/types';
+
+// `.section` va SIEMPRE, incluso en `none`: de ahí sale el filete que separa
+// una sección de la siguiente (`.section + .section { border-top }`).
+const PAD = {
+  normal: 'section',
+  tight: 'section section--tight',
+  hero: 'section hero',
+  none: 'section section--flush',
+} as const;
+
+const BG = {
+  white: 'bg-white',
+  secondary: 'bg-secondary',
+  soft: 'bg-soft',
+  dark: 'bg-dark',
+} as const;
+
+interface Props extends HTMLAttributes<'section'> {
+  /** Fondo. Solo tokens: aquí no entra ningún hex. */
+  bg?: keyof typeof BG;
+  /** En MÓVIL las columnas se deslizan en vez de apilarse. A 900px, igual
+      que cualquier fila. Para piezas intercambiables: vídeos, reseñas,
+      tarjetas. No para texto+imagen, que hay que leer entero. */
+  scroll?: boolean;
+  /** El contenido pierde el techo de ancho. Por defecto va contenido. */
+  full?: boolean;
+  /** Ritmo vertical. */
+  pad?: keyof typeof PAD;
+  /** Centra las columnas verticalmente entre sí (.is-vertical-align). */
+  align?: boolean;
+  /** Intercambia los lados a partir de 900px. En móvil manda el marcado:
+      escribe primero lo que quieres leer primero en el teléfono. */
+  reverse?: boolean;
+  /** Centra el texto de toda la sección. */
+  center?: boolean;
+  /** Filete arriba y abajo. */
+  bordered?: boolean;
+  /** Solo con `scroll`: ancho de cada pieza en móvil (ficha --rail-item).
+      Siempre < 100%, para que asome la siguiente. */
+  item?: string;
+  /** Solo con `scroll`: pista bajo el carril, visible solo en móvil. */
+  hint?: string;
+  /** Cabecera del bloque, encima de la fila y a ancho completo. */
+  heading?: string;
+  sub?: string;
+  /** Nivel del encabezado. 2 por defecto; 1 solo en el hero de la página. */
+  level?: 1 | 2 | 3;
+  /** schema.org. Si se pasa, la sección lleva itemscope. */
+  itemtype?: string;
+  /** Nombre accesible. Obligatorio con `scroll` si no hay `heading`. */
+  label?: string;
+  /**
+   * Botón al cierre de la sección. Por defecto abre el modal del formulario
+   * (#form-popup, el mismo .lightbox:target de la cabecera).
+   *
+   * Existe como prop y no como marcado suelto porque el cierre con llamada
+   * a la acción va en TODAS las secciones: escrito a mano son doscientos
+   * sitios donde el texto, la clase o el destino pueden divergir, y basta
+   * con que uno apunte a un ancla que no existe para perder ese clic.
+   */
+  cta?: string;
+  /** Destino del botón. El modal salvo que se diga otra cosa. */
+  ctaHref?: string;
+}
+
+const {
+  bg = 'white',
+  scroll = false,
+  full = false,
+  pad = 'normal',
+  align = false,
+  reverse = false,
+  center = false,
+  bordered = false,
+  item,
+  hint,
+  heading,
+  sub,
+  level = 2,
+  itemtype,
+  label,
+  cta,
+  ctaHref = '#form-popup',
+  class: cls,
+  ...rest
+} = Astro.props;
+
+// Sin defaults silenciosos: una región que se desplaza TIENE que tener
+// nombre accesible y poder recorrerse con teclado. Quien no usa ratón ni
+// gestos no llega a la tercera tarjeta de un carril anónimo. Romper el build
+// es la única forma de que esto no se publique.
+if (scroll && !label && !heading) {
+  throw new Error(
+    '[Section] `scroll` crea una región que se desplaza y necesita nombre accesible. ' +
+      'Pasa `heading` (si el carril lleva titular visible) o `label`.',
+  );
+}
+
+const Heading = `h${level}` as 'h1' | 'h2' | 'h3';
+
+// El titular se pinta con set:html —admite <em>, que es recurso de marca— y
+// un aria-label NO interpreta marcado: se leería "menor que em mayor que".
+const plain = (s: string) =>
+  s.replace(/<[^>]*>/g, '').replace(/&quot;/g, '"').replace(/&amp;/g, '&').trim();
+---
+
+<section
+  class:list={[PAD[pad], BG[bg], bordered && 'bordered', center && 'text-center', cls]}
+  itemscope={itemtype ? true : undefined}
+  itemtype={itemtype}
+  aria-label={!heading ? label : undefined}
+  {...rest}
+>
+  <div class:list={['container', full && 'container--full']}>
+    {(heading || sub) && (
+      <header class="section-header">
+        {heading && <Heading set:html={heading} />}
+        {sub && <p class="lead">{sub}</p>}
+      </header>
+    )}
+
+    <div
+      class:list={['row', scroll && 'row--scroll', reverse && 'row--reverse', align && 'is-vertical-align']}
+      style={scroll && item ? `--rail-item:${item}` : undefined}
+      role={scroll ? 'group' : undefined}
+      aria-label={scroll ? (label ?? (heading ? plain(heading) : undefined)) : undefined}
+      tabindex={scroll ? 0 : undefined}
+    >
+      <slot />
+    </div>
+
+    {scroll && hint && <p class="rail-hint">{hint}</p>}
+
+    {cta && (
+      <div class="btn-row section__cta">
+        <a href={ctaHref} class="button primary pill">{cta}</a>
+      </div>
+    )}
+  </div>
+</section>
+
+<style>
+  /* El botón de cierre respira respecto a la fila; el resto del espacio lo
+     pone el relleno de la sección. */
+  .section__cta { margin-top: 4rem; }
+</style>

@@ -1,0 +1,86 @@
+---
+// HeroLede — la columna de texto del hero con H1 falso.
+//
+// EL TRUCO (se mantiene tal cual): el <h1> de verdad es la chapita de
+// disponibilidad, con su punto pulsante — es la primera línea que ve el
+// visitante y tiene sentido visual. El titular grande que PARECE un H1 es
+// un <p> con la escala de h1: es un claim publicitario, no un encabezado,
+// y ponerlo como h1 dejaba la página con la consulta SEO enterrada.
+//
+// Va dentro de una <Section pad="hero">. No trae fondo ni ancho propios.
+import { site, PRIMARY_CTA, whatsappHref } from '@agenciaweb/kit-site';
+
+interface Props {
+  /** El H1 real: la chapita de disponibilidad. */
+  badge?: string;
+  /** Nivel de la chapa. 1 en una landing —es EL h1—; 2 en un catálogo,
+      donde el h1 ya lo pone la página y no puede haber dos. */
+  level?: 1 | 2;
+  /** El titular visible, grande. Va como <p>. Admite <em> dorado. */
+  displayTitle?: string;
+  subtitle?: string;
+  /** Texto del CTA principal. */
+  cta?: string;
+  ctaHref?: string;
+  /** Texto del botón de WhatsApp. Vacío para no pintarlo. */
+  waText?: string;
+  /** Cifras bajo los botones. Por defecto, las dos primeras de site.proof. */
+  stats?: { num: string; label: string }[];
+}
+
+const {
+  badge = 'Now accepting patients',
+  level = 1,
+  displayTitle = 'Fixed teeth in one day. All-on-4 dental implants.',
+  subtitle = 'A full arch of permanent-looking teeth on just 4 implants. Free consultation with 3D scan and written plan.',
+  cta = PRIMARY_CTA,
+  ctaHref = '#consulta',
+  waText = 'WhatsApp',
+  stats = site.proof.slice(0, 2),
+} = Astro.props;
+
+const Badge = `h${level}` as 'h1' | 'h2';
+---
+
+<div class="hero-lede">
+  <Badge class="hero-avail-badge" itemprop="headline">
+    <span class="hero-avail-badge__dot" aria-hidden="true"></span>
+    {badge}
+  </Badge>
+
+  <p class="hero-title" set:html={displayTitle} />
+  {subtitle && <p class="lead hero-sub">{subtitle}</p>}
+
+  <div class="btn-row">
+    {/* .accent y no .primary: este es EL CTA de la página, no una repetición. */}
+    <a href={ctaHref} class="button accent pill">{cta}</a>
+    {waText && (
+      <a href={whatsappHref} class="button outline pill" target="_blank" rel="noopener" data-wa-cta>
+        {waText}
+      </a>
+    )}
+  </div>
+
+  {stats.length > 0 && (
+    <ul class="inline-stats hero-stats">
+      {stats.map((p) => (
+        <li class="inline-stat">
+          <strong class="inline-stat__num text-primary">{p.num}</strong>
+          <span class="inline-stat__label">{p.label}</span>
+        </li>
+      ))}
+    </ul>
+  )}
+</div>
+
+<style>
+  /* .btn-row global centra; en el hero los botones van a la izquierda,
+     alineados con el titular. */
+  .btn-row { justify-content: flex-start; }
+  /* La capa base le da al h1 letter-spacing y margen de titular. La chapita
+     no es un titular: se normaliza. El estilo visual (sans, versalitas,
+     filete) lo pone .hero-avail-badge global. */
+  :is(h1, h2).hero-avail-badge { margin: 0 0 1.6rem; }
+  .hero-sub { margin: 1.6rem 0 2.4rem; }
+  .hero-stats { margin-top: 2.4rem; }
+</style>

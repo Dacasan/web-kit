@@ -1,0 +1,120 @@
+---
+// Pie — datos de contacto. El nodo del negocio ya viaja en el grafo JSON-LD,
+// así que aquí no se repiten microdatos: duplicar la entidad entre JSON-LD y
+// microdatos es un error de datos estructurados (skill §20).
+import { site, whatsappHref, PAGINAS, HERRAMIENTAS } from '@agenciaweb/kit-site';
+
+// El índice del pie es COMPOSICIÓN del cliente y llega por el contrato de
+// datos (PAGINAS / HERRAMIENTAS): una página nueva aparece por existir y
+// una borrada desaparece sola. Escrito a mano se queda viejo a la primera,
+// y un enlace roto en el pie está en las 27 páginas a la vez.
+const titulo = (slug: string) =>
+  slug.replace(/-/g,"").replace(/\b\w/g, (c) => c.toUpperCase());
+
+
+---
+
+<footer class="section section--tight bg-dark">
+  <div class="container">
+    {/* Mapa del sitio. En el pie porque es donde un rastreador espera
+        encontrar el enlazado completo, y porque un visitante que llega al
+        final sin convertir todavía puede estar buscando otra página. */}
+    <nav class="footer-map" aria-label="All pages">
+      <ul class="footer-map__list">
+        <li><a href="/" class="text-white">Home</a></li>
+        {PAGINAS.map((slug) => (
+          <li><a href={`/${slug}/`} class="text-white">{titulo(slug)}</a></li>
+        ))}
+      </ul>
+      <ul class="footer-map__list footer-map__list--tools">
+        {HERRAMIENTAS.map((slug) => (
+          <li><a href={`/${slug}`} class="text-white" rel="nofollow">{titulo(slug)}</a></li>
+        ))}
+      </ul>
+    </nav>
+
+  <div class="text-center">
+    {/* Misma marca que la cabecera, versión para fondo oscuro. El PNG va con
+        fondo TRANSPARENTE: antes traía un rectángulo #111111 pegado que
+        pasaba desapercibido sobre el pie negro, pero sobre el verde profundo
+        --brand-ink se vería como una caja alrededor del logotipo. */}
+    <p class="footer-name">
+      <img
+        src="/logo-a4-dark.png"
+        alt={site.name}
+        width="520"
+        height="147"
+        loading="lazy"
+        decoding="async"
+      />
+    </p>
+    <p class="footer-address">
+      {site.address.street}, {site.address.locality}, {site.address.region}
+    </p>
+    <p class="footer-contact">
+      <a href={`tel:${site.phone.replace(/\s/g,"")}`} class="text-white">{site.phone}</a>
+      <span aria-hidden="true"> · </span>
+      <a href={`mailto:${site.email}`} class="text-white">{site.email}</a>
+    </p>
+    <p class="footer-wa">
+      <a
+        href={whatsappHref}
+        class="text-white"
+        target="_blank"
+        rel="noopener"
+        data-wa-cta
+        data-track="whatsapp_click"
+        data-track-label="footer"
+      >
+        WhatsApp
+      </a>
+    </p>
+    <p class="footer-legal">
+      Results vary depending on the case, diagnosis and adherence to treatment.
+      This page does not replace a medical consultation.
+    </p>
+    <p class="footer-legal">
+      <a href="/privacy-policy/">Privacy Policy</a> · <a href="/terms/">Terms and Conditions</a>
+    </p>
+  </div>
+  </div>
+</footer>
+
+<style>
+  .footer-map { margin-bottom: 4.8rem; }
+  .footer-map__list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: .8rem 2.4rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: var(--text-sm);
+  }
+  .footer-map__list--tools {
+    margin-top: 2.4rem;
+    padding-top: 2.4rem;
+    border-top: 1px solid rgb(255 255 255 / .12);
+    font-size: var(--text-xs);
+    opacity: .7;
+  }
+
+  .footer-name { margin-bottom: 1.6rem; }
+  .footer-name img {
+    display: block;
+    width: auto;
+    height: 44px;
+    margin-inline: auto;
+  }
+  .footer-address { font-size: var(--text-sm); }
+  .footer-contact {
+    font-size: var(--text-sm);
+    margin-top: 1.6rem;
+  }
+  .footer-wa { font-size: var(--text-sm); }
+  .footer-legal {
+    font-size: var(--text-xs);
+    margin-top: 2.4rem;
+  }
+</style>

@@ -1,0 +1,172 @@
+---
+// EstimateResult — el estimado, entregado en la página de gracias.
+//
+// Lo pinta el servidor con los precios de lista (ambas arcadas) y lo ajusta
+// el navegador con lo que el visitante respondió, que llega por
+// sessionStorage desde lead-form.ts. Dos consecuencias buenas de hacerlo en
+// ese orden: la página tiene contenido aunque el JS falle o el navegador
+// bloquee el almacenamiento, y la PII no viaja por la URL (la regla del
+// proyecto, escrita en thank-you.astro).
+//
+// Dos escenarios, misma sección:
+//   · Vino del estimado  → precios de SU arcada + el ahorro calculado contra
+//                          el presupuesto que trajo de EE. UU.
+//   · Vino de un formulario corto → los mismos dos planes y el ahorro medio.
+//     Enseñar el precio y callar el ahorro desaprovecha la única página que
+//     el visitante mira con calma.
+import { PLANS, QUOTE_FALLBACK, AVG_SAVINGS, site } from '@agenciaweb/kit-site';
+
+interface Props {
+  label?: string;
+  /** Titular del caso genérico (sin cuestionario). */
+  genericTitle?: string;
+  includesNote?: string;
+}
+
+const {
+  label = 'Your travel-included estimate',
+  genericTitle = `Our patients save ${AVG_SAVINGS} on average.`,
+  includesNote = 'Surgery, temporaries, final teeth, CT scan, medications, airport transfers and hotel for 2 guests. No hidden fees.',
+} = Astro.props;
+
+const usd = (n: number) => `$${n.toLocaleString('en-US')}`;
+
+/** El script necesita los precios en el cliente: viajan como JSON en el DOM. */
+const planData = JSON.stringify(PLANS.map((p) => ({ key: p.key, price: p.price })));
+---
+
+<section class="section" data-estimate-result data-plans={planData} data-quote-fallback={QUOTE_FALLBACK}>
+  <div class="container">
+    <div class="est-result">
+      <p class="label">{label}</p>
+
+      {/* Tres huecos: nombre, verbo y cifra. El servidor pinta el caso
+          genérico; el navegador lo sustituye si hubo cuestionario. */}
+      <h2 class="est-result__title">
+        <span data-est-name>{genericTitle}</span><span data-est-verb hidden></span>
+        <em class="est-result__save" data-est-save hidden></em>
+      </h2>
+      <p class="est-result__meta text-grey" data-est-meta>
+        Written quote guaranteed for 12 months · {site.rating.value}/5 from {Number(site.rating.count).toLocaleString('en-US')} patients
+      </p>
+
+      {/* Las dos rutas. La diferencia que manda es el número de viajes: va
+          arriba del todo, en grande, antes que el nombre y que el precio. */}
+      <div class="est-plans">
+        {PLANS.map((p, i) => (
+          <article
+            class:list={['card', 'est-plan', p.dark && 'est-plan--dark']}
+            data-plan-index={i}
+          >
+            <p class="est-plan__trips">{p.trips}</p>
+            <p class="est-plan__timeline">{p.tripsNote}</p>
+
+            <div class="est-plan__row">
+              <div class="est-plan__id">
+                <p class="label est-plan__eyebrow">{p.eyebrow}</p>
+                <h3 class="est-plan__name">{p.name}</h3>
+              </div>
+              <div class="est-plan__money">
+                <p class="est-plan__price" data-plan-price>
+                  {typeof p.price.both === 'number' ? usd(p.price.both) : QUOTE_FALLBACK}
+                </p>
+                <p class="est-plan__save" data-plan-save hidden></p>
+              </div>
+            </div>
+
+            <p class="est-plan__text">{p.text}</p>
+            <p class="est-plan__specs">{p.specs}</p>
+          </article>
+        ))}
+      </div>
+
+      <p class="est-includes">
+        <strong>Includes:</strong> {includesNote}
+        <span data-est-quote hidden></span>
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .est-result { max-width: 92rem; margin-inline: auto; }
+  .est-result__title { margin: .8rem 0 .4rem; }
+  .est-result__save { color: var(--ink-primary); }
+  .est-result__save[hidden], .est-result__meta[hidden] { display: none; }
+  .est-result__meta { font-size: var(--text-sm); margin-bottom: 3.2rem; }
+
+  /* Las dos rutas, apiladas en móvil y en columnas a 900px. */
+  .est-plans { display: grid; gap: var(--gap-card); }
+
+  .est-plan { display: grid; gap: .8rem; }
+  .est-plan--dark {
+    background: var(--bg-dark);
+    border-color: var(--bg-dark);
+    color: var(--ink-body-on-dark);
+  }
+
+  /* EL DATO QUE DISTINGUE A LOS DOS PLANES: el número de viajes va primero,
+     grande y en mayúsculas, antes que el nombre y antes que el precio. */
+  .est-plan__trips {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 3.2rem;
+    line-height: 1;
+    letter-spacing: -.02em;
+    text-transform: uppercase;
+    color: var(--ink-primary);
+  }
+  .est-plan--dark .est-plan__trips { color: var(--ink-title-on-dark); }
+  .est-plan__timeline {
+    margin: 0 0 .8rem;
+    padding-bottom: 1.2rem;
+    font-size: var(--text-sm);
+    color: var(--ink-muted);
+    border-bottom: 1px solid var(--border-hairline);
+  }
+  .est-plan--dark .est-plan__timeline {
+    color: var(--ink-body-on-dark);
+    border-bottom-color: color-mix(in srgb, var(--ink-body-on-dark) 25%, transparent);
+  }
+
+  .est-plan__row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.6rem;
+  }
+  .est-plan__id { min-width: 0; }
+  .est-plan__eyebrow { margin: 0 0 .4rem; }
+  .est-plan--dark .est-plan__eyebrow { color: var(--ink-title-on-dark); opacity: 1; }
+  .est-plan__name { margin: 0; font-size: var(--text-xl); }
+  .est-plan--dark .est-plan__name { color: var(--ink-title-on-dark); }
+  .est-plan__money { text-align: right; flex-shrink: 0; }
+  .est-plan__price {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 2.6rem;
+    line-height: 1.1;
+  }
+  .est-plan__save { margin: .2rem 0 0; font-size: var(--text-xs); color: var(--ink-muted); }
+  .est-plan--dark .est-plan__save { color: var(--ink-title-on-dark); }
+  .est-plan__save[hidden] { display: none; }
+  .est-plan__text { margin: 0; font-size: var(--text-sm); }
+  .est-plan__specs { margin: 0; font-size: var(--text-xs); color: var(--ink-muted); }
+  .est-plan--dark :is(.est-plan__text, .est-plan__specs) { color: var(--ink-body-on-dark); }
+
+  .est-includes {
+    margin: 3.2rem 0 0;
+    padding: 1.6rem;
+    font-size: var(--text-sm);
+    background: var(--bg-alt);
+    border-radius: var(--radius);
+  }
+
+  @media (min-width: 900px) {
+    .est-plans { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+</style>
+
+<script>
+  import '../../scripts/estimate-result';
+</script>

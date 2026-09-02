@@ -1,0 +1,22 @@
+---
+import BaseLayout from '@agenciaweb/kit/layouts/BaseLayout.astro';
+import Section from '@agenciaweb/kit/components/Section.astro';
+import Card from '@agenciaweb/kit/components/blocks/Card.astro';
+import Text from '@agenciaweb/kit/components/blocks/Text.astro';
+import { site, PRIMARY_CTA, whatsappHref } from '../data/site';
+import '../styles/index.css';
+---
+
+<BaseLayout title={`${site.name} — home`} description={`[BRAND] propuesta de valor de ${site.name} en una frase.`} path="/">
+  <Section>
+    <div class="row">
+      <div class="col-12 col-8">
+        <Card>
+          <Text kind="h1">{site.name}</Text>
+          <Text>[BRAND] H1 — repite el lenguaje del anuncio que trajo el clic.</Text>
+          <p><a class="btn" href={whatsappHref}>{PRIMARY_CTA}</a></p>
+        </Card>
+      </div>
+    </div>
+  </Section>
+</BaseLayout>

@@ -1,0 +1,105 @@
+---
+// Marquee — la marquesina infinita: logos, certificaciones o frases.
+//
+// EL TRUCO: el contenido se duplica y la animación va de 0 a -50%, así que
+// al cerrar el ciclo la segunda copia está exactamente donde estaba la
+// primera y el salto es invisible. Pausa al pasar el cursor y parada total
+// con prefers-reduced-motion — todo eso ya vive en .scroller
+// (05-components.css). Cero JavaScript.
+//
+// DÓNDE PONERLO: en una <Section full> — .scroller nace pensado para ir a
+// sangre (width 90%, techo de 1536px, centrado). Dentro de una sección con
+// .container se queda al 90% de la columna, que es más estrecho de lo que
+// pide una marquesina de logos.
+interface MarqueeImage {
+  src: string;
+  alt: string;
+  /** Medidas reales del archivo. Sin ellas la marquesina da un salto según
+      van entrando los logos, porque cada uno estrena su ancho al cargar. */
+  width: number;
+  height: number;
+}
+
+import Image from './Image.astro';
+
+interface Props {
+  /** Frases. Se ignora si se pasan `images`. */
+  items?: string[];
+  /** Logos. Si vienen, la marquesina va en modo imágenes. */
+  images?: MarqueeImage[];
+  speed?: 'fast' | 'normal' | 'slow';
+  /** Nombre accesible de la región. Obligatorio si la sección no tiene
+      cabecera: sin él, un lector de pantalla anuncia un grupo sin nombre. */
+  label?: string;
+}
+
+const {
+  items = [
+    'Board-certified implantologists',
+    'Same-day fixed teeth',
+    '3D CT-guided surgery',
+    'In-house lab',
+    'Financing available',
+    '1,200+ arches restored',
+  ],
+  images,
+  speed = 'normal',
+  label = 'Certifications',
+} = Astro.props;
+
+const useImages = Boolean(images && images.length > 0);
+const source: (string | MarqueeImage)[] = useImages ? (images as MarqueeImage[]) : items;
+// El duplicado es lo que hace que el bucle no dé el salto. La segunda copia
+// va aria-hidden: el contenido real está una sola vez para quien escucha.
+const loop = [...source, ...source];
+---
+
+<div
+  class:list={[
+    'scroller',
+    'scroller--h',
+    speed === 'fast' && 'scroller--fast',
+    speed === 'slow' && 'scroller--slow',
+  ]}
+  aria-label={label}
+>
+  <div class="scroller-track">
+    {loop.map((t, i) =>
+      useImages ? (
+        <div class="scroller-item" aria-hidden={i >= source.length ? 'true' : undefined}>
+          <Image
+            src={(t as MarqueeImage).src}
+            alt={(t as MarqueeImage).alt}
+            width={(t as MarqueeImage).width}
+            height={(t as MarqueeImage).height}
+            fit="contain"
+            full={false}
+            rounded={false}
+            class="scroller-item--logo"
+          />
+        </div>
+      ) : (
+        <div class="scroller-item scroller-item--text" aria-hidden={i >= source.length ? 'true' : undefined}>
+          {t as string}
+        </div>
+      ),
+    )}
+  </div>
+</div>
+
+<style>
+  /* Logos: altura uniforme y escala de grises con opacidad, que recuperan
+     color al pasar el cursor — el patrón estándar de logos de confianza. */
+  .scroller-item--logo {
+    height: 40px;
+    width: auto;
+    max-width: 160px;
+    object-fit: contain;
+    filter: grayscale(1) opacity(0.65);
+    transition: filter 0.2s ease;
+  }
+  .scroller:hover .scroller-item--logo { filter: grayscale(0) opacity(1); }
+  @media (min-width: 900px) {
+    .scroller-item--logo { height: 48px; max-width: 200px; }
+  }
+</style>

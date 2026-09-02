@@ -1,0 +1,109 @@
+---
+// BaseLayout — shell HTML del sitio web (skill §9.1).
+//
+// Emite las etiquetas de SEO, el grafo JSON-LD (§9.2), las pistas de
+// conexión (§8.4) y monta el widget de contacto después de <main> (§7.7).
+//
+// Conexión con el CRM (proyecto separado):
+//   - god.js se sirve desde el dominio del CRM (CRM_URL), un <script src>
+//     cross-origin legal sin CORS. Se ejecuta en el contexto de ESTE dominio
+//     → cookies first-party del sitio → atribución correcta.
+//   - __WACRM_API_URL__ apunta al CRM para los endpoints /api/* (events,
+//     track). Ambos dominios salen de CRM_URL (lib/crm-url.ts).
+import SeoHead from"../components/SeoHead.astro";
+import ContactLauncher from"../components/ContactLauncher.astro";
+import Footer from"../components/sections/Footer.astro";
+import { CRM_URL } from"../lib/crm-url";
+
+interface Props {
+  title: string;
+  description: string;
+  path?: string;
+  ogImage?: string;
+  ogType?: string;
+  preloadHero?: { mobile: string; desktop: string; breakpoint: number };
+  hasVideo?: boolean;
+  noindex?: boolean;
+  faq?: readonly { q: string; a: string }[];
+  steps?: readonly { title: string; text: string }[];
+  breadcrumb?: { name: string; item?: string }[];
+  product?: {
+    name: string;
+    description?: string;
+    price?: string;
+    ratingValue?: string;
+    ratingCount?: string;
+  };
+}
+
+const {
+  title,
+  description,
+  path ="/",
+  ogImage,
+  ogType,
+  preloadHero,
+  hasVideo = false,
+  noindex = false,
+  faq,
+  steps,
+  breadcrumb,
+  product,
+} = Astro.props;
+
+// EL CUERPO SE RENDERIZA ANTES QUE LA CABECERA, y no es un capricho de
+// estilo: <Image priority> vive dentro del cuerpo y necesita que SeoHead
+// sepa cuál es la imagen del hero para precargarla en el <head>. Astro
+// renderiza de arriba abajo, así que si el <slot> se pintara en su sitio
+// la cabecera ya se habría cerrado y sería tarde.
+//
+// Renderizándolo a un buffer primero, cuando llega el turno de <head> ya
+// está Astro.locals.heroImage puesto. El coste es perder el streaming del
+// HTML, que en un build estático no existe: la página se escribe entera en
+// un archivo de todas formas.
+const body = await Astro.slots.render('default');
+
+
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <SeoHead
+      title={title}
+      description={description}
+      path={path}
+      ogImage={ogImage}
+      ogType={ogType}
+      noindex={noindex}
+      preloadHero={Astro.locals.heroImage ?? preloadHero}
+      hasVideo={hasVideo}
+      faq={faq}
+      steps={steps}
+      breadcrumb={breadcrumb}
+      product={product}
+    />
+  </head>
+  <body>
+    {/* Ya renderizado arriba: es HTML del propio Astro, no entrada de nadie. */}
+    <main set:html={body} />
+
+    {/* Fuera de <main>: el pie es cromo del sitio, no contenido de la página. */}
+    <Footer />
+
+    <ContactLauncher />
+
+    <!-- god.js: atribución + beacons. Se sirve desde el CRM (dominio
+         separado); se ejecuta en el contexto de este sitio (cookies
+         first-party correctas). Fuera del bundle de Astro. -->
+    <script is:inline src={`${CRM_URL}/god.js`}></script>
+    <script>
+      // Inyecta el ref_code persistido en los CTA de WhatsApp. Antes se
+      // importaba desde el frontmatter de index.astro, así que se ejecutaba
+      // en build y nunca llegaba al navegador: el código no viajaba.
+      import"../scripts/wa-ref";
+    </script>
+  </body>
+</html>

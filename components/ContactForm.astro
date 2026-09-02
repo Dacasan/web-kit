@@ -1,0 +1,79 @@
+---
+// ContactForm — el formulario corto: datos + tratamiento.
+//
+// Lo montan cuatro sitios: la sección de captación, el imán de leads, el
+// popup de la cabecera y el widget flotante. Los campos NO viven aquí, sino
+// en ContactFields.astro, que es el marcado único que comparte con el
+// estimado instantáneo (skill §13.4). Aquí solo está el <form>, el titular
+// opcional y el botón.
+//
+// Antes existía una variante `compact` que únicamente apretaba márgenes, y
+// un textarea de mensaje libre que el estimado no tenía. Las dos se
+// eliminaron: cinco formularios que se parecen de lejos son cinco
+// formularios que hay que arreglar cinco veces.
+//
+// El envío lo hace scripts/lead-form.ts contra /api/events y termina
+// redirigiendo a la página de gracias, que es donde se entrega el estimado.
+import ContactFields from"./ContactFields.astro";
+
+interface SelectOption { value: string; label: string }
+
+interface Props {
+  /** Sufijo de los id: dos formularios en el mismo documento no colisionan. */
+  formId: string;
+  /** Sale del bloque; en el widget el título lo pone la cabecera del panel. */
+  heading?: string;
+  sub?: string;
+  cta?: string;
+  selectLabel?: string;
+  selectOptions?: SelectOption[];
+  /**
+   * A dónde va el navegador tras un envío correcto. El imán de leads manda a
+   * /thank-you-download, que dispara la descarga del PDF; el resto al
+   * /thank-you normal, donde se pinta el estimado. Ruta desde la raíz.
+   */
+  thankYou?: string;
+}
+
+const {
+  formId,
+  heading,
+  sub,
+  cta ="Get My Quote",
+  selectLabel,
+  selectOptions,
+  thankYou ="/thank-you",
+} = Astro.props;
+---
+
+<form
+  id={`lead-form-${formId}`}
+  class="form"
+  data-lead-form
+  data-thank-you={thankYou}
+  novalidate
+>
+  {heading && <h3 class="form-heading">{heading}</h3>}
+  {sub && <p class="form-sub">{sub}</p>}
+
+  <ContactFields formId={formId} selectLabel={selectLabel} selectOptions={selectOptions} />
+
+  <button type="submit" class="button primary">{cta}</button>
+  <p class="form__trust">No commitment. We reply within 24 hours.</p>
+</form>
+
+<style>
+  /* Encabezado y subtítulo del bloque. */
+  .form-heading {
+    font-size: var(--text-xl);
+    line-height: 1.3;
+    font-weight: 600;
+    margin: .35em 0 1.6rem;
+  }
+  .form-sub {
+    font-size: var(--text-sm);
+    color: var(--ink-muted);
+    margin: 0 0 1.6rem;
+  }
+  .form__trust { font-size: var(--text-xs); }
+</style>

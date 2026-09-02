@@ -1,0 +1,44 @@
+---
+// Stars — la valoración en estrellas.
+//
+// Estaba escrita dentro del <style> de Reviews.astro, así que una tarjeta de
+// reseña de Google en cualquier otro sitio tenía que volver a inventarla.
+// Las clases .rating y .rating__off son ahora del sistema.
+//
+// Las estrellas apagadas se dibujan igual que las encendidas pero en gris de
+// filete: así la valoración se lee como "4 de 5" y no como "4", que es una
+// cifra sin escala.
+interface Props {
+  /** Estrellas encendidas, 0 a 5. */
+  n?: number;
+  /** Total. Cinco salvo que alguien invente otra escala. */
+  of?: number;
+  /** Cifra junto a las estrellas:"4.9". Sin ella, solo las estrellas. */
+  score?: string;
+  /** Texto de apoyo:"1,247 reviews". */
+  count?: string;
+}
+
+const { n = 5, of = 5, score, count } = Astro.props;
+
+const on = Math.max(0, Math.min(of, Math.round(n)));
+---
+
+<p class="stars" aria-label={`${on} out of ${of}`}>
+  <span class="rating" aria-hidden="true">
+    {'★'.repeat(on)}<span class="rating__off">{'★'.repeat(of - on)}</span>
+  </span>
+  {score && <strong class="stars__score">{score}</strong>}
+  {count && <span class="stars__count">{count}</span>}
+</p>
+
+<style>
+  .stars {
+    display: flex;
+    align-items: center;
+    gap: .8rem;
+    margin: 0;
+  }
+  .stars__score { font-size: var(--text-lg); line-height: 1; font-weight: 700; }
+  .stars__count { font-size: var(--text-xs); color: var(--ink-muted); }
+</style>

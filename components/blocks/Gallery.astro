@@ -1,0 +1,45 @@
+---
+// Gallery — mosaico 3x3 con lightbox. Cero JavaScript.
+//
+// EL LIGHTBOX ES `:target`: cada miniatura es un <a href="#lb-x"> y la capa
+// se abre sola cuando el hash coincide. Cerrar es <a href="#!">. Lo gobierna
+// .lightbox en 05-components.css, la misma clase que el popup del header.
+//
+// MOBILE FIRST: la rejilla es 3x3 DESDE EL MÓVIL —cada columna a 1fr, así
+// que las miniaturas se encogen— porque una galería de antes/después se lee
+// mejor como mosaico que apilada. Nueve fotos apiladas son nueve pantallas.
+//
+// `id` TIENE QUE SER ÚNICO EN LA PÁGINA: de ahí salen los hash del lightbox.
+// Dos galerías con el mismo id abren las dos a la vez.
+interface Item {
+  src: string;
+  alt: string;
+}
+
+interface Props {
+  /** Prefijo de los hash del lightbox. Único por página. */
+  id?: string;
+  images: Item[];
+}
+
+const { id = 'gal', images } = Astro.props;
+
+const items = images.map((it, i) => ({ ...it, hash: `${id}-${i + 1}` }));
+---
+
+<div class="gallery-3x3 mx-auto" itemscope itemtype="https://schema.org/ImageGallery">
+  {items.map((it) => (
+    <a class="frame" href={`#${it.hash}`} aria-label={it.alt} itemprop="contentUrl">
+      <img src={it.src} alt={it.alt} width="600" height="600" loading="lazy" decoding="async" />
+    </a>
+  ))}
+</div>
+
+{/* Las capas van al final del componente: son superposiciones a pantalla
+    completa (position: fixed), así que da igual dónde vivan en el árbol. */}
+{items.map((it) => (
+  <div class="lightbox" id={it.hash}>
+    <a href="#!" class="lightbox-close" aria-label="Close">&times;</a>
+    <img src={it.src} alt={it.alt} width="600" height="600" loading="lazy" decoding="async" />
+  </div>
+))}
