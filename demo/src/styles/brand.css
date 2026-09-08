@@ -1,0 +1,33 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   MARCA — PALETA DEMO DEL CATÁLOGO (no es la paleta de ningún cliente)
+
+   El catálogo (/atomos + /showcase) es la vitrina del kit: con los defaults
+   verdes del kit era indistinguible de una marca sin rellenar y de los
+   clientes que usan esa familia. Esta paleta violeta/naranja demo es
+   deliberadamente distinta para que se VEA que es el demo.
+
+   Mismo mecanismo canónico que cualquier sitio (design-tokens.md): se
+   importa DESPUÉS de tokens.css, misma capa `tokens`, gana el orden de
+   fuente. Solo las 9 primitivas + 2 tipografías; los tokens semánticos
+   derivan solos.
+
+   Contrastes verificados: #4F3CC8 sobre blanco 7.5:1 · #A79BFF sobre
+   #1E1B2E 7.0:1 · ink-on-accent (#1E1B2E) sobre #FF7847 6.4:1.
+   ═══════════════════════════════════════════════════════════════════════ */
+:root {
+  --brand-dark:            #1E1B2E;  /* 60% · fondos oscuros, tinta del cuerpo, bordes, velo */
+  --brand-light:           #FFFFFF;  /* fondo de página, superficies, tinta sobre oscuro */
+  --brand-neutral:         #F1EFF8;  /* franja alterna: el segundo fondo claro */
+  --brand-primary:         #6D5AE6;  /* 30% · el color de la marca: superficies y bordes */
+  --brand-primary-strong:  #4F3CC8;  /* el primario que aguanta texto SOBRE claro · >=4.5:1 */
+  --brand-primary-soft:    #EBE7FB;  /* tinte del primario: superficie suave, títulos sobre oscuro */
+  --brand-primary-on-dark: #A79BFF;  /* el primario que se lee SOBRE oscuro · >=4.5:1 */
+
+  /* EL ACENTO — el CTA del demo: naranja, color ajeno a la familia del
+     primario para ejemplificar un acento propio. */
+  --brand-accent:          #FF7847;
+  --brand-ink-on-accent:   #1E1B2E;
+
+  --brand-font-body:      system-ui, -apple-system, sans-serif;
+  --brand-font-display:   Georgia, serif;
+}

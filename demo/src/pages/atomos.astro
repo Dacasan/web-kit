@@ -33,9 +33,9 @@ import { getCollection } from 'astro:content';
 // Las preguntas del acordeón de abajo. En una página real este array es el
 // mismo que se pasa a `BaseLayout faq=`, que es lo que emite el FAQPage.
 const FAQ_DEMO = [
-  { q: '¿El presupuesto incluye el hotel?', a: 'Sí: 6 noches para 2 personas, traslados, sedación intravenosa y escáner CBCT. El presupuesto se entrega por escrito antes de viajar.' },
-  { q: '¿Puedo llevarme los dientes fijos en un solo viaje?', a: 'Algunos casos sí. Si no hay infección activa y los implantes superan las pruebas de torque, el híbrido final se entrega en 10 días hábiles.' },
-  { q: '¿Qué garantía tengo?', a: 'La del sistema de implantes usado, más el seguimiento del propio centro. Se entrega por escrito con el alta.' },
+  { q: '¿El presupuesto incluye el traslado?', a: 'Sí: traslados y accommodation placeholder. El presupuesto demo se entrega por escrito antes de confirmar. Sustituye este contenido por el de la marca.' },
+  { q: '¿Puedo ver el resultado en un solo paso?', a: 'Este texto es un placeholder del catálogo: demuestra cómo se ve un acordeón con contenido realista de dos oraciones y media.' },
+  { q: '¿Qué garantía tengo?', a: 'Placeholder: la respuesta demo muestra el párrafo más largo del acordeón. Ningún texto de aquí es de un cliente real.' },
 ];
 
 const nombre = (p: string) => p.replace(/^.*\//, '').replace(/\.astro$/, '');
@@ -60,9 +60,9 @@ const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
   <Section pad="hero" align itemtype="https://schema.org/WPHeader">
     <div class="col-7-md">
       <HeroLede
-        badge="Now accepting patients"
-        displayTitle="<em>Fixed Teeth</em>, All-Inclusive — From $14,990."
-        subtitle="Full-arch implant treatment for patients traveling from the US and Canada."
+        badge="Demo placeholder"
+        displayTitle="<em>Demo heading</em>, placeholder — Replace with the brand."
+        subtitle="Placeholder subtitle for the catalogue hero: two lines that show how the component breathes."
         cta="Get My Quote"
       />
     </div>
@@ -70,7 +70,7 @@ const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
       <Image
         src="/gallery/gallery-1.webp"
         desktop="/gallery/gallery-5.webp"
-        alt="Patient smiling after full mouth dental implants"
+        alt="Demo image placeholder"
         ratio="4/5"
         width={480}
         height={580}
@@ -84,7 +84,7 @@ const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
   <Section pad="tight" bg="secondary" bordered full label="Certifications">
     <div class="col-12">
       <Marquee
-        items={['Nobel Biocare', 'Straumann', '3D CT-guided surgery', 'In-house lab', '8,000+ patients treated']}
+        items={['Demo item one', 'Demo item two', 'Placeholder item three', 'Demo item four', 'Placeholder item five']}
         label="Certifications"
       />
     </div>
@@ -132,8 +132,8 @@ const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
     <div class="col-6">
       <Text
         level={3}
-        title="Why the 3D scan comes before the surgery"
-        text="Placing implants without a CT scan is like building a house without a floor plan. Your written plan comes out of that scan, not out of a generic protocol."
+        title="Why the demo scan comes first"
+        text="Placeholder copy for the two-column text block: two sentences that show line length and rhythm. Replace with the brand's real differentiator."
       />
     </div>
     <div class="col-6">
@@ -160,8 +160,8 @@ const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
     <div class="col-4">
       <Card itemtype="https://schema.org/Review">
         <Stars n={5} />
-        <Text level={3} text="I was terrified of the surgery and it was nothing. Sedation, woke up with teeth, done." />
-        <p class="text-body"><strong>Susan W.</strong></p>
+        <Text level={3} text="Placeholder review: shows the card with a quote and a name. The catálogo must never carry a real patient's words." />
+        <p class="text-body"><strong>Demo Person</strong></p>
       </Card>
     </div>
     <div class="col-4">
@@ -190,16 +190,16 @@ const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
     </div>
     <div class="col-4">
       <Card itemtype="https://schema.org/Review">
-        <YouTubeLite id="iORLYp3xEGA" ratio="vertical" playlabel="Testimonial from Linda M." />
-        <Text level={3} text="“They rebuilt my whole smile in one day. I can’t stop smiling.”" />
-        <p class="text-body"><strong>Linda M.</strong></p>
+        <YouTubeLite id="aqz-KE-bpKQ" ratio="vertical" playlabel="Demo video placeholder two" />
+        <Text level={3} text="“Placeholder quote two — the catálogo must never carry a real patient’s words.”" />
+        <p class="text-body"><strong>Demo Person Two</strong></p>
       </Card>
     </div>
     <div class="col-4">
       <Card itemtype="https://schema.org/Review">
-        <YouTubeLite id="RvN_pudEBt4" ratio="vertical" playlabel="Testimonial from James T." />
-        <Text level={3} text="“The plan was written, priced and explained before a single drill.”" />
-        <p class="text-body"><strong>James T.</strong></p>
+        <YouTubeLite id="aqz-KE-bpKQ" ratio="vertical" playlabel="Demo video placeholder three" />
+        <Text level={3} text="“Placeholder quote three — written copy demonstrates the card’s rhythm.”" />
+        <p class="text-body"><strong>Demo Person Three</strong></p>
       </Card>
     </div>
   </Section>
@@ -211,10 +211,10 @@ const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
         <div class="table-wrap">
           <table class="table">
             <tbody>
-              <tr><th>Implantes</th><td>4 por arcada</td></tr>
-              <tr><th>Sedación IV</th><td>Incluida</td></tr>
-              <tr><th>Escáner CBCT</th><td>Incluido</td></tr>
-              <tr><th>Hotel</th><td>6 noches, 2 personas</td></tr>
+              <tr><th>Demo feature one</th><td>Included</td></tr>
+              <tr><th>Demo feature two</th><td>Included</td></tr>
+              <tr><th>Demo feature three</th><td>Optional</td></tr>
+              <tr><th>Demo accommodation</th><td>Placeholder</td></tr>
             </tbody>
           </table>
         </div>
@@ -263,19 +263,19 @@ const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
     <div class="col-4">
       <Card>
         <Text level={3} title="Normal" text="Borde gris, el de siempre." />
-        <p class="text-body"><strong>$9,000</strong> · una arcada</p>
+        <p class="text-body"><strong>$900</strong> · demo price one</p>
       </Card>
     </div>
     <div class="col-4">
       <Card featured ribbon="Más elegido">
         <Text level={3} title="Destacada" text="Borde de marca y cinta cabalgando el borde." />
-        <p class="text-body"><strong>$14,990</strong> · dos arcadas</p>
+        <p class="text-body"><strong>$2,500</strong> · demo price two</p>
       </Card>
     </div>
     <div class="col-4">
       <Card featured>
         <Text level={3} title="Solo featured" text="Sin cinta: la cinta es una prop aparte." />
-        <p class="text-body"><strong>$19,800</strong> · todo incluido</p>
+        <p class="text-body"><strong>$2,900</strong> · demo price three</p>
       </Card>
     </div>
   </Section>
@@ -289,15 +289,15 @@ const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
       <Gallery
         id="lb-atomos"
         images={[
-          { src: '/gallery/gallery-1.webp', alt: 'All-on-4 patient result 1' },
-          { src: '/gallery/gallery-2.webp', alt: 'All-on-4 patient result 2' },
-          { src: '/gallery/gallery-3.webp', alt: 'All-on-4 patient result 3' },
-          { src: '/gallery/gallery-4.webp', alt: 'All-on-4 patient result 4' },
-          { src: '/gallery/gallery-5.webp', alt: 'All-on-4 patient result 5' },
-          { src: '/gallery/gallery-6.webp', alt: 'All-on-4 patient result 6' },
-          { src: '/gallery/gallery-7.webp', alt: 'All-on-4 patient result 7' },
-          { src: '/gallery/gallery-8.webp', alt: 'All-on-4 patient result 8' },
-          { src: '/gallery/gallery-9.webp', alt: 'All-on-4 patient result 9' },
+          { src: '/gallery/gallery-1.webp', alt: 'Demo gallery image 1' },
+          { src: '/gallery/gallery-2.webp', alt: 'Demo gallery image 2' },
+          { src: '/gallery/gallery-3.webp', alt: 'Demo gallery image 3' },
+          { src: '/gallery/gallery-4.webp', alt: 'Demo gallery image 4' },
+          { src: '/gallery/gallery-5.webp', alt: 'Demo gallery image 5' },
+          { src: '/gallery/gallery-6.webp', alt: 'Demo gallery image 6' },
+          { src: '/gallery/gallery-7.webp', alt: 'Demo gallery image 7' },
+          { src: '/gallery/gallery-8.webp', alt: 'Demo gallery image 8' },
+          { src: '/gallery/gallery-9.webp', alt: 'Demo gallery image 9' },
         ]}
       />
     </div>
@@ -311,7 +311,7 @@ const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
     sub="Grosor, brillo y flotado. Se recuperó de git cuando el borrado de LeadMagnet se llevó su <style> por delante."
   >
     <div class="col-5-md">
-      <BookCover title="The Dental Vacation Guide 2026" />
+      <BookCover title="The Demo Guide 2026" />
     </div>
     <div class="col-7-md">
       <Text
@@ -392,7 +392,7 @@ const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
     <div class="col-12">
       <Card>
         <p class="ty-label">--brand-font-display · títulos</p>
-        <p class="ty-display">Fixed teeth in one trip</p>
+        <p class="ty-display">Demo display typeface</p>
         <p class="ty-note">La cara de display carga el carácter de la marca. Solo en <code>h1</code>–<code>h3</code> y en la cursiva de acento. Nunca en párrafos: a tamaño de cuerpo cansa.</p>
       </Card>
     </div>
@@ -400,7 +400,7 @@ const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
     <div class="col-12">
       <Card>
         <p class="ty-label">--brand-font-body · cuerpo</p>
-        <p class="ty-body">Allon4DentalCenter es un centro especializado en implantes dentales. Hacemos una cosa: tratamiento de arcada completa para pacientes que viajan desde Estados Unidos y Canadá.</p>
+        <p class="ty-body">Kit Demo Clinic es un negocio demo placeholder. Este párrafo demuestra el cuerpo de la marca: dos oraciones que muestran el renglón y el ritmo del texto sin datos de ningún cliente real.</p>
         <p class="ty-note">Máximo 62 caracteres por línea. Más ancho y el ojo pierde el renglón al volver.</p>
       </Card>
     </div>
@@ -478,10 +478,10 @@ const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
       <Card>
         <Text level={3} title="marker=&quot;bullet&quot;" text="Por defecto. Es un <ul>." />
         <StepList>
-          <li>All-on-4 / All-on-5 / All-on-6</li>
-          <li>Implantes cigomáticos</li>
-          <li>Elevación de seno e injerto óseo</li>
-          <li>Restauraciones de circonio</li>
+          <li>Demo specialty one</li>
+          <li>Demo specialty two</li>
+          <li>Demo specialty three</li>
+          <li>Demo specialty four</li>
         </StepList>
       </Card>
     </div>
@@ -489,10 +489,10 @@ const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
       <Card>
         <Text level={3} title="marker=&quot;numbered&quot;" text="Contador CSS y <ol>: renumerar es reordenar los <li>." />
         <StepList marker="numbered">
-          <li>Consulta y escáner CBCT</li>
-          <li>Plan de tratamiento por escrito</li>
-          <li>Cirugía y provisionales el mismo día</li>
-          <li>Circonio final a los 4 meses</li>
+          <li>Demo step one — evaluation</li>
+          <li>Demo step two — written plan</li>
+          <li>Demo step three — delivery</li>
+          <li>Demo step four — follow-up</li>
         </StepList>
       </Card>
     </div>
@@ -509,9 +509,9 @@ const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
         <Table>
           <thead><tr><th>Tratamiento</th><th>Precio</th></tr></thead>
           <tbody>
-            <tr><td>Implante unitario</td><td>$1,290</td></tr>
-            <tr><td>All-on-4, una arcada</td><td>$8,900</td></tr>
-            <tr><td>Mejora a circonio</td><td>$2,400</td></tr>
+            <tr><td>Demo item one</td><td>$250</td></tr>
+            <tr><td>Demo item two</td><td>$1,100</td></tr>
+            <tr><td>Demo item three</td><td>$600</td></tr>
           </tbody>
         </Table>
       </Card>
@@ -522,11 +522,11 @@ const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
         <PriceTable caption="Paquetes">
           <thead><tr><th>Paquete</th><th>Desde</th></tr></thead>
           <tbody>
-            <tr class="pricing-table-category"><td colspan="2">Dos arcadas</td></tr>
-            <tr><td>Todo incluido, 2 viajes</td><td>$19,800</td></tr>
-            <tr><td>Un viaje</td><td>$14,990</td></tr>
-            <tr class="pricing-table-category"><td colspan="2">Diente unitario</td></tr>
-            <tr><td>Implante y corona</td><td>$1,290</td></tr>
+            <tr class="pricing-table-category"><td colspan="2">Demo packages</td></tr>
+            <tr><td>Demo Package A, 2 steps</td><td>$2,900</td></tr>
+            <tr><td>Demo Package B</td><td>$2,500</td></tr>
+            <tr class="pricing-table-category"><td colspan="2">Demo add-ons</td></tr>
+            <tr><td>Demo add-on included</td><td>$600</td></tr>
           </tbody>
         </PriceTable>
       </Card>
@@ -541,22 +541,22 @@ const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
     sub="Apilada en móvil, en fila desde 900px. Los separadores cambian de borde inferior a borde derecho solos."
   >
     <div class="col-12">
-      <ProofStrip label="Datos de la clínica">
+      <ProofStrip label="Datos demo del catálogo">
         <div class="proof-strip__item">
-          <span class="proof-strip__num">8,000+</span>
-          <span class="proof-strip__label">pacientes atendidos</span>
+          <span class="proof-strip__num">2,000+</span>
+          <span class="proof-strip__label">placeholder label</span>
         </div>
         <div class="proof-strip__item">
           <span class="proof-strip__num">4.9/5</span>
-          <span class="proof-strip__label">1,247 reseñas</span>
+          <span class="proof-strip__label">250 reseñas placeholder</span>
         </div>
         <div class="proof-strip__item">
-          <span class="proof-strip__num">98.2%</span>
-          <span class="proof-strip__label">tasa de éxito</span>
+          <span class="proof-strip__num">97.5%</span>
+          <span class="proof-strip__label">tasa demo</span>
         </div>
         <div class="proof-strip__item">
-          <span class="proof-strip__num">25</span>
-          <span class="proof-strip__label">años de experiencia</span>
+          <span class="proof-strip__num">15</span>
+          <span class="proof-strip__label">años demo</span>
         </div>
       </ProofStrip>
     </div>
@@ -617,7 +617,7 @@ const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
 
   <Section id="consulta" bg="dark" align>
     <div class="col-6">
-      <Text title="Get your written quote" text="Send your case and get an all-inclusive written quote within 24 hours." onDark />
+      <Text title="Get your demo quote" text="Placeholder CTA for the catálogo's dark section: the form below demonstrates the lead flow without sending to any client." onDark />
     </div>
     <div class="col-6">
       <Card><ContactForm formId="atomos" /></Card>
