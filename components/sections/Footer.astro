@@ -34,13 +34,14 @@ const titulo = (slug: string) =>
     </nav>
 
   <div class="text-center">
-    {/* Misma marca que la cabecera, versión para fondo oscuro. El PNG va con
-        fondo TRANSPARENTE: antes traía un rectángulo #111111 pegado que
-        pasaba desapercibido sobre el pie negro, pero sobre el verde profundo
-        --brand-ink se vería como una caja alrededor del logotipo. */}
+    {/* Misma marca que la cabecera, versión para fondo oscuro (site.logoDark,
+        con site.logo como fallback). El PNG va con fondo TRANSPARENTE: antes
+        traía un rectángulo #111111 pegado que pasaba desapercibido sobre el
+        pie negro, pero sobre el verde profundo --brand-ink se vería como una
+        caja alrededor del logotipo. */}
     <p class="footer-name">
       <img
-        src="/logo-a4-dark.png"
+        src={site.logoDark ?? site.logo}
         alt={site.name}
         width="520"
         height="147"

@@ -1,6 +1,6 @@
 {
   "name": "@agenciaweb/kit",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "private": true,
   "type": "module",
   "description": "Framework de diseño de agencia: estilos, componentes y scripts del sitio. Se consume versionado; no se copia.",
@@ -12,7 +12,8 @@
     "./components/*": "./components/*",
     "./layouts/*": "./layouts/*",
     "./lib/*": "./lib/*",
-    "./scripts/*": "./scripts/*"
+    "./scripts/*": "./scripts/*",
+    "./demo/*": "./demo/*"
   },
   "peerDependencies": {
     "astro": "^7.1.6"

@@ -52,13 +52,14 @@ const topbar = Astro.props.topbar ?? (variant === 'money' ? TOPBAR : undefined);
 <header class="nav">
   <div class="container nav__inner">
     {/* La marca es el logotipo, no el nombre en texto. La barra ahora es
-        --brand-ink, así que va la versión para fondo oscuro — y con fondo
-        TRANSPARENTE, sin el rectángulo pegado que traía el PNG anterior.
-        width/height reales del archivo para que el navegador reserve el
-        hueco y la cabecera no salte al cargar. */}
+        --brand-ink, así que va la versión para fondo oscuro (site.logoDark,
+        con site.logo como fallback para marcas sin versión dark) — y con
+        fondo TRANSPARENTE, sin el rectángulo pegado que traía el PNG
+        anterior. width/height reales del archivo para que el navegador
+        reserve el hueco y la cabecera no salte al cargar. */}
     <a href="/" class="nav__brand">
       <img
-        src="/logo-a4-dark.png"
+        src={site.logoDark ?? site.logo}
         alt={site.name}
         width="520"
         height="147"
