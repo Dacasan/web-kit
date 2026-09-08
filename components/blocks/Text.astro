@@ -5,6 +5,28 @@
 // la capa base y el párrafo la clase .text-body que ya existe. La separación
 // entre los dos sale del margen de .7em que la capa base da a los
 // encabezados. Nada que mantener.
+//
+// TRES casos de uso — el texto va SIEMPRE por props, nunca como hijo:
+//
+//   1. Titular + párrafo (el 90% de las Cards):
+//      <Text level={3} title="Precios de demo" text="Desde $2,900. Todo placeholder." />
+//      → <div><h3>Precios de demo</h3><p class="text-body">Desde $2,900…</p></div>
+//
+//   2. Solo titular (el nivel lo elige `level`; h2 si no se pasa):
+//      <Text level={3} title="Qué incluye el precio" />
+//      → <div><h3>Qué incluye el precio</h3></div>
+//      El h1 de la página — UNO por documento, en el hero:
+//      <Text level={1} title="Kit Demo Clinic" />
+//      → <div><h1>Kit Demo Clinic</h1></div>
+//
+//   3. Solo párrafo (sin encabezado):
+//      <Text text="Las estrellas son un átomo: Stars n={5}." />
+//      → <div><p class="text-body">Las estrellas son un átomo…</p></div>
+//
+// ⚠️ Lo que se pasa como HIJO (<Text>texto</Text>) cae al <div> SIN
+// semántica: ni heading ni párrafo. No existe prop `kind` — el hN solo
+// sale de title + level. El <slot /> es para un botón o una lista dentro
+// del bloque, no para el texto.
 interface Props {
   /** Titular. Admite <em> — el italic turquesa es un recurso de marca. */
   title?: string;
