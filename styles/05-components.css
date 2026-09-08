@@ -1,6 +1,6 @@
 /* Componentes base (skill §6) + widget de contacto flotante (§7.7). */
 
-/* ── Botones — tema acero: menos píldora, más filete ── */
+/* ── Botones — tema acero: menos píldora, más borde ── */
 .button {
   /* inline-flex y NO inline-block: con min-height el sobrante se añadía */
   display: inline-flex;
@@ -704,8 +704,13 @@
 /* Envoltorio de tabla — portado de chota-god.css:597-607. */
 .table-wrap { margin-bottom: 2.4rem; overflow-x: auto; }
 .pricing-table { width: 100%; border-collapse: separate; border-spacing: 0 5px; font-size: var(--text-sm); }
+/* --cta-bg + --ink-on-primary, no --primary + --ink-body. El caption son
+   20px en negrita —texto grande, exige 3:1— y la tinta casi-negra sobre el
+   primario daba 2.99:1 con la marca por defecto del kit: fallaba de serie.
+   Este par pasa para cualquier marca por contrato: --brand-primary-strong
+   está definido como el primario que aguanta texto. */
 .pricing-table caption {
-  background: var(--primary); color: var(--ink-body);
+  background: var(--cta-bg); color: var(--ink-on-primary);
   padding: 1rem; font-weight: 700; font-size: var(--text-lg);
   border-radius: var(--radius) var(--radius) 0 0;
 }
@@ -718,7 +723,10 @@
 }
 .pricing-table thead th:last-child { text-align: right; }
 .pricing-table tbody td { padding: .8rem .6rem; border-bottom: 1px solid var(--border-hairline); }
-.pricing-table tbody td:last-child { text-align: left; font-weight: 600; }
+/* A la derecha, igual que su cabecera. Estaba a la izquierda: la columna de
+   precio quedaba desalineada respecto al `Price` de arriba en todas las
+   tablas. Además las cifras se comparan alineadas por la derecha. */
+.pricing-table tbody td:last-child { text-align: right; font-weight: 600; }
 .pricing-table-category td {
   color: var(--ink-primary);
   font-weight: 700; padding-top: 1.5rem;

@@ -1,0 +1,74 @@
+---
+// StepList — lista de pasos o de puntos. Los <li> los escribes tú.
+//
+//   <StepList>
+//     <li>All-on-4 / All-on-6</li>
+//     <li>Elevación de seno e injerto óseo</li>
+//   </StepList>
+//
+//   <StepList marker="numbered">
+//     <li>Consulta y CBCT</li>
+//     <li>Cirugía y dientes provisionales</li>
+//   </StepList>
+//
+// EL MARCADOR LO PONE EL CSS, no el marcado. Es la razón de que este
+// componente exista: hoy las páginas escriben
+//
+//   <li><span aria-hidden="true">·</span> texto</li>
+//
+// una y otra vez —89 veces solo en un sitio— y ese `aria-hidden` es
+// exactamente el detalle que se olvida en la número 90, dejando que el
+// lector de pantalla lea "punto" antes de cada línea. Con ::before el
+// marcador no está en el árbol de accesibilidad y no hay nada que olvidar.
+//
+// `numbered` además usa un contador CSS: renumerar es reordenar los <li>,
+// no reescribir los números.
+interface Props {
+  /** `bullet` (por defecto) o `numbered`. */
+  marker?: 'bullet' | 'numbered';
+  class?: string;
+}
+
+const { marker = 'bullet', class: cls } = Astro.props;
+const Tag = marker === 'numbered' ? 'ol' : 'ul';
+---
+
+<Tag class:list={['step-list', `mk-${marker}`, cls]}>
+  <slot />
+</Tag>
+
+<style>
+  /* :global porque los <li> vienen del slot y no llevan el scope de aquí. */
+  .mk-numbered { counter-reset: paso; }
+
+  .mk-bullet :global(li)::before,
+  .mk-numbered :global(li)::before {
+    flex-shrink: 0;
+    color: var(--ink-primary);
+  }
+
+  /* El punto: mismo hueco que el número para que dos listas seguidas
+     alineen su texto, aunque una lleve viñeta y otra cifra. */
+  .mk-bullet :global(li)::before {
+    content: '·';
+    display: grid;
+    place-items: center;
+    width: 32px;
+    font-size: var(--text-xl);
+    line-height: 1;
+  }
+
+  /* Réplica de .step-num, que hasta ahora había que escribir a mano. */
+  .mk-numbered :global(li)::before {
+    counter-increment: paso;
+    content: counter(paso);
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    border: 1px solid var(--ink-primary);
+    border-radius: 50%;
+  }
+</style>

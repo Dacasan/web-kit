@@ -1,0 +1,39 @@
+---
+// PriceTable — la tabla de precios. Filas de categoría, columna de importe.
+//
+// Como Table, el contenido es tuyo. La diferencia es el tratamiento: banda
+// de título, cabecera en versalitas y la última columna alineada a la
+// derecha para poder comparar cifras.
+//
+//   <PriceTable caption="Paquetes de arcada completa">
+//     <thead><tr><th>Paquete</th><th>Desde</th></tr></thead>
+//     <tbody>
+//       <tr class="pricing-table-category"><td colspan="2">Dos arcadas</td></tr>
+//       <tr><td>Todo incluido, 2 viajes</td><td>$19,800</td></tr>
+//     </tbody>
+//   </PriceTable>
+//
+// `caption` es prop y no marcado porque <caption> tiene que ser el PRIMER
+// hijo de <table>: puesto a mano dentro del slot, un <thead> escrito antes
+// lo deja en un sitio inválido y el navegador lo reubica en silencio.
+interface Props {
+  /** Banda de título sobre la tabla. Es el <caption> real, no un <h*>:
+      así el lector de pantalla lo anuncia como el nombre de la tabla. */
+  caption?: string;
+  itemtype?: string;
+  class?: string;
+}
+
+const { caption, itemtype, class: cls } = Astro.props;
+---
+
+<div class="table-wrap">
+  <table
+    class:list={['pricing-table', cls]}
+    itemscope={itemtype ? true : undefined}
+    itemtype={itemtype}
+  >
+    {caption && <caption>{caption}</caption>}
+    <slot />
+  </table>
+</div>

@@ -13,7 +13,8 @@ export default defineConfig({
         // specifier y CADA consumidor lo resuelve a su propio site.ts.
         // Explícito y grep-able; nunca un resolver silencioso.
         // (El build del demo necesita LANDING_API_URL≠localhost: lib/crm-url.ts
-        // rompe el build ante dominios locales — SITIO.md §9.)
+        // rompe el build ante dominios locales a propósito —
+        // https://docs.adwebcrm.com/web-kit/new-site/)
         "@agenciaweb/kit-site": new URL("./src/site-stub.ts", import.meta.url).pathname,
       },
     },

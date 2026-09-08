@@ -1,4 +1,11 @@
 ---
+// Página de confirmación de lead. La conversión se cuenta AQUÍ, al cargarse
+// esta página, no en el submit del formulario: un submit puede fallar después
+// de disparar el evento y dejarte contando leads que nunca llegaron.
+// Ver https://docs.adwebcrm.com/crm/attribution/
+//
+// `noindex` es deliberado: esta URL no debe aparecer en resultados de
+// búsqueda ni recibir tráfico directo, o el recuento se ensucia.
 import BaseLayout from '@agenciaweb/kit/layouts/BaseLayout.astro';
 import Section from '@agenciaweb/kit/components/Section.astro';
 import Card from '@agenciaweb/kit/components/blocks/Card.astro';
@@ -6,13 +13,17 @@ import Text from '@agenciaweb/kit/components/blocks/Text.astro';
 import '../styles/index.css';
 ---
 
-<BaseLayout title="Gracias — recibimos tu solicitud" description="Tu solicitud fue recibida." noindex>
+<BaseLayout
+  title="[BRAND] Gracias — recibimos tu solicitud"
+  description="[BRAND] Tu solicitud fue recibida."
+  noindex
+>
   <Section>
     <div class="row">
       <div class="col-12">
         <Card>
-          <Text kind="h1">Thank you</Text>
-          <Text>[BRAND] Confirmación de lead. La conversión se cuenta AQUÍ, no en el submit (SITIO.md §2).</Text>
+          <Text kind="h1">[BRAND] Gracias</Text>
+          <Text>[BRAND] Recibimos tu solicitud. Te contactamos en breve.</Text>
         </Card>
       </div>
     </div>

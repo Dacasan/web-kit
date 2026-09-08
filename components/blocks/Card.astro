@@ -10,7 +10,7 @@
 //   <Card background="/foto.webp" ratio="4/5"><Text …/><a class="button">…</a></Card>
 //   <Card featured ribbon="Más elegido"><Text …/></Card>
 //
-// El radio, el filete y la sombra vienen de .card. Todo lo demás está aquí
+// El radio, el borde y la sombra vienen de .card. Todo lo demás está aquí
 // abajo, en el <style> con scope: no añade ni una clase al CSS global.
 import Image from './Image.astro';
 
@@ -35,7 +35,7 @@ interface Props {
   alt?: string;
   /** La foto de esta tarjeta es el LCP. Una por página. */
   priority?: boolean;
-  /** Destacada: el filete pasa a color de marca. */
+  /** Destacada: el borde pasa a color de marca. */
   featured?: boolean;
   /** Cinta que cabalga el borde superior. */
   ribbon?: string;
@@ -202,6 +202,13 @@ const Tag = href ? 'a' : 'div';
   /* La cinta sale medio cuerpo por encima del borde, así que la tarjeta
      tiene que darle de qué colgarse y no recortarla. */
   .ribboned { position: relative; overflow: visible; }
+  /* --cta-bg y no --primary: la cinta es texto de 11px en versalitas, o sea
+     texto pequeño, que exige 4.5:1. Sobre --primary eso depende de lo claro
+     que sea el primario del cliente — con el teal de allon4 daba 3.85:1 y
+     fallaba, con el neutro del kit daba 5.82:1 y pasaba. --cta-bg ES el
+     token que el sistema define como "el primario que aguanta texto"
+     (--brand-primary-strong, >=4.5:1 por contrato), así que aquí pasa para
+     cualquier marca: 8.42:1 con el kit, 5.52:1 con allon4. */
   .ribbon {
     position: absolute;
     top: -1.2rem;
@@ -212,7 +219,7 @@ const Tag = href ? 'a' : 'div';
     font-size: var(--text-xs);
     letter-spacing: .1em;
     text-transform: uppercase;
-    background: var(--primary);
+    background: var(--cta-bg);
     color: var(--ink-on-primary);
     border-radius: var(--radius);
   }

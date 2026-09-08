@@ -51,7 +51,7 @@ select, textarea {
   padding: .8rem 1rem;
   min-height: 48px;
   font-size: 16px;
-  /* --ink-muted y no --border-field (#1A1A1A): un filete negro puro sobre */
+  /* --ink-muted y no --border-field (#1A1A1A): un borde negro puro sobre */
   border: 1px solid var(--ink-muted);
   border-radius: var(--radius);
   transition: border-color .2s ease, box-shadow .2s ease;

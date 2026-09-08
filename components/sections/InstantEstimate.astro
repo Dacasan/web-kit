@@ -227,7 +227,7 @@ const archNote = (value: ArchKey): string => {
 
   /* Opción = etiqueta con radio dentro. El radio real se queda para el
      teclado y los lectores de pantalla; lo que se ve es la caja.
-     Superficie, filete, radio y el hover dorado los pone `card card--link`
+     Superficie, borde, radio y el hover dorado los pone `card card--link`
      en el marcado: aquí solo queda la maqueta de la fila y el estado
      marcado. Antes esto redeclaraba fondo, borde y radio por su cuenta —
      tres propiedades copiadas del sistema que ya iban por libre. */
@@ -265,7 +265,7 @@ const archNote = (value: ArchKey): string => {
     border: 1px solid var(--ink-muted);
     border-radius: 50%;
   }
-  /* Marcada = filete dorado doblado. Antes era negro sobre negro (borde +
+  /* Marcada = borde dorado doblado. Antes era negro sobre negro (borde +
      inset del mismo color), que se leía como un 2px de reja y era justo lo
      que hacía pesado el formulario. El dorado dice lo mismo sin gritar, y
      es el mismo color con el que responde todo lo pulsable del sitio. */

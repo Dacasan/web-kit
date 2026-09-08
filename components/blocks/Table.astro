@@ -1,0 +1,35 @@
+---
+// Table — la tabla del sistema con su envoltorio de scroll.
+//
+// No sabe qué lleva dentro: es un <slot>. Escribes el <thead> y el <tbody>
+// a mano, como cualquier tabla:
+//
+//   <Table>
+//     <thead><tr><th>Tratamiento</th><th>Precio</th></tr></thead>
+//     <tbody>
+//       <tr><td>All-on-4, una arcada</td><td>$8,900</td></tr>
+//     </tbody>
+//   </Table>
+//
+// Lo único que aporta es el `.table-wrap`, y no es poco: sin él una tabla
+// de tres columnas saca la página por la derecha en un móvil, sin error y
+// sin que el build se queje. Escrito a mano son decenas de sitios donde
+// alguien puede olvidarlo, y el fallo solo se ve en un teléfono.
+interface Props {
+  /** schema.org, si la tabla es el dato estructurado de la página. */
+  itemtype?: string;
+  class?: string;
+}
+
+const { itemtype, class: cls } = Astro.props;
+---
+
+<div class="table-wrap">
+  <table
+    class:list={['table', cls]}
+    itemscope={itemtype ? true : undefined}
+    itemtype={itemtype}
+  >
+    <slot />
+  </table>
+</div>

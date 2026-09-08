@@ -1,0 +1,52 @@
+---
+// Faq — el acordeón de preguntas frecuentes.
+//
+//   <Section heading="Preguntas frecuentes">
+//     <div class="col-12"><Faq items={pageFaq} /></div>
+//   </Section>
+//
+// ES EL ÚNICO BLOQUE QUE RECIBE EL CONTENIDO POR PROP, y conviene saber por
+// qué, porque en todo lo demás el sistema pone el contenido en el <slot>.
+//
+// El JSON-LD de FAQPage se emite en el <head>, que Astro renderiza ANTES del
+// <body>. Un <slot> en el cuerpo no puede alimentar una cabecera ya escrita.
+// Así que las preguntas tienen que existir como dato antes de pintarse.
+//
+// La buena noticia es que ese dato YA existe en cada página: el array que se
+// pasa a `BaseLayout faq={...}` para el schema. Este componente lo reusa en
+// vez de obligar a escribir el acordeón otra vez a mano debajo.
+//
+//   const pageFaq = [ { q: "…", a: "…" }, … ];
+//   <BaseLayout faq={pageFaq} …>          ← el schema
+//     <Faq items={pageFaq} />             ← lo visible, del mismo array
+//
+// PASA EL MISMO ARRAY A LOS DOS. Un FAQPage cuyas preguntas no están en la
+// página es structured data que no corresponde con el contenido visible:
+// Google lo trata como engañoso y es motivo de acción manual.
+interface Props {
+  /** El mismo array que va a `BaseLayout faq=`. */
+  items: readonly { q: string; a: string }[];
+  /** Abre la primera. Útil cuando el acordeón es el contenido principal
+      de la sección y no un anexo al pie. */
+  openFirst?: boolean;
+  class?: string;
+}
+
+const { items, openFirst = false, class: cls } = Astro.props;
+
+// Sin defaults silenciosos, igual que Section y Card: un acordeón vacío es
+// una sección en blanco publicada, y el schema de FAQPage además exige un
+// mínimo de dos preguntas para ser válido.
+if (!items?.length) {
+  throw new Error('[Faq] `items` está vacío. Pasa el mismo array que `BaseLayout faq=`.');
+}
+---
+
+<div class:list={['accordion', cls]}>
+  {items.map((f, i) => (
+    <details class="accordion__item" open={openFirst && i === 0}>
+      <summary class="accordion__summary" set:html={f.q} />
+      <div class="accordion__panel"><p set:html={f.a} /></div>
+    </details>
+  ))}
+</div>

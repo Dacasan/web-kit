@@ -15,6 +15,11 @@ import Section from '../../../components/Section.astro';
 
 import Card from '../../../components/blocks/Card.astro';
 import Text from '../../../components/blocks/Text.astro';
+import Table from '../../../components/blocks/Table.astro';
+import PriceTable from '../../../components/blocks/PriceTable.astro';
+import StepList from '../../../components/blocks/StepList.astro';
+import ProofStrip from '../../../components/blocks/ProofStrip.astro';
+import Faq from '../../../components/blocks/Faq.astro';
 import Image from '../../../components/blocks/Image.astro';
 import Stars from '../../../components/blocks/Stars.astro';
 import HeroLede from '../../../components/blocks/HeroLede.astro';
@@ -24,6 +29,14 @@ import BookCover from '../../../components/blocks/BookCover.astro';
 import YouTubeLite from '../../../components/YouTubeLite.astro';
 import ContactForm from '../../../components/ContactForm.astro';
 import { getCollection } from 'astro:content';
+
+// Las preguntas del acordeón de abajo. En una página real este array es el
+// mismo que se pasa a `BaseLayout faq=`, que es lo que emite el FAQPage.
+const FAQ_DEMO = [
+  { q: '¿El presupuesto incluye el hotel?', a: 'Sí: 6 noches para 2 personas, traslados, sedación intravenosa y escáner CBCT. El presupuesto se entrega por escrito antes de viajar.' },
+  { q: '¿Puedo llevarme los dientes fijos en un solo viaje?', a: 'Algunos casos sí. Si no hay infección activa y los implantes superan las pruebas de torque, el híbrido final se entrega en 10 días hábiles.' },
+  { q: '¿Qué garantía tengo?', a: 'La del sistema de implantes usado, más el seguimiento del propio centro. Se entrega por escrito con el alta.' },
+];
 
 const nombre = (p: string) => p.replace(/^.*\//, '').replace(/\.astro$/, '');
 const nuevos = Object.keys(import.meta.glob('../../../components/blocks/*.astro')).map(nombre).sort();
@@ -141,7 +154,7 @@ const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
   <Section heading="Card — qué le metes dentro" sub="No sabe qué lleva: es un slot. Texto, estrellas, un vídeo, una tabla, un formulario.">
     <div class="col-4">
       <Card>
-        <Text level={3} title="Solo texto" text="Una Card con un Text dentro. El relleno, el filete y la sombra vienen de .card." />
+        <Text level={3} title="Solo texto" text="Una Card con un Text dentro. El relleno, el borde y la sombra vienen de .card." />
       </Card>
     </div>
     <div class="col-4">
@@ -246,16 +259,16 @@ const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
   </Section>
 
   {/* ═══ CARD: FEATURED Y RIBBON ══════════════════════════════ */}
-  <Section bg="soft" heading="featured y ribbon" sub="Lo único que cambia featured es el filete: color de marca en vez de gris.">
+  <Section bg="soft" heading="featured y ribbon" sub="Lo único que cambia featured es el borde: color de marca en vez de gris.">
     <div class="col-4">
       <Card>
-        <Text level={3} title="Normal" text="Filete gris, el de siempre." />
+        <Text level={3} title="Normal" text="Borde gris, el de siempre." />
         <p class="text-body"><strong>$9,000</strong> · una arcada</p>
       </Card>
     </div>
     <div class="col-4">
       <Card featured ribbon="Más elegido">
-        <Text level={3} title="Destacada" text="Filete de marca y cinta cabalgando el borde." />
+        <Text level={3} title="Destacada" text="Borde de marca y cinta cabalgando el borde." />
         <p class="text-body"><strong>$14,990</strong> · dos arcadas</p>
       </Card>
     </div>
@@ -325,7 +338,7 @@ const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
 
         <div class="sw"><div class="sw__chip" style="background:var(--brand-primary)"></div>
           <b>--brand-primary</b><span class="sw__pct">30%</span>
-          <p>El color de la marca. Superficies y filetes, no texto pequeño.</p></div>
+          <p>El color de la marca. Superficies y bordes, no texto pequeño.</p></div>
 
         <div class="sw"><div class="sw__chip" style="background:var(--brand-primary-strong)"></div>
           <b>--brand-primary-strong</b>
@@ -452,6 +465,110 @@ const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
           text="Por eso puede ser chillante: no tiene que pasar contraste él mismo — lo que debe pasarlo es --ink-on-accent <em>encima</em> de él, con 4.5:1 mínimo. Un naranja vivo vale aquí y sería ilegible como texto. Si una marca no tiene un cuarto color, --brand-accent hereda el primario y este botón se ve igual que el de al lado: el hueco no cuesta nada."
         />
       </Card>
+    </div>
+  </Section>
+
+  {/* ═══ STEPLIST — VIÑETA Y NUMERADA ═════════════════════════ */}
+  <Section
+    bg="secondary"
+    heading="StepList"
+    sub="El marcador lo pone el CSS, no el marcado. Antes cada línea llevaba un <span aria-hidden> escrito a mano: 89 veces solo en un sitio, y basta con olvidarlo una para que el lector de pantalla lea «punto» antes de cada frase."
+  >
+    <div class="col-6">
+      <Card>
+        <Text level={3} title="marker=&quot;bullet&quot;" text="Por defecto. Es un <ul>." />
+        <StepList>
+          <li>All-on-4 / All-on-5 / All-on-6</li>
+          <li>Implantes cigomáticos</li>
+          <li>Elevación de seno e injerto óseo</li>
+          <li>Restauraciones de circonio</li>
+        </StepList>
+      </Card>
+    </div>
+    <div class="col-6">
+      <Card>
+        <Text level={3} title="marker=&quot;numbered&quot;" text="Contador CSS y <ol>: renumerar es reordenar los <li>." />
+        <StepList marker="numbered">
+          <li>Consulta y escáner CBCT</li>
+          <li>Plan de tratamiento por escrito</li>
+          <li>Cirugía y provisionales el mismo día</li>
+          <li>Circonio final a los 4 meses</li>
+        </StepList>
+      </Card>
+    </div>
+  </Section>
+
+  {/* ═══ TABLE Y PRICETABLE ═══════════════════════════════════ */}
+  <Section
+    heading="Table y PriceTable"
+    sub="Escribes el thead y el tbody a mano; el componente solo garantiza el .table-wrap. Sin él, una tabla saca la página por la derecha en un móvil sin que nada falle."
+  >
+    <div class="col-6">
+      <Card>
+        <Text level={3} title="Table" />
+        <Table>
+          <thead><tr><th>Tratamiento</th><th>Precio</th></tr></thead>
+          <tbody>
+            <tr><td>Implante unitario</td><td>$1,290</td></tr>
+            <tr><td>All-on-4, una arcada</td><td>$8,900</td></tr>
+            <tr><td>Mejora a circonio</td><td>$2,400</td></tr>
+          </tbody>
+        </Table>
+      </Card>
+    </div>
+    <div class="col-6">
+      <Card>
+        <Text level={3} title="PriceTable" text="caption es prop porque <caption> tiene que ser el primer hijo de <table>." />
+        <PriceTable caption="Paquetes">
+          <thead><tr><th>Paquete</th><th>Desde</th></tr></thead>
+          <tbody>
+            <tr class="pricing-table-category"><td colspan="2">Dos arcadas</td></tr>
+            <tr><td>Todo incluido, 2 viajes</td><td>$19,800</td></tr>
+            <tr><td>Un viaje</td><td>$14,990</td></tr>
+            <tr class="pricing-table-category"><td colspan="2">Diente unitario</td></tr>
+            <tr><td>Implante y corona</td><td>$1,290</td></tr>
+          </tbody>
+        </PriceTable>
+      </Card>
+    </div>
+  </Section>
+
+  {/* ═══ PROOFSTRIP ═══════════════════════════════════════════ */}
+  <Section
+    bg="soft"
+    pad="tight"
+    heading="ProofStrip"
+    sub="Apilada en móvil, en fila desde 900px. Los separadores cambian de borde inferior a borde derecho solos."
+  >
+    <div class="col-12">
+      <ProofStrip label="Datos de la clínica">
+        <div class="proof-strip__item">
+          <span class="proof-strip__num">8,000+</span>
+          <span class="proof-strip__label">pacientes atendidos</span>
+        </div>
+        <div class="proof-strip__item">
+          <span class="proof-strip__num">4.9/5</span>
+          <span class="proof-strip__label">1,247 reseñas</span>
+        </div>
+        <div class="proof-strip__item">
+          <span class="proof-strip__num">98.2%</span>
+          <span class="proof-strip__label">tasa de éxito</span>
+        </div>
+        <div class="proof-strip__item">
+          <span class="proof-strip__num">25</span>
+          <span class="proof-strip__label">años de experiencia</span>
+        </div>
+      </ProofStrip>
+    </div>
+  </Section>
+
+  {/* ═══ FAQ ══════════════════════════════════════════════════ */}
+  <Section
+    heading="Faq"
+    sub="El único bloque que recibe el contenido por prop. El JSON-LD de FAQPage se emite en el <head>, que Astro renderiza antes del <body>: un slot del cuerpo no puede alimentarlo. El array ya existe en la página para el schema; esto lo reusa."
+  >
+    <div class="col-12">
+      <Faq items={FAQ_DEMO} openFirst />
     </div>
   </Section>
 

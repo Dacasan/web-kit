@@ -22,7 +22,7 @@
 // tres pantallas de scroll antes del CTA; deslizándose son una.
 import type { HTMLAttributes } from 'astro/types';
 
-// `.section` va SIEMPRE, incluso en `none`: de ahí sale el filete que separa
+// `.section` va SIEMPRE, incluso en `none`: de ahí sale el borde que separa
 // una sección de la siguiente (`.section + .section { border-top }`).
 const PAD = {
   normal: 'section',
@@ -56,7 +56,7 @@ interface Props extends HTMLAttributes<'section'> {
   reverse?: boolean;
   /** Centra el texto de toda la sección. */
   center?: boolean;
-  /** Filete arriba y abajo. */
+  /** Borde arriba y abajo. */
   bordered?: boolean;
   /** Solo con `scroll`: ancho de cada pieza en móvil (ficha --rail-item).
       Siempre < 100%, para que asome la siguiente. */

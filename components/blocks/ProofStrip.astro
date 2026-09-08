@@ -1,0 +1,28 @@
+---
+// ProofStrip — la barra de prueba social. Cifra grande, etiqueta pequeña.
+//
+// Apilada en móvil, en fila desde 900px, con separadores que cambian de
+// borde inferior a borde derecho. Todo eso ya está en .proof-strip; aquí
+// solo va el envoltorio y el contenido lo escribes tú:
+//
+//   <ProofStrip>
+//     <div class="proof-strip__item">
+//       <span class="proof-strip__num">8,000+</span>
+//       <span class="proof-strip__label">pacientes</span>
+//     </div>
+//   </ProofStrip>
+//
+// Va en una .col-12 dentro de una Section, normalmente con pad="tight".
+interface Props {
+  /** Nombre accesible. La barra es una lista de datos, no decoración:
+      sin nombre, un lector de pantalla anuncia cifras sueltas sin contexto. */
+  label?: string;
+  class?: string;
+}
+
+const { label, class: cls } = Astro.props;
+---
+
+<div class:list={['proof-strip', cls]} role="group" aria-label={label}>
+  <slot />
+</div>

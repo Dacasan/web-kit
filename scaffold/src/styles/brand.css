@@ -1,42 +1,41 @@
 /* ═══════════════════════════════════════════════════════════════════════
-   MARCA — [BRAND] reemplaza los nueve valores
+   MARCA — [BRAND] reemplaza estos valores
 
-   Nueve valores. Nada más. Todo lo demás (fondos, tintas, bordes, velos,
-   estados) el kit lo deriva de aquí con var(--brand-*): cambia
-  --brand-dark:            #1A1A1A;  /* 60% · fondos oscuros, tinta del cuerpo, bordes, velo */
-  --brand-light:           #FFFFFF;  /* fondo de página, superficies, tinta sobre oscuro */
-  --brand-neutral:         #F0EDE5;  /* franja alterna: el segundo fondo claro */
-  --brand-primary:         #2F6F6B;  /* 30% · el color de la marca: superficies y filetes */
-  --brand-primary-strong:  #245551;  /* el primario que aguanta texto SOBRE claro · >=4.5:1 */
-  --brand-primary-soft:    #E6EFEE;  /* tinte del primario: superficie suave, títulos sobre oscuro */
-  --brand-primary-on-dark: #4FA9A2;  /* el primario que se lee SOBRE oscuro · >=4.5:1 */
+   Nueve colores y dos tipografías. Nada más. Todo lo demás (fondos, tintas,
+   bordes, velos, estados) el kit lo deriva de aquí con var(--brand-*).
 
-  /* [BRAND] EL ACENTO — jerarquía suprema: fondo del CTA del hero o del
-     header. Es SUPERFICIE, no tinta: no tiene que pasar contraste él mismo,
-     lo que debe pasarlo es --brand-ink-on-accent ENCIMA (>=4.5:1). Por eso
-     un naranja vivo vale aquí y no valdría como texto.
-     Déjalo heredando el primario si esta marca no tiene un acento propio. */
-  --brand-accent:          var(--brand-primary-strong);
-  --brand-ink-on-accent:   var(--brand-light);
-                                       no un cuarto color de relleno. Verifica >=4.5:1 si lleva texto */
+   Se importa DESPUÉS de tokens.css del kit: misma capa `tokens`, gana el
+   orden de fuente. Al revés, el override no gana y el sitio se queda con
+   los neutros del kit sin que nada falle visiblemente.
 
-  --brand-font-body:      system-ui, -apple-system, sans-serif;   /* [BRAND] */
-  --brand-font-display:   Georgia, serif;                          /* [BRAND] */
+   Los valores de abajo son los defaults del kit, puestos aquí explícitos
+   para que se vean los nueve huecos que hay que rellenar.
+   ═══════════════════════════════════════════════════════════════════════ */
 :root {
   --brand-dark:            #1A1A1A;  /* 60% · fondos oscuros, tinta del cuerpo, bordes, velo */
-  --brand-primary:         #2F6F6B;  /* 30% · el color de la marca: superficies y filetes */
-  --brand-primary-strong:  #245551;  /* el primario que aguanta texto SOBRE claro · >=4.5:1 */
-  --brand-primary-on-dark: #4FA9A2;  /* el primario que se lee SOBRE oscuro · >=4.5:1 */
-  --brand-primary-soft:    #E6EFEE;  /* tinte del primario: superficie suave, títulos sobre oscuro */
-  --brand-neutral:         #F0EDE5;  /* franja alterna: el segundo fondo claro */
   --brand-light:           #FFFFFF;  /* fondo de página, superficies, tinta sobre oscuro */
+  --brand-neutral:         #F0EDE5;  /* franja alterna: el segundo fondo claro */
+  --brand-primary:         #2F6F6B;  /* 30% · el color de la marca: superficies y bordes */
+  --brand-primary-strong:  #245551;  /* el primario que aguanta texto SOBRE claro · >=4.5:1 */
+  --brand-primary-soft:    #E6EFEE;  /* tinte del primario: superficie suave, títulos sobre oscuro */
+  --brand-primary-on-dark: #4FA9A2;  /* el primario que se lee SOBRE oscuro · >=4.5:1 */
 
-  --brand-font-body:    system-ui, -apple-system, sans-serif;   /* [BRAND] */
-  --brand-font-display: Georgia, serif;                          /* [BRAND] */
+  /* EL ACENTO — jerarquía suprema: el CTA del hero o del header, uno por
+     pantalla. Es SUPERFICIE, no tinta, y por eso puede ser chillante: no
+     tiene que pasar contraste él mismo — lo que debe pasarlo es
+     --brand-ink-on-accent ENCIMA de él (>=4.5:1). Por eso un naranja vivo
+     vale aquí y no valdría como texto. Si aparece tres veces deja de
+     destacar y ya solo es otro primario.
+     Déjalo heredando el primario si esta marca no tiene acento propio. */
+  --brand-accent:          var(--brand-primary-strong);
+  --brand-ink-on-accent:   var(--brand-light);
+
+  --brand-font-body:      system-ui, -apple-system, sans-serif;   /* [BRAND] */
+  --brand-font-display:   Georgia, serif;                         /* [BRAND] */
 }
 
-/* [BRAND] Fuentes self-hosted: pon los .woff2 en public/fonts/ y
-   declara aquí un @font-face por familia, peso y estilo. Ejemplo:
+/* [BRAND] Fuentes self-hosted: pon los .woff2 en public/fonts/ de ESTE repo
+   y declara aquí un @font-face por familia, peso y estilo. Ejemplo:
 
 @font-face {
   font-family: 'TuFuente';
