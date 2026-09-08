@@ -7,13 +7,13 @@ import { site, PRIMARY_CTA, whatsappHref } from '../data/site';
 import '../styles/index.css';
 ---
 
-<BaseLayout title={`${site.name} — home`} description={`[BRAND] propuesta de valor de ${site.name} en una frase.`} path="/">
+<BaseLayout title={`${site.name} — home`} description={`Placeholder value proposition of ${site.name} in one sentence.`} path="/">
   <Section>
     <div class="row">
       <div class="col-12 col-8">
         <Card>
-          <Text level={1}>{site.name}</Text>
-          <Text>[BRAND] H1 — repite el lenguaje del anuncio que trajo el clic.</Text>
+          <Text level={1} title={site.name} />
+          <Text>El h1 de arriba es el que lleva el peso: repite el lenguaje del anuncio que trajo el clic (guía demo).</Text>
           <p><a class="btn" href={whatsappHref}>{PRIMARY_CTA}</a></p>
         </Card>
       </div>

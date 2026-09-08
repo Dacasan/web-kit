@@ -49,7 +49,7 @@ export const site = {
 
   // ── Ubicación ──
   address: {
-    street: "[BRAND] Street, Suite 100",
+    street: "123 Demo Street, Suite 100",
     locality: "Demo City",
     region: "Demo State",
     postalCode: "00000",
@@ -104,8 +104,8 @@ export const site = {
   heroVideo: {
     mobile: "/video/hero",         // → /video/hero.webm  + .mp4   (9:16)
     desktop: "/video/hero-wide",   // → /video/hero-wide.webm + .mp4 (16:9)
-    poster: "/gallery/gallery-1.png",
-    posterDesktop: "/gallery/gallery-2.png",
+    poster: "/gallery/gallery-1.webp",
+    posterDesktop: "/gallery/gallery-2.webp",
   },
   /** Indexación SEO. Por defecto NO (la plantilla trae datos genéricos).
    *  Se activa por env SITE_INDEXABLE=true. Gobierna la etiqueta
@@ -130,7 +130,7 @@ export const site = {
   services: [
     {
       name: "Demo Service One — 2 Steps",
-      desc: "Phase 1 $1,900 + Phase 2 $1,000 = $2,900. Demo description for placeholder service one: includes accommodation placeholder and transfers. Replace every [BRAND] field before publishing.",
+      desc: "Phase 1 $1,900 + Phase 2 $1,000 = $2,900. Demo description for placeholder service one: includes accommodation placeholder and transfers. Replace every placeholder field before publishing.",
       price: "2900",
     },
     {
@@ -204,7 +204,7 @@ export const site = {
 
   // ── Proceso (reducción de fricción, skill §15.1 paso 6) ──
   steps: [
-    { title: "Step 1 — Demo Evaluation", text: "Placeholder step: comprehensive evaluation with our specialist, written demo plan before anything starts. Replace every [BRAND] field before publishing." },
+    { title: "Step 1 — Demo Evaluation", text: "Placeholder step: comprehensive evaluation with our specialist, written demo plan before anything starts. Replace every placeholder field before publishing." },
     { title: "Step 2 — Demo Delivery", text: "Placeholder step: the service is delivered as described in the demo plan. This text demonstrates the rhythm of a step card." },
     { title: "Step 3 — Demo Follow-up", text: "Placeholder step: remote follow-up with your coordinator. The catálogo must never carry a real customer's story." },
   ],
@@ -221,7 +221,7 @@ export const site = {
     },
     {
       q: "Is the demo follow-up included in the price?",
-      a: "Yes. Every demo package includes the placeholder follow-up described in Step 3. It is included in every package of this demo. Replace every [BRAND] field before publishing.",
+      a: "Yes. Every demo package includes the placeholder follow-up described in Step 3. It is included in every package of this demo. Replace every placeholder field before publishing.",
     },
     {
       q: "Is accommodation really included? Which one?",
@@ -241,7 +241,7 @@ export const site = {
     },
     {
       q: "How long do the demo services last?",
-      a: "Placeholder answer: demo systems are designed to last many years with proper care. The demo component lasts 6-8 placeholder years. Replace every [BRAND] field before publishing.",
+      a: "Placeholder answer: demo systems are designed to last many years with proper care. The demo component lasts 6-8 placeholder years. Replace every placeholder field before publishing.",
     },
     {
       q: "How much does the full demo cost in Demo City?",
@@ -274,7 +274,7 @@ export const MENU_LINKS = [
  * páginas es un número que un día deja de coincidir con el real.
  */
 export const TOPBAR = [
-  "Demo placeholders — replace every [BRAND] field before publishing",
+  "Demo site — placeholder data, not a real business",
   `Call us: ${site.phone}`,
   "24/7 Demo Coordinator",
 ];
