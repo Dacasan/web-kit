@@ -140,13 +140,12 @@ export function buildGraph({
     knowsLanguage: [...site.languages],
     paymentAccepted: [...site.paymentAccepted],
     currenciesAccepted: site.currency,
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: site.rating.value,
-      ratingCount: site.rating.count,
-      bestRating: "5",
-      reviewCount: site.rating.count,
-    },
+    // SIN aggregateRating: Google no admite reseñas autoservidas en el nodo
+    // LocalBusiness/Dentist (self-serving review markup) y es vector de acción
+    // manual. El rating SÍ se muestra como texto visible en la cabecera; esto
+    // solo retira el marcado. Ver sameAs abajo para consolidar la entidad con
+    // la ficha de Google, que es de donde deben salir las estrellas de la SERP.
+    ...(site.sameAs && site.sameAs.length > 0 ? { sameAs: [...site.sameAs] } : {}),
     availableService: site.services.map((s) => ({
       "@type": serviceType(site.schemaType),
       name: s.name,

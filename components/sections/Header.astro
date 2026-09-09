@@ -26,6 +26,9 @@ interface Props {
   links?: { href: string; text: string }[];
   cta?: string;
   ratingText?: string;
+  /** Titular del sello de reputación. Sale de site.ts; nunca un superlativo
+   *  no verificable — un dato contable convierte mejor y es defendible. */
+  ratingHeadline?: string;
   topbar?: string[];
 }
 
@@ -34,7 +37,10 @@ const {
   cta = PRIMARY_CTA,
   // El default de antes ("500+ 5 Star Reviews") contradecía la cifra real
   // que sale en el resto del sitio y en el JSON-LD.
-  ratingText = `${site.rating.value}/5 from ${Number(site.rating.count).toLocaleString('en-US')} reviews`,
+  // Number('1,247') es NaN: la coma del dato del cliente llegaba a pantalla.
+  // Se normaliza aquí para que ningún site.ts pueda romper la cabecera.
+  ratingText = `${site.rating.value}/5 from ${Number(String(site.rating.count).replace(/,/g, "")).toLocaleString("en-US")} reviews`,
+  ratingHeadline = (site as { ratingHeadline?: string }).ratingHeadline ?? "TOP RATED team",
 } = Astro.props;
 
 const links = Astro.props.links ?? (variant === 'money' ? [] : MENU_LINKS);
@@ -81,10 +87,10 @@ const topbar = Astro.props.topbar ?? (variant === 'money' ? TOPBAR : undefined);
     )}
 
     {/* Sello de reputación: columna propia entre el menú y el CTA (desktop). */}
-    <div class="nav-rating" aria-label={`Top rated team in Mexico, ${ratingText}`}>
+    <div class="nav-rating" aria-label={`${ratingHeadline}, ${ratingText}`}>
       <span class="nav-rating__stars" aria-hidden="true">★★★★★</span>
       <span class="nav-rating__text">
-        <strong>TOP RATED team in Mexico</strong>
+        <strong>{ratingHeadline}</strong>
         <span>{ratingText}</span>
       </span>
     </div>

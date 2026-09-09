@@ -47,7 +47,7 @@ const planData = JSON.stringify(PLANS.map((p) => ({ key: p.key, price: p.price }
         <em class="est-result__save" data-est-save hidden></em>
       </h2>
       <p class="est-result__meta text-grey" data-est-meta>
-        Written quote guaranteed for 12 months · {site.rating.value}/5 from {Number(site.rating.count).toLocaleString('en-US')} patients
+        Written quote guaranteed for 12 months · {site.rating.value}/5 from {Number(String(site.rating.count).replace(/,/g, "")).toLocaleString("en-US")} patients
       </p>
 
       {/* Las dos rutas. La diferencia que manda es el número de viajes: va
