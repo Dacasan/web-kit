@@ -44,6 +44,26 @@ const {
 const ytThumb = (v: string) => `https://i.ytimg.com/vi/${v}/hqdefault.jpg`;
 const mobileThumb = thumbMobile ?? ytThumb(id);
 const desktopThumb = thumbDesktop ?? ytThumb(desktopId ?? id);
+
+// VideoObject (schema.org) — opt-in.
+//
+// Google exige `name` + `thumbnailUrl` + `uploadDate` (Video doc §VideoObject):
+// `uploadDate` NUNCA se inventa. La instancia del cliente declara en
+// `site.videos[id]` los datos verificados (nombre, uploadDate ISO-8601,
+// duración); si falta el registro o la fecha, NO se emite schema. El embed
+// declarado replica el runtime real: god.ts:295 YT_HOST = youtube-nocookie.
+interface VideoMeta {
+  name: string;
+  description?: string;
+  /** ISO 8601 con zona. Verificada contra YouTube (no copiada a ojo). */
+  uploadDate: string;
+  /** ISO 8601 duration (PT1M13S). Opcional, recomendada. */
+  duration?: string;
+}
+const registry = (site as { videos?: Record<string, VideoMeta> }).videos;
+const videoMeta = registry?.[id];
+const embedUrl = `https://www.youtube-nocookie.com/embed/${id}`;
+const contentUrl = `https://www.youtube-nocookie.com/embed/${id}`;
 ---
 
 <div
@@ -81,6 +101,27 @@ const desktopThumb = thumbDesktop ?? ytThumb(desktopId ?? id);
   </button>
   <div class="youtube-iframe"></div>
 </div>
+
+{/* VideoObject solo si la instancia declaró el vídeo con uploadDate
+    verificado (patrón is:inline + set:html: SeoHead.astro:121). */}
+{videoMeta && (
+  <script
+    type="application/ld+json"
+    is:inline
+    set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "VideoObject",
+      name: videoMeta.name,
+      ...(videoMeta.description ? { description: videoMeta.description } : {}),
+      thumbnailUrl: [mobileThumb, desktopThumb],
+      uploadDate: videoMeta.uploadDate,
+      ...(videoMeta.duration ? { duration: videoMeta.duration } : {}),
+      embedUrl,
+      contentUrl,
+      creator: { "@type": "Organization", name: site.name, url: site.baseUrl },
+    })}
+  />
+)}
 
 {/* Sin script propio: el diferido del vídeo vive en god.js
     (wireYouTubeFacades), que ya se carga en todas las páginas. */}
