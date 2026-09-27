@@ -47,6 +47,17 @@ const CLICK_IDS = [
 ] as const;
 const UTMS = ["source", "medium", "campaign", "term", "content"] as const;
 
+// Google Ads ad-level, viaja a attribution.ad (dimensión de la puja). Los
+// hidden inputs llevan prefijo gads_; aquí se mapean a las claves que el
+// schema del CRM espera (matchtype, campaign_id, ad_group_id, ad_id, location).
+const GADS_FIELDS: ReadonlyArray<[input: string, key: string]> = [
+  ["gads_matchtype", "matchtype"],
+  ["gads_campaign_id", "campaign_id"],
+  ["gads_ad_group_id", "ad_group_id"],
+  ["gads_ad_id", "ad_id"],
+  ["gads_location", "location"],
+];
+
 /**
  * Lee un campo por nombre dentro de un formulario concreto.
  *
@@ -97,6 +108,14 @@ function newEventId(): string {
 function collectClickIds(form: HTMLFormElement): Record<string, string | undefined> {
   const out: Record<string, string | undefined> = {};
   for (const k of CLICK_IDS) out[k] = readField(form, k) || undefined;
+  return out;
+}
+
+/** Lee los inputs gads_* → attribution.ad. El grupo solo se adjunta al
+ *  payload si algún campo trajo valor (JSONB limpio, sin objetos vacíos). */
+function collectAdParams(form: HTMLFormElement): Record<string, string | undefined> {
+  const out: Record<string, string | undefined> = {};
+  for (const [input, key] of GADS_FIELDS) out[key] = readField(form, input) || undefined;
   return out;
 }
 
@@ -163,11 +182,15 @@ function wire(form: HTMLFormElement): void {
       : "";
 
     const eventId = readField(form, "event_id") || newEventId();
+    const ad = collectAdParams(form);
     const attribution = {
       utm: Object.fromEntries(
         UTMS.map((k) => [k, readField(form, `utm_${k}`) || undefined]),
       ),
       click_ids: collectClickIds(form),
+      // attribution.ad solo cuando la URL del anuncio la trajo: god.js llena
+      // los gads_* y aquí se leen. Sin ellos, el payload no lleva la clave.
+      ...(Object.values(ad).some(Boolean) ? { ad } : {}),
       landing_slug: readField(form, "landing_slug") || undefined,
       ref_code: readField(form, "ref_code") || undefined,
       channel: readField(form, "channel") || undefined,

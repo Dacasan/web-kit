@@ -126,6 +126,15 @@ const id = (name: string) => `${formId}-${name}`;
 <input type="hidden" name="ttclid" />
 <input type="hidden" name="li_fat_id" />
 <input type="hidden" name="gad_source" />
+<!-- Google Ads ad-level (tracking template a nivel de cuenta). Prefijo
+     `gads_` a propósito: un name genérico como `location` podría chocar con
+     un campo visible futuro del formulario, y fillHiddenInputs sobrescribe
+     en silencio. Los declara god.ts en el contrato; lead-form.ts los lee. -->
+<input type="hidden" name="gads_matchtype" />
+<input type="hidden" name="gads_campaign_id" />
+<input type="hidden" name="gads_ad_group_id" />
+<input type="hidden" name="gads_ad_id" />
+<input type="hidden" name="gads_location" />
 <input type="hidden" name="landing_slug" />
 <input type="hidden" name="ref_code" />
 <input type="hidden" name="event_id" />
