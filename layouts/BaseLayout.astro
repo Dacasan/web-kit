@@ -14,6 +14,7 @@ import SeoHead from"../components/SeoHead.astro";
 import ContactLauncher from"../components/ContactLauncher.astro";
 import Footer from"../components/sections/Footer.astro";
 import { CRM_URL } from"../lib/crm-url";
+import { site } from"@agenciaweb/kit-site";
 
 interface Props {
   title: string;
@@ -67,7 +68,7 @@ const body = await Astro.slots.render('default');
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={site.lang}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
