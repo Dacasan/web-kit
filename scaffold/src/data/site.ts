@@ -117,6 +117,10 @@ export const site = {
   /** Imagen Open Graph, 1200×630 (skill §20) */
   // [BRAND] required — replace for every new brand
   ogImage: "/og.png",
+  /** Google tag: ID de conversión de Google Ads (gtag.js), "AW-XXXXXXXXXX".
+   *  [BRAND] opcional — Vacío o ausente = sin Google tag en el <head>. */
+  // [BRAND] optional
+  googleAdsConversionId: "",
   /** ID de video testimonial (YouTube, fachada bajo demanda). Placeholder
    *  de dominio público (Big Buck Bunny — Blender Foundation). */
   // [BRAND] required — replace for every new brand

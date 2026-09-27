@@ -87,6 +87,9 @@ export const site = {
   // ── Medición ──
   /** Imagen Open Graph, 1200×630 (skill §20) */
   ogImage: "/og.png",
+  /** ID de conversión de Google Ads (gtag.js): "AW-XXXXXXXXXX". Vacío = el
+   *  sitio no emite el Google tag en ningún <head>. */
+  googleAdsConversionId: "",
   /** ID de video testimonial (YouTube, fachada bajo demanda). Placeholder
    *  de dominio público (Big Buck Bunny — Blender Foundation). */
   videoId: "aqz-KE-bpKQ",

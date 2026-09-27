@@ -52,6 +52,17 @@ const robots = noindex || !site.indexable
   ?"noindex, nofollow"
   :"index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1";
 
+// Google tag (gtag.js, AW-…) — opt-in por sitio vía site.googleAdsConversionId.
+// Vacío o ausente = el sitio no emite ningún tag de Google (demo, scaffold y
+// sitios nuevos nacen apagados). El bucle de conversiones del CRM sigue
+// siendo la vía server-side (GOOGLE_ADS_* del entorno); este tag no manda
+// eventos de conversión, solo el base tag (dataLayer + cookie de primera
+// parte + señales de página para remarketing).
+
+// Cast local: el campo es OPCIONAL a nivel de tipos — un sitio que actualice
+// el kit sin declararlo sigue compilando (ausente o vacío = tag no emitido).
+const { googleAdsConversionId } = site as { googleAdsConversionId?: string };
+
 const ogFullUrl = ogImage.startsWith("http") ? ogImage : `${site.baseUrl}${ogImage}`;
 
 const graph = buildGraph({
@@ -124,3 +135,18 @@ const graph = buildGraph({
   window.__WACRM_SITE_URL__ = siteUrl;
   window.__WACRM_API_URL__ = apiUrl;
 </script>
+
+{/* Google tag (gtag.js) — señal de página (remarketing y verificación de
+    auto-tagging); lo server-side (conversiones) ya lo lleva el CRM. */}
+{googleAdsConversionId && (
+  <script is:inline async
+    src={`https://www.googletagmanager.com/gtag/js?id=${googleAdsConversionId}`}></script>
+)}
+{googleAdsConversionId && (
+  <script is:inline define:vars={{ gadsId: googleAdsConversionId }}>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', gadsId);
+  </script>
+)}
