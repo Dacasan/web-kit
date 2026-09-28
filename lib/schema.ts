@@ -10,15 +10,23 @@ import { site } from '@agenciaweb/kit-site';
 
 export type SchemaNode = Record<string, unknown> & { "@type": string; "@id"?: string };
 
-/** El tipo de servicio se deriva del tipo de negocio (skill §9.2). */
-function serviceType(businessType: string): string {
-  if (["MedicalClinic", "Physician", "Hospital"].includes(businessType)) {
-    return "MedicalProcedure";
-  }
-  if (businessType === "Dentist") return "DentalProcedure";
-  if (businessType === "Product") return "Product";
-  return "Service";
-}
+// El catálogo y el nodo #product van como `Service` en todos los casos.
+// Motivo, verificado contra schema.org v30.1: `DentalProcedure` no existe, y
+// `availableService` exige dominio Hospital|MedicalClinic|Physician — por eso
+// la oferta se expone con `hasOfferCatalog` → OfferCatalog (⊂ ItemList →
+// ListItem → item), cuyo `item` admite `Service`, y `Service` sí admite
+// `offers` (precios). Cadena comprobada: OfferCatalog⊂ItemList, itemListElement
+// dom=ItemList/rng=ListItem, item dom=ListItem/rng=Thing, offers dom incluye Service.
+//
+// Cast local — mismo patrón que SeoHead.astro:64: los campos son OPCIONALES a
+// nivel de tipos, de modo que un sitio que actualice el kit sin declararlos
+// sigue compilando (ausente = el nodo no emite esa propiedad). Verificado con
+// tsc 6.0.3 --strict: un objeto sin esos campos sí convierte a este tipo.
+const { geo, medicalSpecialty, openingHoursSpec } = site as {
+  geo?: { lat: number; lng: number };
+  medicalSpecialty?: string;
+  openingHoursSpec?: { days: string[]; opens: string; closes: string }[];
+};
 
 interface GraphInput {
   /** URL absoluta de la página actual. */
@@ -79,7 +87,12 @@ export function buildGraph({
         "@type": "ListItem",
         position: i + 1,
         name: b.name,
-        ...(b.item ? { item: b.item } : {}),
+        // `item` va absoluto: una ruta relativa ("/") no es una URL para
+        // BreadcrumbList. Mismo patrón que SeoHead.astro:69 (ogFullUrl) —
+        // un valor que ya viene absoluto se deja tal cual.
+        ...(b.item
+          ? { item: b.item.startsWith("http") ? b.item : `${siteUrl}${b.item}` }
+          : {}),
       })),
     });
   }
@@ -111,6 +124,9 @@ export function buildGraph({
     jobTitle: site.author.jobTitle,
     knowsAbout: [...site.author.knowsAbout],
     ...(site.author.sameAs.length ? { sameAs: [...site.author.sameAs] } : {}),
+    // E-E-A-T: enlace inverso persona → negocio (el negocio declara a la
+    // persona vía `founder`). `worksFor` dom=Person, rng=Organization ✅.
+    worksFor: { "@id": `${siteUrl}#business` },
   });
 
   // Entidad principal del negocio. `areaServed` va como array de nodos
@@ -137,32 +153,72 @@ export function buildGraph({
     },
     areaServed: site.areaServed.map((c) => ({ "@type": "Country", name: c })),
     openingHours: site.openingHours,
+    // Horario estructurado — `openingHoursSpecification` es lo que Google
+    // documenta como recommended para LocalBusiness; `openingHours` (Text) no
+    // está en esa lista, por eso se mantiene el uno y se añade el otro.
+    // `dayOfWeek` va con nombres completos: el enumerado DayOfWeek (v30.1) no
+    // contiene "Mo" ni ninguna abreviatura.
+    ...(openingHoursSpec && openingHoursSpec.length
+      ? {
+          openingHoursSpecification: openingHoursSpec.map((h) => ({
+            "@type": "OpeningHoursSpecification",
+            dayOfWeek: h.days,
+            opens: h.opens,
+            closes: h.closes,
+          })),
+        }
+      : {}),
+    // NAP/local: `geo` dom=Place (Dentist ⊂ Place ✅). Google exige al menos
+    // 5 decimales de precisión en latitude/longitude.
+    ...(geo ? { geo: { "@type": "GeoCoordinates", latitude: geo.lat, longitude: geo.lng } } : {}),
+    // Miembro del enumerado MedicalSpecialty (v30.1). Dominio de la propiedad
+    // = Hospital|MedicalClinic|MedicalOrganization|Physician, y Dentist ⊂
+    // MedicalOrganization ✅.
+    ...(medicalSpecialty ? { medicalSpecialty } : {}),
     knowsLanguage: [...site.languages],
     paymentAccepted: [...site.paymentAccepted],
     currenciesAccepted: site.currency,
+    // E-E-A-T: el negocio declara a su fundador (inverso de `worksFor` del
+    // nodo Person). `founder` dom=Organization, rng=Organization|Person ✅.
+    founder: { "@id": `${siteUrl}#author` },
     // SIN aggregateRating: Google no admite reseñas autoservidas en el nodo
     // LocalBusiness/Dentist (self-serving review markup) y es vector de acción
     // manual. El rating SÍ se muestra como texto visible en la cabecera; esto
     // solo retira el marcado. Ver sameAs abajo para consolidar la entidad con
     // la ficha de Google, que es de donde deben salir las estrellas de la SERP.
     ...(site.sameAs && site.sameAs.length > 0 ? { sameAs: [...site.sameAs] } : {}),
-    availableService: site.services.map((s) => ({
-      "@type": serviceType(site.schemaType),
-      name: s.name,
-      description: s.desc,
-      offers: {
-        "@type": "Offer",
-        price: s.price,
-        priceCurrency: site.currency,
-      },
-    })),
+    // Catálogo de ofertas — sustituye a `availableService`, cuyo dominio no
+    // incluye Dentist. Cada servicio mantiene su precio: `offers` es válido
+    // sobre `Service`, que es lo que `item` espera en rango (rng=Thing).
+    hasOfferCatalog: {
+      "@type": "OfferCatalog",
+      name: `Treatments — ${site.name}`,
+      itemListElement: site.services.map((s, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        item: {
+          "@type": "Service",
+          name: s.name,
+          description: s.desc,
+          provider: { "@id": `${siteUrl}#business` },
+          offers: {
+            "@type": "Offer",
+            price: s.price,
+            priceCurrency: site.currency,
+          },
+        },
+      })),
+    },
   });
 
   // Nodo de producto/tratamiento de la página: el bloque que gana rich
   // snippets de estrellas, reviews y precio en la SERP.
   if (product) {
     graph.push({
-      "@type": serviceType(site.schemaType),
+      // `Service` (no `DentalProcedure`: el tipo no existe). Elegido sobre
+      // `Product` porque conserva `provider` y `areaServed`, que el dominio de
+      // `Product` excluye — y el snippet de producto ya no aparece en la SERP.
+      "@type": "Service",
       "@id": `${url}#product`,
       name: product.name,
       url,

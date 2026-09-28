@@ -28,8 +28,11 @@ const items = images.map((it, i) => ({ ...it, hash: `${id}-${i + 1}` }));
 ---
 
 <div class="gallery-3x3 mx-auto" itemscope itemtype="https://schema.org/ImageGallery">
+  {/* Sin `itemprop`: `contentUrl` exige dom=MediaObject y este nodo es
+      ImageGallery (⊂ CollectionPage ⊂ WebPage), además el valor era el
+      fragmento `#gal-1`, no una URL. */}
   {items.map((it) => (
-    <a class="frame" href={`#${it.hash}`} aria-label={it.alt} itemprop="contentUrl">
+    <a class="frame" href={`#${it.hash}`} aria-label={it.alt}>
       <img src={it.src} alt={it.alt} width="600" height="600" loading="lazy" decoding="async" />
     </a>
   ))}
