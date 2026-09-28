@@ -61,7 +61,10 @@ const robots = noindex || !site.indexable
 
 // Cast local: el campo es OPCIONAL a nivel de tipos — un sitio que actualice
 // el kit sin declararlo sigue compilando (ausente o vacío = tag no emitido).
-const { googleAdsConversionId } = site as { googleAdsConversionId?: string };
+const { googleAdsConversionId, metaPixelId } = site as {
+  googleAdsConversionId?: string;
+  metaPixelId?: string;
+};
 
 const ogFullUrl = ogImage.startsWith("http") ? ogImage : `${site.baseUrl}${ogImage}`;
 
@@ -149,4 +152,31 @@ const graph = buildGraph({
     gtag('js', new Date());
     gtag('config', gadsId);
   </script>
+)}
+
+{/* Meta Pixel (base code oficial, developers.facebook.com/docs/meta-pixel/
+    get-started) — opt-in por sitio vía site.metaPixelId. Su papel aquí es
+    el lado BROWSER del dedup: planta las cookies _fbp/_fbc que el CRM lee
+    y envía PageView con el MISMO event_id que la CAPI usa server-side.
+    Sin pixel en el sitio, la CAPI va sola con fbclid sintetizado (EMQ
+    bajo); con pixel+CAPI deduplicados, EMQ alto (el setup estándar 2026). */}
+{metaPixelId && (
+  <script is:inline define:vars={{ fbPixelId: metaPixelId }}>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', fbPixelId);
+    fbq('track', 'PageView');
+  </script>
+)}
+{metaPixelId && (
+  <noscript>
+    <img height="1" width="1" style="display:none"
+      src={`https://www.facebook.com/tr?id=${metaPixelId}&ev=PageView&noscript=1`} />
+  </noscript>
 )}

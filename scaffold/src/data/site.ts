@@ -121,6 +121,10 @@ export const site = {
    *  [BRAND] opcional — Vacío o ausente = sin Google tag en el <head>. */
   // [BRAND] optional
   googleAdsConversionId: "",
+  /** Meta Pixel / Dataset ID (Events Manager), base code oficial.
+   *  [BRAND] opcional — Vacío o ausente = sin píxel Meta en el <head>. */
+  // [BRAND] optional
+  metaPixelId: "",
   /** ID de video testimonial (YouTube, fachada bajo demanda). Placeholder
    *  de dominio público (Big Buck Bunny — Blender Foundation). */
   // [BRAND] required — replace for every new brand

@@ -90,6 +90,9 @@ export const site = {
   /** ID de conversión de Google Ads (gtag.js): "AW-XXXXXXXXXX". Vacío = el
    *  sitio no emite el Google tag en ningún <head>. */
   googleAdsConversionId: "",
+  /** Meta Pixel / Dataset (base code): ID numérico de Events Manager.
+   *  Vacío = el sitio no emite el píxel en ningún <head>. */
+  metaPixelId: "",
   /** ID de video testimonial (YouTube, fachada bajo demanda). Placeholder
    *  de dominio público (Big Buck Bunny — Blender Foundation). */
   videoId: "aqz-KE-bpKQ",
