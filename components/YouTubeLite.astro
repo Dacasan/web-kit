@@ -113,7 +113,14 @@ const contentUrl = `https://www.youtube-nocookie.com/embed/${id}`;
       "@type": "VideoObject",
       name: videoMeta.name,
       ...(videoMeta.description ? { description: videoMeta.description } : {}),
-      thumbnailUrl: [mobileThumb, desktopThumb],
+      // Absoluto: todos los ejemplos de VideoObject de Google usan URLs
+      // absolutas, y thumbnailUrl es el campo con el que Google decide si
+      // indexa el vídeo. Solo se absolutiza el schema; el <img> de la
+      // fachada se queda relativo, como hasta ahora. Patrón de
+      // SeoHead.astro:69 (og:image).
+      thumbnailUrl: [mobileThumb, desktopThumb].map((t) =>
+        t.startsWith("http") ? t : `${site.baseUrl}${t}`,
+      ),
       uploadDate: videoMeta.uploadDate,
       ...(videoMeta.duration ? { duration: videoMeta.duration } : {}),
       embedUrl,
