@@ -236,13 +236,17 @@ export function buildGraph({
             },
           }
         : {}),
-      aggregateRating: {
-        "@type": "AggregateRating",
-        ratingValue: product.ratingValue ?? site.rating.value,
-        ratingCount: product.ratingCount ?? site.rating.count,
-        bestRating: "5",
-        reviewCount: product.ratingCount ?? site.rating.count,
-      },
+      // SIN aggregateRating: Google solo lo admite en Book, Course list, Event,
+      // Local business*, Movie, Product, Recipe y Software App — `Service` no
+      // aparece en esa lista. Emitiéndolo, Search Console marcaba el elemento
+      // como "1 problema crítico" ("El tipo de objeto del campo <parent_node>
+      // no es válido"), lo que invalida TODO el nodo y sus 11 precios frente a
+      // los resultados enriquecidos. En schema.org sí es válido (domainIncludes
+      // incluye Service), por eso validator.schema.org no lo señalaba: son dos
+      // vidas distintas y aquí manda la de Google. La única alternativa tipada
+      // sería #business (LocalBusiness), con el asterisco de reseñas
+      // autoservidas — ver el comentario del nodo negocio. Las estrellas
+      // siguen visibles en la cabecera y la fuente autoritativa es la ficha GBP.
     });
   }
 
