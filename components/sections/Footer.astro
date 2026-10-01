@@ -11,6 +11,14 @@ import { site, whatsappHref, PAGINAS, HERRAMIENTAS } from '@agenciaweb/kit-site'
 const titulo = (slug: string) =>
   slug.replace(/-/g,"").replace(/\b\w/g, (c) => c.toUpperCase());
 
+// Textos del pie por sitio — opt-in (mismo patrón que formLabels).
+const F = (site as { legalNote?: string; footerTitles?: Record<string, string> });
+const legalNote = F.legalNote ?? "Results vary depending on the case, diagnosis and adherence to treatment. This page does not replace a medical consultation.";
+const footTitle = (slug: string) => F.footerTitles?.[slug] ?? titulo(slug);
+const homeLabel = F.footerTitles?.home ?? "Home";
+const privacyLabel = F.footerTitles?.["privacy-policy"] ?? "Privacy Policy";
+const termsLabel = F.footerTitles?.["terms"] ?? "Terms and Conditions";
+
 
 ---
 
@@ -21,14 +29,14 @@ const titulo = (slug: string) =>
         final sin convertir todavía puede estar buscando otra página. */}
     <nav class="footer-map" aria-label="All pages">
       <ul class="footer-map__list">
-        <li><a href="/" class="text-white">Home</a></li>
+        <li><a href="/" class="text-white">{homeLabel}</a></li>
         {PAGINAS.map((slug) => (
-          <li><a href={`/${slug}/`} class="text-white">{titulo(slug)}</a></li>
+          <li><a href={`/${slug}/`} class="text-white">{footTitle(slug)}</a></li>
         ))}
       </ul>
       <ul class="footer-map__list footer-map__list--tools">
         {HERRAMIENTAS.map((slug) => (
-          <li><a href={`/${slug}`} class="text-white" rel="nofollow">{titulo(slug)}</a></li>
+          <li><a href={`/${slug}`} class="text-white" rel="nofollow">{footTitle(slug)}</a></li>
         ))}
       </ul>
     </nav>
@@ -71,11 +79,10 @@ const titulo = (slug: string) =>
       </a>
     </p>
     <p class="footer-legal">
-      Results vary depending on the case, diagnosis and adherence to treatment.
-      This page does not replace a medical consultation.
+      {legalNote}
     </p>
     <p class="footer-legal">
-      <a href="/privacy-policy/">Privacy Policy</a> · <a href="/terms/">Terms and Conditions</a>
+      <a href="/privacy-policy/">{privacyLabel}</a> · <a href="/terms/">{termsLabel}</a>
     </p>
   </div>
   </div>
