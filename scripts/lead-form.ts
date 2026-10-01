@@ -24,6 +24,20 @@
 // ============================================================
 
 import { getApiBase } from "../lib/api-base";
+import { site } from "@agenciaweb/kit-site";
+
+/** Campos extra por cliente (opt-in vía site.ts). El cast es defensivo:
+ *  un sitio viejo que actualice el kit no declara la clave y el array
+ *  queda vacío — cero campos, cero cambios en sus formularios. */
+interface LeadExtraField {
+  type: 'date' | 'select' | 'number' | 'text';
+  name: string;
+  label: string;
+  required?: boolean;
+}
+const EXTRA_FIELDS = ((site as {
+  LEAD_EXTRA_FIELDS?: readonly LeadExtraField[];
+}).LEAD_EXTRA_FIELDS ?? []) as readonly LeadExtraField[];
 
 /** Clave del traspaso a /thank-you. */
 export const ESTIMATE_KEY = "a4_estimate";
@@ -158,6 +172,11 @@ function wire(form: HTMLFormElement): void {
     if (!name) return showError("Please enter your name.");
     if (!email.includes("@")) return showError("Please enter a valid email.");
     if (!phone) return showError("Please enter your phone number.");
+    for (const f of EXTRA_FIELDS) {
+      if (f.required && !readField(form, f.name).trim()) {
+        return showError(`Please fill in: ${f.label}.`);
+      }
+    }
     if (!isChecked(form, "consent")) {
       return showError("Please accept being contacted so we can send your plan.");
     }
@@ -171,15 +190,24 @@ function wire(form: HTMLFormElement): void {
 
     // El cuestionario viaja como mensaje legible: el coordinador ve el caso
     // completo en el CRM sin necesidad de campos nuevos en el esquema.
-    const message = hasQuiz
+    const quizLines = hasQuiz
       ? [
           `Arches: ${arch || "—"}`,
           situation && `Situation: ${situation}`,
           bone.length ? `Bone: ${bone.join(", ")}` : "",
           quote > 0 ? `US quote: ${money(quote)}` : "",
           timeframe && `Travel: ${timeframe}`,
-        ].filter(Boolean).join(" · ")
-      : "";
+        ].filter(Boolean)
+      : [];
+
+    // Campos extra del cliente (fechas, huéspedes, …): "Etiqueta: valor".
+    // Solo viaja el par con valor — JSONB limpio, sin objetos vacíos.
+    const extraLines = EXTRA_FIELDS.map((f) => {
+      const v = readField(form, f.name).trim();
+      return v ? `${f.label}: ${v}` : "";
+    }).filter(Boolean);
+
+    const message = [...quizLines, ...extraLines].join(" · ");
 
     const eventId = readField(form, "event_id") || newEventId();
     const ad = collectAdParams(form);

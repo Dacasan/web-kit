@@ -16,6 +16,23 @@ import { TREATMENT_OPTIONS, site } from '@agenciaweb/kit-site';
 
 interface SelectOption { value: string; label: string }
 
+/**
+ * Campos extra por cliente — opt-in vía site.ts (LEAD_EXTRA_FIELDS).
+ * Un sitio que no los declara no renderiza NADA: allon4, demo y scaffold
+ * quedan byte a byte iguales (mismo patrón de cast defensivo que los campos
+ * de medición, SeoHead v1.2.8). Los `name` viajan a lead-form.ts, que los
+ * adjunta al `message` del lead con su etiqueta — el CRM los lee como texto
+ * libre sin cambios de esquema.
+ */
+interface LeadExtraField {
+  /** Solo tipos nativos de HTML: `date` es el calendario del móvil, sin librerías. */
+  type: 'date' | 'select' | 'number' | 'text';
+  name: string;
+  label: string;
+  required?: boolean;
+  options?: SelectOption[];
+}
+
 interface Props {
   /** Sufijo de los id: dos formularios en el mismo documento no colisionan. */
   formId: string;
@@ -41,6 +58,12 @@ const {
 } = Astro.props;
 
 const consent = (consentText ?? site.smsConsentText).replace("{name}", site.name);
+
+// Cast defensivo: el campo es OPCIONAL a nivel de tipos — un sitio viejo que
+// actualice el kit sigue compilando (ausente = cero campos extra).
+const { LEAD_EXTRA_FIELDS: extraFields } = site as {
+  LEAD_EXTRA_FIELDS?: readonly LeadExtraField[];
+};
 
 const id = (name: string) => `${formId}-${name}`;
 ---
@@ -97,6 +120,22 @@ const id = (name: string) => `${formId}-${name}`;
     {selectOptions.map((o) => <option value={o.value}>{o.label}</option>)}
   </select>
 </div>
+
+{/* Campos extra del cliente (opt-in vía site.ts). Tras el desplegable de
+    destino y antes del consentimiento: el orden de lectura es el mismo para
+    todos los formularios del sitio porque los pinta este único bloque. */}
+{extraFields?.map((f) => (
+  <div class="field">
+    <label class="form-label" for={id(f.name)}>{f.label}{f.required && " *"}</label>
+    {f.type === "select" ? (
+      <select id={id(f.name)} name={f.name} required={f.required}>
+        {(f.options ?? []).map((o) => <option value={o.value}>{o.label}</option>)}
+      </select>
+    ) : (
+      <input id={id(f.name)} name={f.name} type={f.type} required={f.required} />
+    )}
+  </div>
+))}
 
 <label class="form-consent" for={id("consent")}>
   <input id={id("consent")} name="consent" type="checkbox" required />
