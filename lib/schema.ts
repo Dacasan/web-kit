@@ -192,7 +192,7 @@ export function buildGraph({
     // sobre `Service`, que es lo que `item` espera en rango (rng=Thing).
     hasOfferCatalog: {
       "@type": "OfferCatalog",
-      name: `Treatments — ${site.name}`,
+      name: (site as { offerCatalogName?: string }).offerCatalogName ?? `Treatments — ${site.name}`,
       itemListElement: site.services.map((s, i) => ({
         "@type": "ListItem",
         position: i + 1,
