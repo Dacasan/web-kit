@@ -48,6 +48,7 @@ interface Props {
 interface FormLabels {
   name?: string; email?: string; phone?: string; selectLabel?: string;
   namePh?: string; emailPh?: string; phonePh?: string; phonePrefix?: string;
+  consentLinks?: string;
 }
 const FL = (site as { formLabels?: Partial<FormLabels> }).formLabels ?? {};
 
@@ -152,7 +153,7 @@ const id = (name: string) => `${formId}-${name}`;
   <input id={id("consent")} name="consent" type="checkbox" required />
   <span>
     {consent}
-    See our <a href="/privacy-policy/">Privacy Policy</a> and <a href="/terms/">Terms</a>.
+    {(FL as { consentLinks?: string }).consentLinks ?? "See our \<a href=\"/privacy-policy/\"\>Privacy Policy\</a\> and \<a href=\"/terms/\"\>Terms\</a\>."}
   </span>
 </label>
 
