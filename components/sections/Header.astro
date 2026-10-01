@@ -43,7 +43,6 @@ const {
   ratingText = `${site.rating.value}/5 from ${Number(String(site.rating.count).replace(/,/g, "")).toLocaleString("en-US")} reviews`,
   ratingHeadline = (site as { ratingHeadline?: string }).ratingHeadline ?? "TOP RATED team",
   rating: ratingOpt, // override de página opcional
-  rating: ratingOpt, // override de página opcional
 } = Astro.props;
 
 const rating = ratingOpt ?? site.rating;
