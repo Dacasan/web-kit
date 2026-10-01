@@ -153,7 +153,9 @@ const id = (name: string) => `${formId}-${name}`;
   <input id={id("consent")} name="consent" type="checkbox" required />
   <span>
     {consent}
-    {(FL as { consentLinks?: string }).consentLinks ?? "See our \<a href=\"/privacy-policy/\"\>Privacy Policy\</a\> and \<a href=\"/terms/\"\>Terms\</a\>."}
+    {FL.consentLinks
+      ? <Fragment set:html={(FL as { consentLinks?: string }).consentLinks} />
+      : <>See our <a href="/privacy-policy/">Privacy Policy</a> and <a href="/terms/">Terms</a>.</>}
   </span>
 </label>
 
