@@ -17,7 +17,7 @@ import { TREATMENT_OPTIONS, site } from '@agenciaweb/kit-site';
 interface SelectOption { value: string; label: string }
 
 /**
- * Campos extra por cliente — opt-in vía site.ts (LEAD_EXTRA_FIELDS).
+ * Campos extra por cliente — opt-in vía site.ts (site.leadExtraFields).
  * Un sitio que no los declara no renderiza NADA: allon4, demo y scaffold
  * quedan byte a byte iguales (mismo patrón de cast defensivo que los campos
  * de medición, SeoHead v1.2.8). Los `name` viajan a lead-form.ts, que los
@@ -61,8 +61,8 @@ const consent = (consentText ?? site.smsConsentText).replace("{name}", site.name
 
 // Cast defensivo: el campo es OPCIONAL a nivel de tipos — un sitio viejo que
 // actualice el kit sigue compilando (ausente = cero campos extra).
-const { LEAD_EXTRA_FIELDS: extraFields } = site as {
-  LEAD_EXTRA_FIELDS?: readonly LeadExtraField[];
+const { leadExtraFields: extraFields } = site as {
+  leadExtraFields?: readonly LeadExtraField[];
 };
 
 const id = (name: string) => `${formId}-${name}`;

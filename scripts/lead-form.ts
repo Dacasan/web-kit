@@ -36,8 +36,8 @@ interface LeadExtraField {
   required?: boolean;
 }
 const EXTRA_FIELDS = ((site as {
-  LEAD_EXTRA_FIELDS?: readonly LeadExtraField[];
-}).LEAD_EXTRA_FIELDS ?? []) as readonly LeadExtraField[];
+  leadExtraFields?: readonly LeadExtraField[];
+}).leadExtraFields ?? []) as readonly LeadExtraField[];
 
 /** Clave del traspaso a /thank-you. */
 export const ESTIMATE_KEY = "a4_estimate";
