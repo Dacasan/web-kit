@@ -29,6 +29,7 @@ interface Props {
   /** Titular del sello de reputación. Sale de site.ts; nunca un superlativo
    *  no verificable — un dato contable convierte mejor y es defendible. */
   ratingHeadline?: string;
+  rating?: { value?: string; count?: string };
   topbar?: string[];
 }
 
@@ -41,6 +42,12 @@ const {
   // Se normaliza aquí para que ningún site.ts pueda romper la cabecera.
   ratingText = `${site.rating.value}/5 from ${Number(String(site.rating.count).replace(/,/g, "")).toLocaleString("en-US")} reviews`,
   ratingHeadline = (site as { ratingHeadline?: string }).ratingHeadline ?? "TOP RATED team",
+  rating: ratingOpt, // override de página opcional
+
+
+const rating = ratingOpt ?? site.rating;
+// Opt-out: sin cifras de rating, el sello no se pinta.
+const ratingHasValue = Boolean(String(rating?.value ?? '').trim());
 } = Astro.props;
 
 const links = Astro.props.links ?? (variant === 'money' ? [] : MENU_LINKS);
@@ -87,6 +94,9 @@ const topbar = Astro.props.topbar ?? (variant === 'money' ? TOPBAR : undefined);
     )}
 
     {/* Sello de reputación: columna propia entre el menú y el CTA (desktop). */}
+    {/* Opt-out: un sitio sin rating declarado (cifras sin respaldo aún) no
+        pinta el sello; los que sí lo tienen no cambian nada. */}
+    {ratingHasValue && (
     <div class="nav-rating" aria-label={`${ratingHeadline}, ${ratingText}`}>
       <span class="nav-rating__stars" aria-hidden="true">★★★★★</span>
       <span class="nav-rating__text">
@@ -94,6 +104,7 @@ const topbar = Astro.props.topbar ?? (variant === 'money' ? TOPBAR : undefined);
         <span>{ratingText}</span>
       </span>
     </div>
+    )}
     {/* Sin .pill: la barra es la pieza más compacta del sitio y el botón
         grande no cabe. El radio lo pone .button (--radius). */}
     <a href="#form-popup" class="button primary nav__cta">{cta}</a>
