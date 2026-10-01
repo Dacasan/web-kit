@@ -15,6 +15,7 @@
 // El envío lo hace scripts/lead-form.ts contra /api/events y termina
 // redirigiendo a la página de gracias, que es donde se entrega el estimado.
 import ContactFields from"./ContactFields.astro";
+import { site } from "@agenciaweb/kit-site";
 
 interface SelectOption { value: string; label: string }
 
@@ -59,7 +60,7 @@ const {
   <ContactFields formId={formId} selectLabel={selectLabel} selectOptions={selectOptions} />
 
   <button type="submit" class="button primary">{cta}</button>
-  <p class="form__trust">No commitment. We reply within 24 hours.</p>
+  <p class="form__trust">{(site as { formLabels?: { trust?: string } }).formLabels?.trust ?? "No commitment. We reply within 24 hours."}</p>
 </form>
 
 <style>

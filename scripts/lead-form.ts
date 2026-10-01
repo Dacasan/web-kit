@@ -35,6 +35,13 @@ interface LeadExtraField {
   label: string;
   required?: boolean;
 }
+const FL = (site as {
+  formLabels?: {
+    errName?: string; errEmail?: string; errPhone?: string; errConsent?: string;
+    errFail?: string; sending?: string;
+  };
+}).formLabels ?? {};
+
 const EXTRA_FIELDS = ((site as {
   leadExtraFields?: readonly LeadExtraField[];
 }).leadExtraFields ?? []) as readonly LeadExtraField[];
@@ -169,23 +176,23 @@ function wire(form: HTMLFormElement): void {
     const quote = parseMoney(readField(form, "us_quote"));
     const hasQuiz = Boolean(arch || situation || bone.length || quote);
 
-    if (!name) return showError("Please enter your name.");
-    if (!email.includes("@")) return showError("Please enter a valid email.");
-    if (!phone) return showError("Please enter your phone number.");
+    if (!name) return showError(FL.errName ?? "Please enter your name.");
+    if (!email.includes("@")) return showError(FL.errEmail ?? "Please enter a valid email.");
+    if (!phone) return showError(FL.errPhone ?? "Please enter your phone number.");
     for (const f of EXTRA_FIELDS) {
       if (f.required && !readField(form, f.name).trim()) {
         return showError(`Please fill in: ${f.label}.`);
       }
     }
     if (!isChecked(form, "consent")) {
-      return showError("Please accept being contacted so we can send your plan.");
+      return showError(FL.errConsent ?? "Please accept being contacted so we can send your plan.");
     }
 
     const button = form.querySelector<HTMLButtonElement>("button[type=submit]");
     const buttonLabel = button?.textContent ?? "";
     if (button) {
       button.disabled = true;
-      button.textContent = "Sending...";
+      button.textContent = FL.sending ?? "Sending...";
     }
 
     // El cuestionario viaja como mensaje legible: el coordinador ve el caso
@@ -272,7 +279,7 @@ function wire(form: HTMLFormElement): void {
       // El thank-you vive en ESTE sitio (mismo origin) — no se redirige al CRM.
       window.location.href = `${location.origin}${thankYou}?${qs}`;
     } catch {
-      showError("Something went wrong. Try again or message us on WhatsApp.");
+      showError(FL.errFail ?? "Something went wrong. Try again or message us on WhatsApp.");
       if (button) {
         button.disabled = false;
         button.textContent = buttonLabel;

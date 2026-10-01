@@ -105,10 +105,10 @@ const topbar = Astro.props.topbar ?? (variant === 'money' ? TOPBAR : undefined);
   <a href="#!" class="lightbox-close" aria-label="Close">&times;</a>
   <div class="lightbox__panel">
     <h2 class="popup-title">{cta}</h2>
-    <p class="popup-sub">We'll contact you by WhatsApp within 24 hours.</p>
+    <p class="popup-sub">{(site as { formLabels?: { popupSub?: string } }).formLabels?.popupSub ?? "We'll contact you by WhatsApp within 24 hours."}</p>
     <ContactForm formId="popup" cta={cta} />
     <p class="popup-note text-center">
-      <a href={whatsappHref} target="_blank" rel="noopener" data-wa-cta>or message us on WhatsApp</a>
+      <a href={whatsappHref} target="_blank" rel="noopener" data-wa-cta>{(site as { formLabels?: { waNote?: string } }).formLabels?.waNote ?? "or message us on WhatsApp"}</a>
     </p>
   </div>
 </div>

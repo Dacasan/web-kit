@@ -42,9 +42,18 @@ interface Props {
   consentText?: string;
 }
 
+
+// Textos del formulario por sitio — opt-in vía site.formLabels. Un sitio
+// que no los declara conserva los textos por defecto (inglés) byte a byte.
+interface FormLabels {
+  name?: string; email?: string; phone?: string; selectLabel?: string;
+  namePh?: string; emailPh?: string; phonePh?: string; phonePrefix?: string;
+}
+const FL = (site as { formLabels?: Partial<FormLabels> }).formLabels ?? {};
+
 const {
   formId,
-  selectLabel ="Treatment",
+  selectLabel = FL.selectLabel ?? "Treatment",
   selectOptions = TREATMENT_OPTIONS,
   // Lenguaje de consentimiento exigido por la verificación A2P 10DLC de
   // Twilio: consentimiento explícito, frecuencia variable, tarifas y
@@ -59,6 +68,8 @@ const {
 
 const consent = (consentText ?? site.smsConsentText).replace("{name}", site.name);
 
+
+
 // Cast defensivo: el campo es OPCIONAL a nivel de tipos — un sitio viejo que
 // actualice el kit sigue compilando (ausente = cero campos extra).
 const { leadExtraFields: extraFields } = site as {
@@ -71,7 +82,7 @@ const id = (name: string) => `${formId}-${name}`;
 <p class="form__error" id={id("error")} role="alert" tabindex="-1" hidden></p>
 
 <div class="field">
-  <label class="form-label" for={id("name")}>Name *</label>
+  <label class="form-label" for={id("name")}>{FL.name ?? "Name"} *</label>
   <input
     id={id("name")}
     name="name"
@@ -79,12 +90,12 @@ const id = (name: string) => `${formId}-${name}`;
     autocomplete="name"
     maxlength="80"
     required
-    placeholder="Alex Rivera"
+    placeholder={FL.namePh ?? "Alex Rivera"}
   />
 </div>
 
 <div class="field">
-  <label class="form-label" for={id("email")}>Email *</label>
+  <label class="form-label" for={id("email")}>{FL.email ?? "Email"} *</label>
   <input
     id={id("email")}
     name="email"
@@ -93,14 +104,14 @@ const id = (name: string) => `${formId}-${name}`;
     inputmode="email"
     maxlength="120"
     required
-    placeholder="alex@email.com"
+    placeholder={FL.emailPh ?? "alex@email.com"}
   />
 </div>
 
 <div class="field">
-  <label class="form-label" for={id("phone")}>Phone *</label>
+  <label class="form-label" for={id("phone")}>{FL.phone ?? "Phone"} *</label>
   <div class="form-prefix">
-    <span class="badge form-prefix__sign" aria-hidden="true">+1</span>
+    <span class="badge form-prefix__sign" aria-hidden="true">{FL.phonePrefix ?? "+1"}</span>
     <input
       id={id("phone")}
       name="phone"
@@ -109,7 +120,7 @@ const id = (name: string) => `${formId}-${name}`;
       inputmode="tel"
       maxlength="24"
       required
-      placeholder="(555) 000-0000"
+      placeholder={FL.phonePh ?? "(555) 000-0000"}
     />
   </div>
 </div>
