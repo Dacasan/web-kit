@@ -43,12 +43,12 @@ const {
   ratingText = `${site.rating.value}/5 from ${Number(String(site.rating.count).replace(/,/g, "")).toLocaleString("en-US")} reviews`,
   ratingHeadline = (site as { ratingHeadline?: string }).ratingHeadline ?? "TOP RATED team",
   rating: ratingOpt, // override de página opcional
-
+  rating: ratingOpt, // override de página opcional
+} = Astro.props;
 
 const rating = ratingOpt ?? site.rating;
 // Opt-out: sin cifras de rating, el sello no se pinta.
 const ratingHasValue = Boolean(String(rating?.value ?? '').trim());
-} = Astro.props;
 
 const links = Astro.props.links ?? (variant === 'money' ? [] : MENU_LINKS);
 const topbar = Astro.props.topbar ?? (variant === 'money' ? TOPBAR : undefined);
