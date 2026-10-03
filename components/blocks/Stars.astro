@@ -24,7 +24,7 @@ const { n = 5, of = 5, score, count } = Astro.props;
 const on = Math.max(0, Math.min(of, Math.round(n)));
 ---
 
-<p class="stars" aria-label={`${on} out of ${of}`}>
+<p class="stars" role="img" aria-label={`${on} out of ${of}`}>
   <span class="rating" aria-hidden="true">
     {'★'.repeat(on)}<span class="rating__off">{'★'.repeat(of - on)}</span>
   </span>

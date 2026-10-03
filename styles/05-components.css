@@ -803,6 +803,18 @@
   font-size: 1.2rem;
 }
 
+/* Links DENTRO de un bloque de texto (consent y legal): nunca se
+   distinguen solo por color — subrayado obligatorio (Lighthouse
+   link-in-text-block) y sobrevive a los lectores de pantalla.
+   El color hereda del párrafo: en el footer oscuro esto corrige el
+   contraste real — el a global({--ink-primary} #245551) daba ~1.4:1
+   sobre #1A1A1A. */
+.form-consent a, .footer-legal a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: .2em;
+}
+
 /* MOBILE FIRST: las tarjetas flotantes se apilan bajo la imagen; solo a */
 .hero-col-img { position: relative; }
 
