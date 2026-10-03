@@ -64,6 +64,12 @@ const {
 // un archivo de todas formas.
 const body = await Astro.slots.render('default');
 
+// Preconnects: la traza móvil (Slow 4G) marcaba que el DNS+TLS de god.js
+// (CRM) y de gtag se resolvían tarde, cuando el parser ya llegaba a ellos.
+// El de Google va condicionado al MISMO opt-in que usa SeoHead para emitir
+// el tag: un sitio sin googleAdsConversionId no habla con GTM, y el kit no
+// pista conexiones a terceros que el sitio no usa (demo/scaffold: cero).
+const { googleAdsConversionId } = site as { googleAdsConversionId?: string };
 
 ---
 
@@ -72,6 +78,15 @@ const body = await Astro.slots.render('default');
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    {/* Orden: primero lo que viaja en la cadena crítica (gtag y god.js se
+        insertan más abajo). El dns-prefetch del CRM es la red de seguridad
+        para la petición no-CORS de god.js, que no reutiliza la conexión
+        con crossorigin. */}
+    {googleAdsConversionId && (
+      <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin />
+    )}
+    <link rel="preconnect" href={CRM_URL} crossorigin />
+    <link rel="dns-prefetch" href={CRM_URL} />
     <SeoHead
       title={title}
       description={description}

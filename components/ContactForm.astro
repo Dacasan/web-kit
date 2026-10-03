@@ -45,6 +45,19 @@ const {
   selectOptions,
   thankYou ="/thank-you",
 } = Astro.props;
+
+// WebMCP declarativo (propuesta en origin trial; Lighthouse lo audita):
+// declara el <form> como tool para que un agente de IA lo rellene. El nombre
+// distingue las dos acciones reales del sitio — el imán de leads
+// (thankYou=/thank-you-download) pide la guía; el resto pide presupuesto.
+// SIN toolautosubmit a propósito: sin él, el agente rellena y el navegador
+// pone el foco en el botón para que la PERSONA confirme el envío — un lead
+// con consentimiento no se entrega por decisión de un bot.
+const isGuide = thankYou === "/thank-you-download";
+const toolname = isGuide ? "download_guide" : "request_quote";
+const tooldescription = isGuide
+  ? "Sends the patient's name, email and phone so the dental center emails them a free dental treatment guide (PDF)."
+  : "Sends a consultation request to the dental center. The team replies within 24 hours with a written treatment plan and an exact all-inclusive price.";
 ---
 
 <form
@@ -52,6 +65,8 @@ const {
   class="form"
   data-lead-form
   data-thank-you={thankYou}
+  toolname={toolname}
+  tooldescription={tooldescription}
   novalidate
 >
   {heading && <h3 class="form-heading">{heading}</h3>}

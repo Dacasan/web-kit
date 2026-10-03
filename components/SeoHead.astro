@@ -52,6 +52,16 @@ const robots = noindex || !site.indexable
   ?"noindex, nofollow"
   :"index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1";
 
+// Descubrimiento por agentes (opt-in vía site.aiDiscovery): el sitio declara
+// en su <head> dónde viven sus ficheros de IA. Sin el flag, cero links —
+// demo y scaffold siguen byte a byte iguales y ningún link apunta a un
+// archivo 404.
+//   - describedby → llms.txt (spec v2, ago-2026: HTML <link> o header Link)
+//   - ard → /.well-known/ard.json (spec ARD v0.91: nombre canónico,
+//     el consumidor MUST resolverlo) · ai-catalog → path predecesor (lo
+//     audita Lighthouse; cortesía para consumidores antiguos)
+const { aiDiscovery } = site as { aiDiscovery?: boolean };
+
 // Google tag (gtag.js, AW-…) — opt-in por sitio vía site.googleAdsConversionId.
 // Vacío o ausente = el sitio no emite ningún tag de Google (demo, scaffold y
 // sitios nuevos nacen apagados). El bucle de conversiones del CRM sigue
@@ -86,6 +96,13 @@ const graph = buildGraph({
 <meta name="description" content={description} />
 <meta name="robots" content={robots} />
 <link rel="canonical" href={canonical} />
+{aiDiscovery && (
+  <>
+    <link rel="describedby" href="/llms.txt" />
+    <link rel="ard" href="/.well-known/ard.json" />
+    <link rel="ai-catalog" href="/.well-known/ai-catalog.json" />
+  </>
+)}
 <link rel="icon" href="/favicon.ico" sizes="any" />
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 

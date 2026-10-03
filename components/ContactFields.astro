@@ -92,6 +92,7 @@ const id = (name: string) => `${formId}-${name}`;
     maxlength="80"
     required
     placeholder={FL.namePh ?? "Alex Rivera"}
+    toolparamdescription="Patient's full name"
   />
 </div>
 
@@ -106,6 +107,7 @@ const id = (name: string) => `${formId}-${name}`;
     maxlength="120"
     required
     placeholder={FL.emailPh ?? "alex@email.com"}
+    toolparamdescription="Contact email address"
   />
 </div>
 
@@ -122,13 +124,14 @@ const id = (name: string) => `${formId}-${name}`;
       maxlength="24"
       required
       placeholder={FL.phonePh ?? "(555) 000-0000"}
+      toolparamdescription="Phone number including country code"
     />
   </div>
 </div>
 
 <div class="field">
   <label class="form-label" for={id("package")}>{selectLabel}</label>
-  <select id={id("package")} name="package">
+  <select id={id("package")} name="package" toolparamdescription="Treatment the patient is interested in">
     {selectOptions.map((o) => <option value={o.value}>{o.label}</option>)}
   </select>
 </div>
@@ -150,7 +153,7 @@ const id = (name: string) => `${formId}-${name}`;
 ))}
 
 <label class="form-consent" for={id("consent")}>
-  <input id={id("consent")} name="consent" type="checkbox" required />
+  <input id={id("consent")} name="consent" type="checkbox" required toolparamdescription="Confirms the patient agrees to be contacted about their case" />
   <span>
     {consent}
     {FL.consentLinks
@@ -202,8 +205,43 @@ const id = (name: string) => `${formId}-${name}`;
 <input type="hidden" name="referrer" />
 
 <script>
-  // Astro deduplica este import aunque el bloque se monte varias veces: el
-  // módulo se empaqueta una sola vez y gobierna todos los [data-lead-form]
-  // del documento, incluido el del estimado.
-  import"../scripts/lead-form";
+  // Carga DIFERIDA de lead-form — traza móvil (Slow 4G, CPU 4×): el chunk
+  // ContactFields → lead-form.B5LQxeU7.js costaba 854 ms en la cadena
+  // crítica aunque nadie tocara el form. El import estático de arriba lo
+  // metía en la carga inicial; aquí se trae solo cuando hace falta.
+  //
+  // lead-form.ts se auto-inicializa al evaluarse (wires todos los
+  // [data-lead-form]), así que basta con importarlo. Disparadores:
+  //   1. cualquier interacción DENTRO de un form (pointerdown/focusin/keydown)
+  //   2. red de seguridad: el propio submit — sin ella, un Enter rápido
+  //      dispararía el envío nativo del <form> (novalidate, sin action):
+  //      GET con la PII en la URL. El listener es capture en window, así
+  //      que corre ANTES que el handler de lead-form y puede cancelarlo.
+  let pending: Promise<void> | null = null;
+  let ready = false;
+  const load = (): Promise<void> =>
+    (pending ??= import("../scripts/lead-form").then(() => { ready = true; }));
+
+  const isLead = (t: EventTarget | null): boolean =>
+    t instanceof Element && t.closest("[data-lead-form]") !== null;
+
+  const interact = (e: Event): void => {
+    if (!isLead(e.target)) return;
+    window.removeEventListener("pointerdown", interact, true);
+    window.removeEventListener("focusin", interact, true);
+    window.removeEventListener("keydown", interact, true);
+    void load();
+  };
+  window.addEventListener("pointerdown", interact, true);
+  window.addEventListener("focusin", interact, true);
+  window.addEventListener("keydown", interact, true);
+
+  window.addEventListener("submit", (e) => {
+    const form = e.target;
+    if (!(form instanceof HTMLFormElement)) return;
+    if (!form.matches("[data-lead-form]")) return;
+    if (ready) return; // el módulo ya wired: su propio listener se ocupa
+    e.preventDefault();
+    void load().then(() => form.requestSubmit());
+  }, true);
 </script>
