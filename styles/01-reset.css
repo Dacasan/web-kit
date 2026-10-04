@@ -4,5 +4,11 @@ html { box-sizing: border-box; font-size: 62.5%; }
 body, h1, h2, h3, h4, p, figure, blockquote, dl, dd { margin: 0; }
 ul[class], ol[class] { list-style: none; padding: 0; }
 img, picture, video, canvas { display: block; max-width: 100%; }
+/* height:auto y no solo max-width: sin ella, la attr height del <img> se
+   interpreta como píxeles fijos y la caja no escala con el ancho →
+   letterbox y vacíos enormes en móvil (auditoría 2026-10-04: 23 imgs).
+   Las clases que SÍ mandan altura (h-100, .frame, cover) ganan por
+   especificidad, así que no se tocan. */
+img { height: auto; }
 input, button, textarea, select { font: inherit; }
 iframe { border: 0; }
