@@ -158,6 +158,16 @@ function wire(form: HTMLFormElement): void {
     e.preventDefault();
     if (errorEl) errorEl.hidden = true;
 
+    // WebMCP: el submit puede venir de un agente de IA (la persona confirmó
+    // el envío). Viaja al CRM como flag del payload y ahí el contacto se
+    // separa con tag (SubmitEvent.agentInvoked, origin trial — ver
+    // developer.chrome.com/docs/ai/webmcp). CONTRATO two-PR con
+    // /api/events del CRM: la clave webmcp_agent vive en los dos lados,
+    // igual que los gads_* — añadir de un solo lado es pérdida silenciosa.
+    // El requestSubmit() del lazy loader no es acción de usuario, así que
+    // bajo esa red de seguridad agentInvoked es siempre false sin importar.
+    const agentInvoked = (e as SubmitEvent).agentInvoked === true;
+
     // Campo trampa: si viene relleno es un bot. Se finge éxito para no
     // enseñarle al bot cuál fue el motivo del rechazo.
     if (readField(form, "company_website").trim()) return;
@@ -256,6 +266,9 @@ function wire(form: HTMLFormElement): void {
             ...(message ? { message } : {}),
             ...(pkg ? { package: pkg } : {}),
             consent: true,
+            // Solo cuando un agente de IA activó el form (contrato con
+            // /api/events: el server tag gee contacto 'AI Agent').
+            ...(agentInvoked ? { webmcp_agent: true } : {}),
           },
         }),
       });
