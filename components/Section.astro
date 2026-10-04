@@ -121,8 +121,11 @@ if (scroll && !label && !heading) {
 
 const Heading = `h${level}` as 'h1' | 'h2' | 'h3';
 
-// El titular se pinta con set:html —admite <em>, que es recurso de marca— y
-// un aria-label NO interpreta marcado: se leería "menor que em mayor que".
+// Titular Y subtítulo se pintan con set:html — admiten <em> (recurso de
+// marca) y <a> (links internos de cierre). Antes solo el heading lo hacía:
+// un sub con un <a href> se escapaba y se leía al usuario el marcado crudo
+// ("&lt;a href=...&gt;"). Un aria-label NO interpreta marcado: se leería
+// "menor que em mayor que".
 const plain = (s: string) =>
   s.replace(/<[^>]*>/g, '').replace(/&quot;/g, '"').replace(/&amp;/g, '&').trim();
 ---
@@ -138,7 +141,7 @@ const plain = (s: string) =>
     {(heading || sub) && (
       <header class="section-header">
         {heading && <Heading set:html={heading} />}
-        {sub && <p class="lead">{sub}</p>}
+        {sub && <p class="lead" set:html={sub} />}
       </header>
     )}
 

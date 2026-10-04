@@ -84,6 +84,20 @@
   box-shadow: var(--shadow-sm);
 }
 
+/* Cards con vídeo (testimonios): el bloque de estrellas iba PRIMERO en el
+   DOM —encima del vídeo, sin sentido visual— porque el microdato
+   reviewRating pide esa posición. En vez de reordenar ~36 tarjetas a mano
+   en 13 páginas, la card que contiene un vídeo se vuelve flex y el rating
+   baja tras el vídeo: vídeo → estrellas → cita → autor. Las cards sin
+   vídeo (:has solo la activa con .youtube-video directo) quedan igual. */
+.card:has(> .youtube-video) {
+  display: flex;
+  flex-direction: column;
+}
+.card:has(> .youtube-video) > * { order: 2; }
+.card:has(> .youtube-video) > .youtube-video { order: 0; }
+.card:has(> .youtube-video) > [itemprop="reviewRating"] { order: 1; }
+
 :root { --gap-card: 1.2rem; }
 @media (min-width: 900px) {
   :root { --gap-card: 1.6rem; }
