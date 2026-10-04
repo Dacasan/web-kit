@@ -62,6 +62,12 @@ const robots = noindex || !site.indexable
 //     audita Lighthouse; cortesía para consumidores antiguos)
 const { aiDiscovery } = site as { aiDiscovery?: boolean };
 
+// Origin trial de WebMCP (opt-in vía site.originTrialToken): sin token,
+// Chrome no habilita la API para usuarios reales durante el trials
+// (Chrome 149–156). La sintaxis correcta es meta http-equiv="origin-trial"
+// — o header Origin-Trial, pero nginx estático no mete headers por página.
+const { originTrialToken } = site as { originTrialToken?: string };
+
 // Google tag (gtag.js, AW-…) — opt-in por sitio vía site.googleAdsConversionId.
 // Vacío o ausente = el sitio no emite ningún tag de Google (demo, scaffold y
 // sitios nuevos nacen apagados). El bucle de conversiones del CRM sigue
@@ -93,6 +99,7 @@ const graph = buildGraph({
 ---
 
 <title>{title}</title>
+{originTrialToken && <meta http-equiv="origin-trial" content={originTrialToken} />}
 <meta name="description" content={description} />
 <meta name="robots" content={robots} />
 <link rel="canonical" href={canonical} />
