@@ -114,7 +114,10 @@ const topbar = Astro.props.topbar ?? (variant === 'money' ? TOPBAR : undefined);
 <div class="lightbox" id="form-popup">
   <a href="#!" class="lightbox-close" aria-label="Close">&times;</a>
   <div class="lightbox__panel">
-    <h2 class="popup-title">{cta}</h2>
+    {/* <p> y no <h2>: es el título de un modal, no una sección de la página —
+        como h2 se colaba en la jerarquía de encabezados (h1 → h2 fantasma)
+        y rompía la estructura SEO. La clase lleva el estilo igual. */}
+    <p class="popup-title">{cta}</p>
     <p class="popup-sub">{(site as { formLabels?: { popupSub?: string } }).formLabels?.popupSub ?? "We'll contact you by WhatsApp within 24 hours."}</p>
     <ContactForm formId="popup" cta={cta} />
     <p class="popup-note text-center">
