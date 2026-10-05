@@ -98,6 +98,18 @@
 .card:has(> .youtube-video) > .youtube-video { order: 0; }
 .card:has(> .youtube-video) > [itemprop="reviewRating"] { order: 1; }
 
+/* Card con IMAGEN ARRIBA (design de tech/two-cases): la imagen va a sangre
+   (top/izq/der) y el padding del Card es solo para el texto — con el marco
+   blanco el arte quedaba encuadrado. Se aplica al <picture> primer hijo: el
+   bloque es de ancho auto, así que los márgenes negativos lo hacen crecer a
+   los dos lados (img width:100% + reset max-width solo no bastaban). */
+.card:not(.bg) > picture:first-child {
+  margin: -1.4rem -1.4rem 1.2rem;
+}
+.card:not(.bg) > picture:first-child img {
+  max-width: none;
+}
+
 :root { --gap-card: 1.2rem; }
 @media (min-width: 900px) {
   :root { --gap-card: 1.6rem; }
