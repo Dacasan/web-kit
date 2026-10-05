@@ -105,6 +105,10 @@
    los dos lados (img width:100% + reset max-width solo no bastaban). */
 .card:not(.bg) > picture:first-child {
   margin: -1.4rem -1.4rem 1.2rem;
+  /* el reset pone max-width:100% también en <picture> — sin estos dos la
+     caja solo se desplazaba y dejaba hueco a la derecha. */
+  width: calc(100% + 2.8rem);
+  max-width: none;
 }
 .card:not(.bg) > picture:first-child img {
   max-width: none;
