@@ -69,7 +69,10 @@ const body = await Astro.slots.render('default');
 // El de Google va condicionado al MISMO opt-in que usa SeoHead para emitir
 // el tag: un sitio sin googleAdsConversionId no habla con GTM, y el kit no
 // pista conexiones a terceros que el sitio no usa (demo/scaffold: cero).
-const { googleAdsConversionId } = site as { googleAdsConversionId?: string };
+const { googleAdsConversionId, ga4MeasurementId } = site as {
+  googleAdsConversionId?: string;
+  ga4MeasurementId?: string;
+};
 
 ---
 
@@ -82,7 +85,7 @@ const { googleAdsConversionId } = site as { googleAdsConversionId?: string };
         insertan más abajo). El dns-prefetch del CRM es la red de seguridad
         para la petición no-CORS de god.js, que no reutiliza la conexión
         con crossorigin. */}
-    {googleAdsConversionId && (
+    {((googleAdsConversionId ?? "") || (ga4MeasurementId ?? "")) && (
       <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin />
     )}
     <link rel="preconnect" href={CRM_URL} crossorigin />

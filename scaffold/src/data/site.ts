@@ -125,6 +125,11 @@ export const site = {
    *  [BRAND] opcional — Vacío o ausente = sin píxel Meta en el <head>. */
   // [BRAND] optional
   metaPixelId: "",
+  /** Google Analytics 4 (gtag.js): "G-XXXXXXXXXX" (measurement ID del data
+   *  stream web de GA4). [BRAND] opcional — Vacío o ausente = sin tag GA4
+   *  en el <head>. */
+  // [BRAND] optional
+  ga4MeasurementId: "",
   /** ID de video testimonial (YouTube, fachada bajo demanda). Placeholder
    *  de dominio público (Big Buck Bunny — Blender Foundation). */
   // [BRAND] required — replace for every new brand

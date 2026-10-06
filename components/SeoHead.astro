@@ -77,9 +77,10 @@ const { originTrialToken } = site as { originTrialToken?: string };
 
 // Cast local: el campo es OPCIONAL a nivel de tipos — un sitio que actualice
 // el kit sin declararlo sigue compilando (ausente o vacío = tag no emitido).
-const { googleAdsConversionId, metaPixelId } = site as {
+const { googleAdsConversionId, metaPixelId, ga4MeasurementId } = site as {
   googleAdsConversionId?: string;
   metaPixelId?: string;
+  ga4MeasurementId?: string;
 };
 
 const ogFullUrl = ogImage.startsWith("http") ? ogImage : `${site.baseUrl}${ogImage}`;
@@ -175,6 +176,26 @@ const graph = buildGraph({
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
     gtag('config', gadsId);
+  </script>
+)}
+
+{/* Google Analytics 4 (gtag.js, G-… con data stream de GA4) — opt-in por
+    sitio vía site.ga4MeasurementId (≥ v1.2.26). Vacío o ausente = no emite
+    nada (demo, scaffold y sitios nuevos nacen apagados). Es ANALYTICS de
+    página, igual que el gtag de Ads arriba: las CONVERSIONES siguen
+    server-side vía el CRM. Va como bloque separado — no toca el dataLayer
+    del tag AW (dos snippets independientes, cero acoplamiento: apagar uno
+    en site.ts no rompe el otro). */}
+{ga4MeasurementId && (
+  <script is:inline async
+    src={`https://www.googletagmanager.com/gtag/js?id=${ga4MeasurementId}`}></script>
+)}
+{ga4MeasurementId && (
+  <script is:inline define:vars={{ ga4Id: ga4MeasurementId }}>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', ga4Id);
   </script>
 )}
 

@@ -93,6 +93,10 @@ export const site = {
   /** Meta Pixel / Dataset (base code): ID numérico de Events Manager.
    *  Vacío = el sitio no emite el píxel en ningún <head>. */
   metaPixelId: "",
+  /** Google Analytics 4 (gtag.js): "G-XXXXXXXXXX" (measurement ID del data
+   *  stream web de GA4). Vacío = el sitio no emite el tag de GA4 en ningún
+   *  <head>. */
+  ga4MeasurementId: "",
   /** ID de video testimonial (YouTube, fachada bajo demanda). Placeholder
    *  de dominio público (Big Buck Bunny — Blender Foundation). */
   videoId: "aqz-KE-bpKQ",
