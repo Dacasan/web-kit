@@ -1,59 +1,89 @@
 # web-kit — AGENTS.md
 
 > Estructura compartida de los sitios de cliente. Documentación completa:
-> https://docs.adwebcrm.com/web-kit/ (fuente: `sitio-docs`). Este fichero
-> repite solo lo que cuesta dinero.
+> `../sitio-docs/src/content/docs/web-kit/` (architecture · components ·
+> design-tokens · new-site; repo `Dacasan/sitio-docs`). Este fichero repite
+> solo lo que cuesta dinero.
 
 ## Qué es este repo
 
-Biblioteca de estilos, componentes, layout, scripts y librería que consumen
-todos los sitios de cliente vía `github:Dacasan/web-kit#semver:^X.Y.Z`.
-Los sitios son SOLO composición: páginas, `src/data/site.ts`, `brand.css`,
-`public/`. Si estás editando un componente de cliente desde aquí, o un
-componente del kit desde un sitio, la frontera está cruzada.
+`Dacasan/web-kit` (público, licencia propietaria): `styles/`, `components/`,
+`layouts/BaseLayout.astro`, `lib/`, `scripts/`, el catálogo `demo/` y la
+plantilla `scaffold/`. Los sitios lo consumen versionado — no copiado — vía
+`github:Dacasan/web-kit#semver:^X.Y.Z`.
+
+Un sitio de cliente es SOLO composición: páginas, `src/data/site.ts`,
+`src/styles/brand.css`, `public/`. Editar un componente de cliente desde aquí,
+o uno del kit desde un sitio, es frontera cruzada.
 
 ## Reglas que cuestan dinero
 
-1. **`demo/` es el release gate.** `pnpm --dir demo build` debe pasar antes
-   de tagear — el catálogo importa TODOS los componentes: si compila, no
-   hay componente roto. Tag solo con build verde.
-2. **Versiones por tag, no por rama.** Los sitios resuelven
-   `semver:^X.Y.Z` contra tags de git. Un cambio debe salir con tag
-   (`v1.2.N`) o ningún sitio lo verá.
+1. **`demo/` es el release gate.** `pnpm --dir demo install && pnpm --dir demo
+   build` (con `LANDING_API_URL`, como CI: `.github/workflows/ci.yml`) en
+   verde antes de tagear. CI lo corre en push a `main` y en PRs — crear un tag
+   no dispara nada. Cobertura real: los 13 bloques (`atomos.astro:16-28`),
+   Header/Breadcrumb/Footer, Section, YouTubeLite, ContactForm/ContactFields,
+   SeoHead y ContactLauncher. **No** cubre HeroVideo, InstantEstimate,
+   EstimateResult, UploadCase ni HalftoneFade: un build verde no prueba esos
+   cinco; verifícalos a mano al tocarlos.
+2. **Versiones por tag, no por rama.** Los sitios resuelven `semver:^X.Y.Z`
+   contra tags de git (último: `v1.2.25`, 2026-10-05). Un cambio debe salir
+   con tag (`vX.Y.Z`) o ningún sitio lo verá. `package.json.version` está
+   desincronizado (`1.2.4`) y **no** se usa para resolver — jamás lo tomes
+   como versión del kit. `private: true`: no se publica a npm.
 3. **Mobile-first literal, un breakpoint: `900px`.** Cero
-   `@media (max-width` — si escribes uno, la lógica está invertida.
-4. **Sin dependencias nuevas.** `astro` como peer dep y nada más. Ni
-   Tailwind, ni React, ni librería de iconos.
+   `@media (max-width` — todas las `@media` de maqueta son
+   `(min-width: 900px)`. Únicos `max-width` legítimos: atributos `media=` de
+   precarga/`<source>` (`SeoHead.astro`, `YouTubeLite.astro`) — aritmética de
+   preload, no maqueta.
+4. **Sin dependencias nuevas.** `astro` como peer dep (`^7.1.6`) y nada más;
+   cero dependencias propias. Ni Tailwind, ni React, ni librería de iconos.
 5. **Los datos del negocio nunca entran al kit.** El kit consume
-   `@agenciaweb/kit-site` (alias que cada sitio resuelve a su `site.ts`).
+   `@agenciaweb/kit-site`; cada sitio lo resuelve a su `site.ts` en
+   `astro.config.mjs` (alias explícito, grep-able).
 
-## Medición (v1.2.8, 2026-09-28)
+## Opt-ins de `site.ts` — el kit emite solo si el sitio lo declara
 
-`SeoHead.astro` emite tags opt-in según el `site.ts` del consumidor:
-
-| Campo | Emite | Estado vacío |
+| Campo | Efecto | Estado vacío/ausente |
 |---|---|---|
-| `googleAdsConversionId` | Google tag (gtag.js) base, `AW-…` | No emite nada |
-| `metaPixelId` | Meta pixel base code (v1.2.8+) + noscript fallback | No emite nada |
+| `googleAdsConversionId` | Google tag base (gtag.js, `AW-…`) + preconnect a GTM | No emite nada |
+| `metaPixelId` (kit ≥ v1.2.8) | Meta pixel base code + fallback `<noscript>` | No emite nada |
+| `ga4MeasurementId` (kit ≥ v1.2.26) | GA4 analytics (gtag.js, `G-…`) + cuenta en el preconnect a GTM | No emite nada |
+| `aiDiscovery` | 3 `<link>`: `llms.txt`, `/.well-known/ard.json`, `/.well-known/ai-catalog.json` (requiere publicar esos ficheros) | No emite nada |
+| `originTrialToken` | `<meta http-equiv="origin-trial">` (WebMCP; experimental, Chrome) | No emite nada |
+| `leadExtraFields` | Campos extra en `ContactFields`; viajan al `message` del lead | Cero campos extra |
+| `formLabels` | Textos del formulario por sitio | Defaults en inglés |
 
-- **Cast defensivo** en SeoHead: los campos son opcionales a nivel de tipos
-  (`site as {...}`) — un sitio viejo que actualice el kit sigue compilando.
-- **demo/scaffold nacen apagados** (`""`): el catálogo no debe emitir tags
-  de terceros y los sitios nuevos heredan el estado neutro.
+- **Cast defensivo** en los componentes: los campos son opcionales a nivel de
+  tipos (`site as {…}`) — un sitio viejo que actualice el kit sigue compilando.
+- **demo y scaffold nacen apagados** (`""` / ausentes): el catálogo no emite
+  tags de terceros ni conexiones condicionadas; los sitios nuevos heredan el
+  estado neutro.
 - **Las conversiones NO viven aquí.** El píxel y el gtag son señal de
   página/cookies de primera parte; las conversiones las entrega el CRM
   server-side (Google Data Manager, Meta CAPI — ver
-  https://docs.adwebcrm.com/crm/attribution/).
-- **`ContactFields.astro` es contrato con el CRM** (`god.js` rellena,
-  `lead-form.ts` lee). Los campos ad-level de Google Ads llevan prefijo
-  `gads_`. Cambiar names de un solo lado = pérdida silenciosa de datos
-  (two-PR change junto con `god.ts` del CRM).
+  `../sitio-docs/src/content/docs/crm/attribution.md`).
+- **`ContactFields.astro` es contrato two-PR con el CRM.**
+  `fillHiddenInputs` de `god.ts` (CRM; servido como `/god.js`) rellena y
+  `lead-form.ts` (kit) lee. Los campos ad-level de Google Ads llevan prefijo
+  `gads_`; también viajan `utm_*`, `gclid`/`fbclid`/…, `event_id`,
+  `visitor_id`, `fbc`/`fbp`. Cambiar un `name` de un solo lado = pérdida
+  silenciosa de datos.
+
+## Otros
+
+- Receta de compresión del vídeo del hero: `docs/hero-video.md` (única doc
+  local del repo).
+- Scaffolder: `pnpm create-sitio <cliente>` copia `scaffold/` a
+  `../clientes/<cliente>/sitio-<cliente>/` (`create-sitio.mjs`). Sale con
+  `file:../../../web-kit` para desarrollo local; al publicar se cambia a
+  `github:Dacasan/web-kit#semver:^X.Y.Z`.
 
 ## Verify
 
 ```bash
-pnpm --dir demo build                              # release gate
-grep -c 'metaPixelId' components/SeoHead.astro     # opt-in presente
-grep -rn 'gtag\|fbq\|connect.facebook' demo/src/   # debe devolver 0:
-                                                   # el catálogo no emite tags
+pnpm --dir demo install && LANDING_API_URL=https://crm.example.com pnpm --dir demo build  # release gate (como CI)
+grep -c 'metaPixelId' components/SeoHead.astro       # >0: opt-in presente
+grep -n 'googleAdsConversionId\|metaPixelId\|ga4MeasurementId' demo/src/site-stub.ts scaffold/src/data/site.ts  # todos: ""
+grep -o 'googletagmanager\|connect\.facebook' demo/dist/atomos/index.html | wc -l     # 0 tras build (dist/ no versionado)
 ```
