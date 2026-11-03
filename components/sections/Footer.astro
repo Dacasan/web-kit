@@ -13,7 +13,7 @@ const titulo = (slug: string) =>
 
 // Textos del pie por sitio — opt-in (mismo patrón que formLabels).
 const F = (site as { legalNote?: string; footerTitles?: Record<string, string> });
-const legalNote = F.legalNote ?? "Results vary depending on the case, diagnosis and adherence to treatment. This page does not replace a medical consultation.";
+const legalNote = F.legalNote ?? "Results vary depending on each case. This page is informational and does not replace a professional consultation.";
 const footTitle = (slug: string) => F.footerTitles?.[slug] ?? titulo(slug);
 const homeLabel = F.footerTitles?.home ?? "Home";
 const privacyLabel = F.footerTitles?.["privacy-policy"] ?? "Privacy Policy";

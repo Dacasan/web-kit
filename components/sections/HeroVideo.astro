@@ -62,9 +62,16 @@ interface Props {
   posterDesktop?: string;
   /** H1 real (chapita) */
   badge?: string;
+  /** Nivel de la chapa. 1 cuando ES el hero de la página; 2 cuando el
+   *  componente entra como sección a mitad de página (ya hay h1 arriba). */
+  level?: 1 | 2;
   /** Claim visible — es un <p> bold, no un encabezado. */
   displayTitle?: string;
   subtitle?: string;
+  /** Texto del botón de WhatsApp. Vacío para no pintarlo. */
+  waText?: string;
+  /** Cifras bajo los CTA. Vacío = sin fila de datos; hereda site.proof. */
+  stats?: { num: string; label: string }[];
 }
 
 const {
@@ -72,9 +79,12 @@ const {
   srcDesktop = site.heroVideo.desktop,
   poster = site.heroVideo.poster,
   posterDesktop = site.heroVideo.posterDesktop,
-  badge = 'Now accepting patients',
-  displayTitle = 'Fixed teeth in one day. All-on-4 dental implants.',
-  subtitle = 'A full arch of permanent-looking teeth on just 4 implants. Free consultation with 3D scan and written plan.',
+  level = 1,
+  badge = 'Now booking new projects',
+  displayTitle = 'A clear offer, in one line.',
+  subtitle = 'One sentence on what you do, for whom, and what happens next.',
+  waText = 'WhatsApp',
+  stats: statsProp,
 } = Astro.props;
 
 // El breakpoint estructural único del sistema.
@@ -102,7 +112,8 @@ const sources = [
 ];
 
 const posterWide = posterDesktop || poster;
-const stats = site.proof.slice(0, 3);
+const stats = statsProp ?? site.proof.slice(0, 3);
+const Badge = `h${level}` as 'h1' | 'h2';
 ---
 
 <header id="home" class="hero-video" itemscope itemtype="https://schema.org/WPHeader">
@@ -131,11 +142,12 @@ const stats = site.proof.slice(0, 3);
   <HalftoneFade direction="bottom" color="#101010" class="hero-video__fade" />
 
   <div class="container hero-video__content">
-    {/* H1 real: la chapita de disponibilidad, con su dot pulsante. */}
-    <h1 class="hero-avail-badge" itemprop="headline">
+    {/* H1 real: la chapita de disponibilidad, con su dot pulsante.
+        Nivel configurable: h1 solo cuando ES el hero de la página. */}
+    <Badge class="hero-avail-badge" itemprop="headline">
       <span class="hero-avail-badge__dot" aria-hidden="true"></span>
       {badge}
-    </h1>
+    </Badge>
 
     {/* El claim visible NO es un encabezado: <p> con .hero-title (4rem→7rem,
         tinta blanca sobre fondo oscuro — lo da la capa de componentes). */}
@@ -144,20 +156,25 @@ const stats = site.proof.slice(0, 3);
 
     <div class="btn-row hero-video__btn-row">
       <a href="#consulta" class="button accent pill">{PRIMARY_CTA}</a>
-      <a href={whatsappHref} class="button outline pill" target="_blank" rel="noopener" data-wa-cta>
-        WhatsApp
-      </a>
+      {waText !== "" && (
+        <a href={whatsappHref} class="button outline pill" target="_blank" rel="noopener" data-wa-cta>
+          {waText}
+        </a>
+      )}
     </div>
 
-    {/* Datos clave del tratamiento: dl con borde superior. */}
-    <dl class="hero-video__stats">
-      {stats.map((p) => (
-        <div class="hero-video__stat">
-          <dt class="hero-video__stat-label">{p.label}</dt>
-          <dd class="hero-video__stat-value">{p.num}</dd>
-        </div>
-      ))}
-    </dl>
+    {/* Datos clave del tratamiento: dl con borde superior.
+        Oculto cuando el sitio no pasa cifras (stats vacío). */}
+    {stats.length > 0 && (
+      <dl class="hero-video__stats">
+        {stats.map((p) => (
+          <div class="hero-video__stat">
+            <dt class="hero-video__stat-label">{p.label}</dt>
+            <dd class="hero-video__stat-value">{p.num}</dd>
+          </div>
+        ))}
+      </dl>
+    )}
   </div>
 </header>
 

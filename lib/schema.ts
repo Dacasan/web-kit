@@ -192,7 +192,7 @@ export function buildGraph({
     // sobre `Service`, que es lo que `item` espera en rango (rng=Thing).
     hasOfferCatalog: {
       "@type": "OfferCatalog",
-      name: (site as { offerCatalogName?: string }).offerCatalogName ?? `Treatments — ${site.name}`,
+      name: (site as { offerCatalogName?: string }).offerCatalogName ?? `Services — ${site.name}`,
       itemListElement: site.services.map((s, i) => ({
         "@type": "ListItem",
         position: i + 1,
@@ -266,7 +266,7 @@ export function buildGraph({
     graph.push({
       "@type": "HowTo",
       "@id": `${url}#howto`,
-      name: `How to start your treatment at ${site.name}`,
+      name: (site as { howToName?: string }).howToName ?? `How it works at ${site.name}`,
       step: steps.map((s, i) => ({
         "@type": "HowToStep",
         position: i + 1,

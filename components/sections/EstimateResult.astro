@@ -24,9 +24,9 @@ interface Props {
 }
 
 const {
-  label = 'Your travel-included estimate',
-  genericTitle = `Our patients save ${AVG_SAVINGS} on average.`,
-  includesNote = 'Surgery, temporaries, final teeth, CT scan, medications, airport transfers and hotel for 2 guests. No hidden fees.',
+  label = 'Your estimate',
+  genericTitle = 'Your estimated total.',
+  includesNote = 'Everything detailed in your quote. No hidden fees.',
 } = Astro.props;
 
 const usd = (n: number) => `$${n.toLocaleString('en-US')}`;

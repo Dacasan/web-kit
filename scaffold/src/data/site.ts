@@ -61,7 +61,7 @@ export const site = {
    */
   // [BRAND] required — replace for every new brand
   smsConsentText:
-    "By checking this box, I agree to receive SMS text messages and emails from {name} about my treatment plan, appointments and follow-ups. Message frequency varies. Msg & data rates may apply. Reply STOP to opt out at any time, or HELP for help. Consent is not a condition of purchase.",
+    "By checking this box, I agree to receive SMS text messages and emails from {name} about your enquiry, updates and follow-ups. Message frequency varies. Msg & data rates may apply. Reply STOP to opt out at any time, or HELP for help. Consent is not a condition of purchase.",
   // [BRAND] required — replace for every new brand
   email: "hello@sitio-demo.example.com",
 
@@ -417,7 +417,7 @@ export const AVG_SAVINGS = "50%";
 /** Opciones del desplegable de tratamiento. Mismo juego en todo el sitio. */
 // [BRAND] required — replace for every new brand
 export const TREATMENT_OPTIONS = [
-  { value: "", label: "Select treatment" },
+  { value: "", label: "Select service" },
   { value: "service-a-2900", label: "Demo Service One — $2,900" },
   { value: "service-b-2500", label: "Demo Service Two — $2,500" },
   { value: "service-b-1500", label: "Demo Service Two Partial — $1,500" },

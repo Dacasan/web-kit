@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 373" role="img" aria-label="Guide cover">
+  <rect width="280" height="373" fill="#0f172a"/>
+  <text x="28" y="64" font-family="system-ui, sans-serif" font-size="13" letter-spacing="2" fill="#9fb3ad">FREE GUIDE</text>
+  <text x="28" y="150" font-family="Georgia, serif" font-size="38" fill="#ffffff">The</text>
+  <text x="28" y="190" font-family="Georgia, serif" font-size="38" fill="#ffffff">Guide</text>
+  <rect x="28" y="214" width="60" height="3" fill="#f59e0b"/>
+  <text x="28" y="330" font-family="system-ui, sans-serif" font-size="12" fill="#9fb3ad">getpage</text>
+</svg>
