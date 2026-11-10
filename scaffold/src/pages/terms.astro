@@ -7,15 +7,13 @@ import { site } from '../data/site';
 import '../styles/index.css';
 ---
 
-<BaseLayout title={`Terms — ${site.name}`} description={`Términos y condiciones de ${site.name}.`} noindex>
+<BaseLayout title={`Terms — ${site.name}`} description={`Terms and conditions for ${site.name}.`} noindex>
   <Section>
-    <div class="row">
-      <div class="col-12">
-        <Card>
-          <Text level={1} title="Terms &amp; Conditions" />
-          <Text>Placeholder terms text: conditions of service for this demo site. Replace every placeholder field before publishing.</Text>
-        </Card>
-      </div>
+    <div class="col-12">
+      <Card>
+        <Text level={1} title="Terms &amp; Conditions" />
+        <Text text="Placeholder terms text: conditions of service for this demo site. Replace every placeholder field before publishing." />
+      </Card>
     </div>
   </Section>
 </BaseLayout>

@@ -7,15 +7,13 @@ import { site } from '../data/site';
 import '../styles/index.css';
 ---
 
-<BaseLayout title={`Privacy Policy — ${site.name}`} description={`Cómo ${site.name} trata tus datos.`} noindex>
+<BaseLayout title={`Privacy Policy — ${site.name}`} description={`How ${site.name} handles your data.`} noindex>
   <Section>
-    <div class="row">
-      <div class="col-12">
-        <Card>
-          <Text level={1} title="Privacy Policy" />
-          <Text>Placeholder policy text: how this demo site treats its data. Replace every placeholder field before publishing.</Text>
-        </Card>
-      </div>
+    <div class="col-12">
+      <Card>
+        <Text level={1} title="Privacy Policy" />
+        <Text text="Placeholder policy text: how this demo site treats its data. Replace every placeholder field before publishing." />
+      </Card>
     </div>
   </Section>
 </BaseLayout>

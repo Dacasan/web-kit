@@ -1,31 +1,9 @@
 ---
-// ContactFields — los campos de datos, SIN el <form> alrededor.
-//
-// Existe por una razón concreta: el estimado necesita que su cuestionario y
-// los datos de contacto viajen en el MISMO <form> (un solo envío, un solo
-// lead), y un <form> no se puede anidar dentro de otro. Si este bloque
-// viviera dentro de ContactForm.astro, el estimado tendría que copiarlo —
-// y una copia es cómo dos formularios acaban divergiendo sin que nadie lo
-// note: obligatoriedad distinta, consentimiento en uno sí y en otro no,
-// nombres de campo que bailan.
-//
-// Aquí está el contrato con el CRM: los `name` de los campos, el campo
-// trampa y los ocultos de atribución que rellena god.js. Quien monte esto
-// dentro de un <form data-lead-form> hereda el comportamiento completo.
 import { TREATMENT_OPTIONS, site } from '@agenciaweb/kit-site';
 
 interface SelectOption { value: string; label: string }
 
-/**
- * Campos extra por cliente — opt-in vía site.ts (site.leadExtraFields).
- * Un sitio que no los declara no renderiza NADA: allon4, demo y scaffold
- * quedan byte a byte iguales (mismo patrón de cast defensivo que los campos
- * de medición, SeoHead v1.2.8). Los `name` viajan a lead-form.ts, que los
- * adjunta al `message` del lead con su etiqueta — el CRM los lee como texto
- * libre sin cambios de esquema.
- */
 interface LeadExtraField {
-  /** Solo tipos nativos de HTML: `date` es el calendario del móvil, sin librerías. */
   type: 'date' | 'select' | 'number' | 'text';
   name: string;
   label: string;
@@ -34,19 +12,16 @@ interface LeadExtraField {
 }
 
 interface Props {
-  /** Sufijo de los id: dos formularios en el mismo documento no colisionan. */
   formId: string;
   selectLabel?: string;
   selectOptions?: SelectOption[];
-  /** Texto de la casilla de consentimiento. */
   consentText?: string;
 }
 
 
-// Textos del formulario por sitio — opt-in vía site.formLabels. Un sitio
-// que no los declara conserva los textos por defecto (inglés) byte a byte.
 interface FormLabels {
   name?: string; email?: string; phone?: string; selectLabel?: string;
+  selectPlaceholder?: string;
   namePh?: string; emailPh?: string; phonePh?: string; phonePrefix?: string;
   consentLinks?: string;
 }
@@ -56,14 +31,6 @@ const {
   formId,
   selectLabel = FL.selectLabel ?? "Service",
   selectOptions = TREATMENT_OPTIONS,
-  // Lenguaje de consentimiento exigido por la verificación A2P 10DLC de
-  // Twilio: consentimiento explícito, frecuencia variable, tarifas y
-  // opt-out STOP. Los enlaces a /privacy-policy/ y /terms/ se añaden
-  // debajo — ambas páginas existen y están enlazadas en el footer.
-  //
-  // La redacción vive en el site.ts del CLIENTE (smsConsentText, con {name})
-  // — el kit no lleva datos de negocio. {name} se sustituye aquí por el
-  // nombre real de la cuenta.
   consentText,
 } = Astro.props;
 
@@ -71,8 +38,6 @@ const consent = (consentText ?? site.smsConsentText).replace("{name}", site.name
 
 
 
-// Cast defensivo: el campo es OPCIONAL a nivel de tipos — un sitio viejo que
-// actualice el kit sigue compilando (ausente = cero campos extra).
 const { leadExtraFields: extraFields } = site as {
   leadExtraFields?: readonly LeadExtraField[];
 };
@@ -132,13 +97,18 @@ const id = (name: string) => `${formId}-${name}`;
 <div class="field">
   <label class="form-label" for={id("package")}>{selectLabel}</label>
   <select id={id("package")} name="package" toolparamdescription="Service the contact is interested in">
+    
+
+
+
+    <option value="">{FL.selectPlaceholder ?? "Select a service"}</option>
     {selectOptions.map((o) => <option value={o.value}>{o.label}</option>)}
   </select>
 </div>
 
-{/* Campos extra del cliente (opt-in vía site.ts). Tras el desplegable de
-    destino y antes del consentimiento: el orden de lectura es el mismo para
-    todos los formularios del sitio porque los pinta este único bloque. */}
+
+
+
 {extraFields?.map((f) => (
   <div class="field">
     <label class="form-label" for={id(f.name)}>{f.label}{f.required && " *"}</label>
@@ -162,13 +132,13 @@ const id = (name: string) => `${formId}-${name}`;
   </span>
 </label>
 
-{/* Campo trampa: oculto y fuera del orden de tabulación (skill §20). */}
+
 <div class="form__trap" aria-hidden="true">
   <label for={id("company_website")}>Do not fill</label>
   <input id={id("company_website")} name="company_website" type="text" tabindex="-1" autocomplete="off" />
 </div>
 
-{/* Campos ocultos que rellena god.js antes del envío. */}
+
 <input type="hidden" name="utm_source" />
 <input type="hidden" name="utm_medium" />
 <input type="hidden" name="utm_campaign" />
@@ -182,10 +152,11 @@ const id = (name: string) => `${formId}-${name}`;
 <input type="hidden" name="ttclid" />
 <input type="hidden" name="li_fat_id" />
 <input type="hidden" name="gad_source" />
-<!-- Google Ads ad-level (tracking template a nivel de cuenta). Prefijo
-     `gads_` a propósito: un name genérico como `location` podría chocar con
-     un campo visible futuro del formulario, y fillHiddenInputs sobrescribe
-     en silencio. Los declara god.ts en el contrato; lead-form.ts los lee. -->
+
+
+
+
+// Los name son contrato con god.js (CRM): cambiarlos pierde datos sin error.
 <input type="hidden" name="gads_matchtype" />
 <input type="hidden" name="gads_campaign_id" />
 <input type="hidden" name="gads_ad_group_id" />
@@ -197,26 +168,14 @@ const id = (name: string) => `${formId}-${name}`;
 <input type="hidden" name="channel" />
 <input type="hidden" name="medium" />
 <input type="hidden" name="visitor_id" />
-{/* Señal Meta: fbc/fbp los planta god.js desde cookies _fbc/_fbp (hoy
-    vacíos — no hay píxel, DEF-6) y referrer desde document.referrer. El
-    servidor sintetiza fbc desde fbclid cuando la cookie no existe. */}
+
+
+
 <input type="hidden" name="fbc" />
 <input type="hidden" name="fbp" />
 <input type="hidden" name="referrer" />
 
 <script>
-  // Carga DIFERIDA de lead-form — traza móvil (Slow 4G, CPU 4×): el chunk
-  // ContactFields → lead-form.B5LQxeU7.js costaba 854 ms en la cadena
-  // crítica aunque nadie tocara el form. El import estático de arriba lo
-  // metía en la carga inicial; aquí se trae solo cuando hace falta.
-  //
-  // lead-form.ts se auto-inicializa al evaluarse (wires todos los
-  // [data-lead-form]), así que basta con importarlo. Disparadores:
-  //   1. cualquier interacción DENTRO de un form (pointerdown/focusin/keydown)
-  //   2. red de seguridad: el propio submit — sin ella, un Enter rápido
-  //      dispararía el envío nativo del <form> (novalidate, sin action):
-  //      GET con la PII en la URL. El listener es capture en window, así
-  //      que corre ANTES que el handler de lead-form y puede cancelarlo.
   let pending: Promise<void> | null = null;
   let ready = false;
   const load = (): Promise<void> =>
@@ -240,7 +199,7 @@ const id = (name: string) => `${formId}-${name}`;
     const form = e.target;
     if (!(form instanceof HTMLFormElement)) return;
     if (!form.matches("[data-lead-form]")) return;
-    if (ready) return; // el módulo ya wired: su propio listener se ocupa
+    if (ready) return;
     e.preventDefault();
     void load().then(() => form.requestSubmit());
   }, true);

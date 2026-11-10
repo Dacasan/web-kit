@@ -1,27 +1,10 @@
 ---
-// UploadCase — "sube tu pano y tu presupuesto" en la página de gracias.
-//
-// Por qué vive aquí y no antes del envío: pedir una radiografía a alguien
-// que todavía no ha dado su nombre es pedir demasiado pronto. En la página
-// de gracias ya dio el paso, ya tiene su estimado delante y la pregunta
-// cambia de "¿me interesa?" a "¿cuánto en MI caso?". Ese es el momento en
-// que subir un archivo cuesta poco.
-//
-// El email se vuelve a pedir porque es la CLAVE con la que el CRM adjunta
-// los archivos al lead que se acaba de crear. Viene rellenado desde
-// sessionStorage (estimate-result.ts) para que un dedazo no deje los
-// archivos huérfanos, pero el campo está visible y es editable.
-//
-// Si el endpoint falla, el bloque cae a WhatsApp: alguien que ya se decidió
-// a mandar su radiografía no se puede quedar sin vía.
 import { UPLOAD, PRICE_LOCK_UNTIL, whatsappHref, site } from '@agenciaweb/kit-site';
 
 interface Props {
-  /** Ancla de navegación: sin esto ningún CTA puede apuntar aquí. */
   id?: string;
   label?: string;
   title?: string;
-  /** Cola del titular, en cursiva dorada. */
   titleAccent?: string;
   text?: string;
   cta?: string;
@@ -94,13 +77,13 @@ const {
           <button type="submit" class="button primary upload-submit">{cta}</button>
           <p class="upload-fine">{fine}</p>
 
-          {/* Salida de emergencia: solo aparece si el envío falla. */}
+          
           <p class="upload-fallback" data-upload-fallback hidden>
             Upload didn’t go through. <a href={whatsappHref} target="_blank" rel="noopener" data-wa-cta>Send them on WhatsApp</a> or email {site.email}.
           </p>
         </form>
 
-        {/* Confirmación: sustituye al formulario tras un envío correcto. */}
+        
         <div class="upload-done" data-upload-done tabindex="-1" hidden>
           <p class="upload-done__icon" aria-hidden="true">✓</p>
           <h3 class="upload-done__title">Got them.</h3>
@@ -113,14 +96,14 @@ const {
 
 <style>
   .upload-title { margin-top: 0; }
-  /* Sección oscura: --primary se apaga contra el fondo, así que entra la
-     variante que sí se lee sobre oscuro. No es el acento: el acento es
-     superficie de CTA, nunca tinta. */
+  
+
+
   .upload-title__accent { color: var(--ink-primary-on-dark); }
   .upload-text { max-width: 46ch; }
 
-  /* Los campos viven sobre fondo oscuro: el borde del sistema
-     (--border-field, casi negro) sería invisible aquí. */
+  
+
   .upload-form :is(input, select) {
     background: transparent;
     color: var(--ink-body-on-dark);

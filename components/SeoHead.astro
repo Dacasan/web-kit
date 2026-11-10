@@ -1,8 +1,4 @@
 ---
-// SeoHead — componente SEO centralizado. Todas las páginas comparten este
-// <head>: metas, og, canonical, preloads y JSON-LD vía buildGraph.
-// Los schemas son siempre iguales (FAQPage, HowTo, BreadcrumbList, Dentist)
-// salvo el producto que cambia por página.
 import { site } from '@agenciaweb/kit-site';
 import { CRM_URL } from"../lib/crm-url";
 import { buildGraph } from"../lib/schema";
@@ -10,11 +6,8 @@ import { buildGraph } from"../lib/schema";
 interface Props {
   title: string;
   description: string;
-  /** Ruta relativa con barra final. Default "/". */
   path?: string;
-  /** OG image custom. Default site.ogImage. */
   ogImage?: string;
-  /** OG type. Default "website". */
   ogType?: string;
   noindex?: boolean;
   preloadHero?: { mobile: string; desktop: string; breakpoint: number };
@@ -22,7 +15,6 @@ interface Props {
   faq?: readonly { q: string; a: string }[];
   steps?: readonly { title: string; text: string }[];
   breadcrumb?: { name: string; item?: string }[];
-  /** Producto/tratamiento de la página → nodo con rating + precio. */
   product?: {
     name: string;
     description?: string;
@@ -52,31 +44,11 @@ const robots = noindex || !site.indexable
   ?"noindex, nofollow"
   :"index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1";
 
-// Descubrimiento por agentes (opt-in vía site.aiDiscovery): el sitio declara
-// en su <head> dónde viven sus ficheros de IA. Sin el flag, cero links —
-// demo y scaffold siguen byte a byte iguales y ningún link apunta a un
-// archivo 404.
-//   - describedby → llms.txt (spec v2, ago-2026: HTML <link> o header Link)
-//   - ard → /.well-known/ard.json (spec ARD v0.91: nombre canónico,
-//     el consumidor MUST resolverlo) · ai-catalog → path predecesor (lo
-//     audita Lighthouse; cortesía para consumidores antiguos)
 const { aiDiscovery } = site as { aiDiscovery?: boolean };
 
-// Origin trial de WebMCP (opt-in vía site.originTrialToken): sin token,
-// Chrome no habilita la API para usuarios reales durante el trials
-// (Chrome 149–156). La sintaxis correcta es meta http-equiv="origin-trial"
-// — o header Origin-Trial, pero nginx estático no mete headers por página.
 const { originTrialToken } = site as { originTrialToken?: string };
 
-// Google tag (gtag.js, AW-…) — opt-in por sitio vía site.googleAdsConversionId.
-// Vacío o ausente = el sitio no emite ningún tag de Google (demo, scaffold y
-// sitios nuevos nacen apagados). El bucle de conversiones del CRM sigue
-// siendo la vía server-side (GOOGLE_ADS_* del entorno); este tag no manda
-// eventos de conversión, solo el base tag (dataLayer + cookie de primera
-// parte + señales de página para remarketing).
 
-// Cast local: el campo es OPCIONAL a nivel de tipos — un sitio que actualice
-// el kit sin declararlo sigue compilando (ausente o vacío = tag no emitido).
 const { googleAdsConversionId, metaPixelId, ga4MeasurementId } = site as {
   googleAdsConversionId?: string;
   metaPixelId?: string;
@@ -128,17 +100,17 @@ const graph = buildGraph({
 <meta name="twitter:description" content={description} />
 <meta name="twitter:image" content={ogFullUrl} />
 
-{/* Precarga de la imagen del hero. Normalmente no la pasa la página: la
-    pone <Image priority> desde el cuerpo a través de Astro.locals.
 
-    Los dos `media` son MUTUAMENTE EXCLUYENTES —max-width: BP-1 es el
-    complemento exacto de min-width: BP— porque si los dos casaran el
-    navegador se descargaría las dos fotos y el preload costaría más de lo
-    que ahorra. Ese max-width es aritmética de precarga, no una media query
-    de maqueta.
 
-    Con una sola foto para todo va UN link y sin `media`: dos links a la
-    misma URL no eligen nada. */}
+
+
+
+
+
+
+
+
+
 {preloadHero && (
   preloadHero.mobile === preloadHero.desktop ? (
     <link rel="preload" as="image" href={preloadHero.mobile} fetchpriority="high" />
@@ -164,8 +136,8 @@ const graph = buildGraph({
   window.__WACRM_API_URL__ = apiUrl;
 </script>
 
-{/* Google tag (gtag.js) — señal de página (remarketing y verificación de
-    auto-tagging); lo server-side (conversiones) ya lo lleva el CRM. */}
+
+
 {googleAdsConversionId && (
   <script is:inline async
     src={`https://www.googletagmanager.com/gtag/js?id=${googleAdsConversionId}`}></script>
@@ -179,13 +151,13 @@ const graph = buildGraph({
   </script>
 )}
 
-{/* Google Analytics 4 (gtag.js, G-… con data stream de GA4) — opt-in por
-    sitio vía site.ga4MeasurementId (≥ v1.2.26). Vacío o ausente = no emite
-    nada (demo, scaffold y sitios nuevos nacen apagados). Es ANALYTICS de
-    página, igual que el gtag de Ads arriba: las CONVERSIONES siguen
-    server-side vía el CRM. Va como bloque separado — no toca el dataLayer
-    del tag AW (dos snippets independientes, cero acoplamiento: apagar uno
-    en site.ts no rompe el otro). */}
+
+
+
+
+
+
+
 {ga4MeasurementId && (
   <script is:inline async
     src={`https://www.googletagmanager.com/gtag/js?id=${ga4MeasurementId}`}></script>
@@ -199,12 +171,12 @@ const graph = buildGraph({
   </script>
 )}
 
-{/* Meta Pixel (base code oficial, developers.facebook.com/docs/meta-pixel/
-    get-started) — opt-in por sitio vía site.metaPixelId. Su papel aquí es
-    el lado BROWSER del dedup: planta las cookies _fbp/_fbc que el CRM lee
-    y envía PageView con el MISMO event_id que la CAPI usa server-side.
-    Sin pixel en el sitio, la CAPI va sola con fbclid sintetizado (EMQ
-    bajo); con pixel+CAPI deduplicados, EMQ alto (el setup estándar 2026). */}
+
+
+
+
+
+
 {metaPixelId && (
   <script is:inline define:vars={{ fbPixelId: metaPixelId }}>
     !function(f,b,e,v,n,t,s)

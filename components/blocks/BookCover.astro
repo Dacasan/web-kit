@@ -1,21 +1,6 @@
 ---
-// BookCover — la portada de la guía en 3D: grosor, brillo y flotado.
-//
-// Se perdió al borrar LeadMagnet y hubo que recuperarla de git. El efecto
-// vivía en el <style> con scope de aquel componente, así que se fue con él.
-// Ahora es un átomo: solo el libro, sin sección, sin formulario y sin
-// columnas. Se mete en una <Col> al lado de lo que sea.
-//
-// TRES COSAS QUE PARECEN CAPRICHO Y NO LO SON, y por eso los comentarios se
-// conservan íntegros abajo:
-//   · la perspectiva vive en el ESCENARIO, no en el libro
-//   · la inclinación va en `transform` y el flotado en `translate`/`rotate`
-//   · el brillo usa mix-blend-mode, que aplana: por eso no va dentro del
-//     elemento con preserve-3d
 interface Props {
-  /** Imagen de la portada. */
   cover?: string;
-  /** Título del libro, para el alt. */
   title?: string;
 }
 
@@ -26,7 +11,7 @@ const {
 ---
 
 <figure class="book-stage">
-  {/* La sombra va primero: se pinta debajo del libro sin z-index. */}
+  
   <span class="book__shadow" aria-hidden="true"></span>
 
   <div class="book">
@@ -40,9 +25,9 @@ const {
 </figure>
 
 <style>
-  /* ── Escenario ──
-     La perspectiva vive en el padre: sobre el propio libro le daría un punto
-     de fuga individual en vez del de la escena. */
+  
+
+
   .book-stage {
     position: relative;
     display: grid;
@@ -53,7 +38,7 @@ const {
     perspective-origin: 50% 40%;
   }
 
-  /* ── El libro ── */
+  
   .book {
     --book-w: min(280px, 62vw);
     --book-depth: 26px;
@@ -64,29 +49,29 @@ const {
     transform-style: preserve-3d;
     will-change: transform, translate;
 
-    /* La inclinación va en `transform`; el flotado en `translate` y `rotate`,
-       que son propiedades independientes. Si el flotado animara `transform`,
-       en el primer fotograma sustituiría a la inclinación y el libro se
-       aplanaría de golpe. */
+    
+
+
+
     transform: rotateX(6deg) rotateY(-22deg);
     transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
 
-    /* 7 y 11 segundos no coinciden hasta los 77: el ojo deja de detectar el
-       bucle y el movimiento se percibe orgánico. */
+    
+
     animation:
       book-float 7s ease-in-out infinite,
       book-tilt 11s ease-in-out infinite;
   }
 
-  /* ── Cara frontal ──
-     El brillo usa `mix-blend-mode`, que aplana su contenedor. Por eso vive
-     aquí y no dentro del elemento con `preserve-3d`: ahí destruiría el
-     grosor del canto. */
+  
+
+
+
   .book__face {
     position: absolute;
     inset: 0;
     overflow: hidden;
-    border-radius: 6px 14px 14px 6px; /* lomo a la izquierda: ilusión de libro */
+    border-radius: 6px 14px 14px 6px; 
     box-shadow:
       0 2px 6px rgb(16 24 40 / 0.18),
       0 24px 48px rgb(16 24 40 / 0.22);
@@ -98,7 +83,7 @@ const {
     display: block;
   }
 
-  /* Lomo */
+  
   .book__binding {
     position: absolute;
     inset: 0 auto 0 0;
@@ -112,9 +97,9 @@ const {
     );
   }
 
-  /* ── Canto de páginas ──
-     Bisagra en el borde derecho y giro de -90°: la cara se hunde hacia el
-     fondo y forma el grosor. */
+  
+
+
   .book__edge {
     position: absolute;
     top: 1.2%;
@@ -127,10 +112,10 @@ const {
     border-radius: 0 6px 6px 0;
   }
 
-  /* ── Brillo ──
-     `screen` solo puede aclarar: sobre las zonas claras apenas se nota y
-     sobre las oscuras produce el destello, que es cómo se comporta la luz
-     reflejada. Una capa blanca con opacidad lavaría la portada entera. */
+  
+
+
+
   .book__sheen {
     position: absolute;
     top: -20%;
@@ -151,11 +136,11 @@ const {
     animation: book-sheen 5s linear infinite;
   }
 
-  /* ── Sombra proyectada ──
-     Hermana del libro, no hija: como hija se inclinaría con él y delataría el
-     truco. Misma duración y curva, así crece y se oscurece cuando el libro
-     baja — la sombra reacciona a la altura, que es lo que da la sensación de
-     peso. */
+  
+
+
+
+
   .book__shadow {
     position: absolute;
     left: 15%;
@@ -206,16 +191,16 @@ const {
     }
   }
 
-  /* Al acercar el cursor el libro se endereza: gesto de entrega. */
+  
   @media (hover: hover) {
     .book-stage:hover .book {
       transform: rotateX(2deg) rotateY(-7deg) scale(1.03);
     }
   }
 
-  /* El brillo desaparece del todo: pararlo a medio recorrido dejaría una
-     banda blanca fija sobre la portada, peor que no tenerlo. La inclinación
-     se conserva porque no es movimiento, es la forma del objeto. */
+  
+
+
   @media (prefers-reduced-motion: reduce) {
     .book,
     .book__sheen,

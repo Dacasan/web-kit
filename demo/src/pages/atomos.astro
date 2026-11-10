@@ -1,14 +1,5 @@
 ---
 import '../styles/index.css';
-// Laboratorio del sistema atómico.
-//
-// Dos trabajos:
-//   1. Probar cada componente nuevo en todos sus casos, sin trucos: lo que
-//      se ve aquí sale del componente, no de CSS escrito para esta página.
-//   2. Llevar la cuenta de lo que falta para poder borrar sections/.
-//
-// El inventario de abajo NO está escrito a mano: se lee de las carpetas con
-// import.meta.glob, así que no puede quedarse desfasado.
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import Header from '../../../components/sections/Header.astro';
 import Section from '../../../components/Section.astro';
@@ -28,10 +19,12 @@ import Gallery from '../../../components/blocks/Gallery.astro';
 import BookCover from '../../../components/blocks/BookCover.astro';
 import YouTubeLite from '../../../components/YouTubeLite.astro';
 import ContactForm from '../../../components/ContactForm.astro';
+import HalftoneFade from '../../../components/HalftoneFade.astro';
+import InstantEstimate from '../../../components/sections/InstantEstimate.astro';
+import EstimateResult from '../../../components/sections/EstimateResult.astro';
+import UploadCase from '../../../components/sections/UploadCase.astro';
 import { getCollection } from 'astro:content';
 
-// Las preguntas del acordeón de abajo. En una página real este array es el
-// mismo que se pasa a `BaseLayout faq=`, que es lo que emite el FAQPage.
 const FAQ_DEMO = [
   { q: '¿El presupuesto incluye el traslado?', a: 'Sí: traslados y accommodation placeholder. El presupuesto demo se entrega por escrito antes de confirmar. Sustituye este contenido por el de la marca.' },
   { q: '¿Puedo ver el resultado en un solo paso?', a: 'Este texto es un placeholder del catálogo: demuestra cómo se ve un acordeón con contenido realista de dos oraciones y media.' },
@@ -42,10 +35,8 @@ const nombre = (p: string) => p.replace(/^.*\//, '').replace(/\.astro$/, '');
 const nuevos = Object.keys(import.meta.glob('../../../components/blocks/*.astro')).map(nombre).sort();
 const viejos = Object.keys(import.meta.glob('../../../components/sections/*.astro'))
   .map(nombre)
-  // Cromo del sitio: no son bloques de contenido y se quedan donde están.
   .filter((n) => !['Header', 'Footer', 'Breadcrumb', 'Divider'].includes(n))
   .sort();
-// El índice sale de la colección, que lo lee de lo que exporta cada página.
 const PAGES = (await getCollection('paginas'))
   .map((e) => e.data)
   .sort((a, b) => (a.order ?? 999) - (b.order ?? 999) || a.href.localeCompare(b.href));
@@ -56,7 +47,7 @@ const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
 <BaseLayout title="Sistema atómico — laboratorio" description="Banco de pruebas de los componentes atómicos." path="/atomos" noindex>
   <Header />
 
-  {/* ═══ HERO — HeroLede + Image + Stars ═══════════════════════ */}
+  
   <Section pad="hero" align itemtype="https://schema.org/WPHeader">
     <div class="col-7-md">
       <HeroLede
@@ -80,7 +71,7 @@ const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
     </div>
   </Section>
 
-  {/* ═══ MARQUEE — a sangre, se mueve solo ════════════════════ */}
+  
   <Section pad="tight" bg="secondary" bordered full label="Certifications">
     <div class="col-12">
       <Marquee
@@ -90,7 +81,7 @@ const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
     </div>
   </Section>
 
-  {/* ═══ INVENTARIO ═══════════════════════════════════════════ */}
+  
   <Section
     heading="Dónde vamos"
     sub="Leído de las carpetas en cada build: esta cuenta no se puede quedar vieja."
@@ -115,7 +106,7 @@ const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
     </div>
   </Section>
 
-  {/* ═══ COLUMNAS ═════════════════════════════════════════════ */}
+  
   <Section bg="secondary" heading="Columnas" sub="col-12 · col-6 · col-4 · col-3. En móvil todo es ancho completo.">
     <div class="col-6"><Card><Text level={3} title="col-6" /></Card></div>
     <div class="col-6"><Card><Text level={3} title="col-6" /></Card></div>
@@ -150,7 +141,7 @@ const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
     </div>
   </Section>
 
-  {/* ═══ CARD: QUÉ LE METES DENTRO ════════════════════════════ */}
+  
   <Section heading="Card — qué le metes dentro" sub="No sabe qué lleva: es un slot. Texto, estrellas, un vídeo, una tabla, un formulario.">
     <div class="col-4">
       <Card>
@@ -228,7 +219,7 @@ const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
     </div>
   </Section>
 
-  {/* ═══ CARD: FONDOS ═════════════════════════════════════════ */}
+  
   <Section
     bg="secondary"
     heading="background"
@@ -250,7 +241,7 @@ const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
     </div>
   </Section>
 
-  {/* ═══ CARD: RATIO ══════════════════════════════════════════ */}
+  
   <Section heading="ratio" sub="Los cuatro del sistema. Sin ratio, la altura la pone el contenido.">
     <div class="col-3"><Card background="/gallery/gallery-2.webp" alt="" ratio="1"><Text level={3} title="1" /></Card></div>
     <div class="col-3"><Card background="/gallery/gallery-3.webp" alt="" ratio="4/5"><Text level={3} title="4/5" /></Card></div>
@@ -258,7 +249,7 @@ const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
     <div class="col-3"><Card background="/gallery/gallery-7.webp" alt="" ratio="16/9"><Text level={3} title="16/9" /></Card></div>
   </Section>
 
-  {/* ═══ CARD: FEATURED Y RIBBON ══════════════════════════════ */}
+  
   <Section bg="soft" heading="featured y ribbon" sub="Lo único que cambia featured es el borde: color de marca en vez de gris.">
     <div class="col-4">
       <Card>
@@ -280,7 +271,7 @@ const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
     </div>
   </Section>
 
-  {/* ═══ REJILLA 3x3 CON LIGHTBOX ═════════════════════════════ */}
+  
   <Section
     heading="Gallery — mosaico 3x3"
     sub="Lightbox con :target, cero JavaScript. 3 columnas desde el móvil: nueve fotos apiladas son nueve pantallas."
@@ -303,7 +294,7 @@ const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
     </div>
   </Section>
 
-  {/* ═══ BOOKCOVER ════════════════════════════════════════════ */}
+  
   <Section
     align
     bg="secondary"
@@ -322,10 +313,10 @@ const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
     </div>
   </Section>
 
-  {/* ═══ COLOR — EL BRAND GUIDE VIVO ═══════════════════════════
-      Las muestras pintan var(--brand-*), no hexadecimales escritos: esta
-      página enseña la paleta de la marca que esté cargada. Un cliente nuevo
-      cambia su brand.css y este catálogo se actualiza solo. */}
+  
+
+
+
   <Section
     heading="Color"
     sub="Siete primitivas. Es lo único que un cliente sobrescribe en su brand.css; todo lo demás el kit lo deriva."
@@ -383,7 +374,7 @@ const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
     </div>
   </Section>
 
-  {/* ═══ TIPOGRAFÍA ════════════════════════════════════════════ */}
+  
   <Section
     bg="secondary"
     heading="Tipografía"
@@ -414,14 +405,14 @@ const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
           <div><span>--text-lg</span><p style="font-size:var(--text-lg)">2rem</p></div>
           <div><span>--font-size</span><p style="font-size:var(--font-size)">1.7rem · cuerpo</p></div>
           <div><span>--text-sm</span><p style="font-size:var(--text-sm)">1.5rem</p></div>
-          <div><span>--text-xs</span><p style="font-size:var(--text-xs)">1.1rem · pies y etiquetas</p></div>
+          <div><span>--text-xs</span><p style="font-size:var(--text-xs)">1.2rem · pies y etiquetas</p></div>
         </div>
         <p class="ty-note">Si un tamaño no está aquí, no existe. Un <code>font-size: 17px</code> suelto es lo que delata una plantilla.</p>
       </Card>
     </div>
   </Section>
 
-  {/* ═══ BOTONES — LAS CUATRO VARIANTES Y CUÁNDO USAR CADA UNA ══ */}
+  
   <Section
     heading="Botones"
     sub="Cuatro variantes. La jerarquía la lleva el color de la superficie, no el tamaño."
@@ -468,7 +459,7 @@ const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
     </div>
   </Section>
 
-  {/* ═══ STEPLIST — VIÑETA Y NUMERADA ═════════════════════════ */}
+  
   <Section
     bg="secondary"
     heading="StepList"
@@ -498,7 +489,7 @@ const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
     </div>
   </Section>
 
-  {/* ═══ TABLE Y PRICETABLE ═══════════════════════════════════ */}
+  
   <Section
     heading="Table y PriceTable"
     sub="Escribes el thead y el tbody a mano; el componente solo garantiza el .table-wrap. Sin él, una tabla saca la página por la derecha en un móvil sin que nada falle."
@@ -533,7 +524,7 @@ const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
     </div>
   </Section>
 
-  {/* ═══ PROOFSTRIP ═══════════════════════════════════════════ */}
+  
   <Section
     bg="soft"
     pad="tight"
@@ -562,7 +553,7 @@ const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
     </div>
   </Section>
 
-  {/* ═══ FAQ ══════════════════════════════════════════════════ */}
+  
   <Section
     heading="Faq"
     sub="El único bloque que recibe el contenido por prop. El JSON-LD de FAQPage se emite en el <head>, que Astro renderiza antes del <body>: un slot del cuerpo no puede alimentarlo. El array ya existe en la página para el schema; esto lo reusa."
@@ -572,7 +563,7 @@ const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
     </div>
   </Section>
 
-  {/* ═══ SECTION cta — CIERRE CON LLAMADA A LA ACCIÓN ══════════ */}
+  
   <Section
     heading="Section cta"
     sub="Todas las secciones de venta cierran con botón, y el botón abre el modal del formulario. Es una prop, no marcado suelto: escrito a mano son 237 sitios donde el destino puede divergir."
@@ -585,7 +576,7 @@ const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
     </div>
   </Section>
 
-  {/* ═══ CARD-LINK DESDE EL ÍNDICE DE PÁGINAS ═════════════════ */}
+  
   <Section
     heading="Enlazado interno"
     sub="Ni un título escrito a mano: sale de lo que cada página exporta en su `meta`."
@@ -606,7 +597,7 @@ const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
     ))}
   </Section>
 
-  {/* ═══ UNA CARD DE 12 COLUMNAS ES LA SECCIÓN TARJETA ════════ */}
+  
   <Section bg="soft" pad="tight">
     <div class="col-12">
       <Card background="soft">
@@ -623,17 +614,31 @@ const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
       <Card><ContactForm formId="atomos" /></Card>
     </div>
   </Section>
+
+  
+
+
+
+  <InstantEstimate />
+  <EstimateResult label="Your estimate" />
+  <UploadCase label="Share your case" />
+
+  <Section bg="secondary" heading="HalftoneFade" sub="Trama de puntos que disuelve un bloque en el color siguiente.">
+    <div class="col-12" style="position:relative;height:10rem;overflow:hidden;background:var(--bg-soft)">
+      <HalftoneFade direction="bottom" color="#1A1A1A" />
+    </div>
+  </Section>
 </BaseLayout>
 
 <style>
-  /* Cromo del laboratorio, no componentes del sistema.
-     Estas clases solo existen en /atomos para poder ENSEÑAR los tokens:
-     muestras de color, pares de contraste y la escala tipográfica. Todas
-     pintan var(--brand-*) o var(--text-*), nunca un valor propio, así que
-     la página muestra la marca que esté cargada. No copies nada de aquí a
-     una landing: si una sección lo necesita, es un componente del kit. */
+  
 
-  /* ── Muestras de color ── */
+
+
+
+
+
+  
   .sw-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -674,7 +679,7 @@ const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
   }
   .sw__pct--acc { background: var(--accent); color: var(--ink-on-accent); }
 
-  /* ── Pares de contraste ── */
+  
   .pair-row {
     display: flex;
     flex-wrap: wrap;
@@ -688,7 +693,7 @@ const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
     font-weight: 600;
   }
 
-  /* ── Tipografía ── */
+  
   .ty-label {
     margin: 0 0 1.2rem;
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;

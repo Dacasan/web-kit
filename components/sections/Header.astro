@@ -1,33 +1,12 @@
 ---
-// Cabecera con menú móvil y popup de formulario — cero JavaScript.
-//
-// Dos trucos, ninguno con JS:
-//   · El menú es `input:checked ~ .nav-center` (casilla oculta + label).
-//   · El popup de "Agenda tu cita" es el MISMO `.lightbox:target` que la
-//     galería. Una clase, dos componentes.
 import ContactForm from '../ContactForm.astro';
 import { site, PRIMARY_CTA, MENU_LINKS, TOPBAR, whatsappHref } from '@agenciaweb/kit-site';
 
 interface Props {
-  /**
-   * Las dos barras del sitio, y la diferencia es de intención, no de estilo:
-   *
-   *   'money' — página a la que se paga tráfico. CERO enlaces: cada uno es
-   *             una salida de la página por la que ya se pagó. A cambio
-   *             lleva la línea de confianza arriba (teléfono,"desde 2019").
-   *   'seo'   — página que se alcanza por búsqueda. Cuatro enlaces reales,
-   *             porque aquí el visitante llega frío y hay que dejarle
-   *             recorrer el sitio.
-   *
-   * `links` y `topbar` siguen existiendo para casos sueltos: si se pasan,
-   * mandan sobre la variante.
-   */
   variant?: 'money' | 'seo';
   links?: { href: string; text: string }[];
   cta?: string;
   ratingText?: string;
-  /** Titular del sello de reputación. Sale de site.ts; nunca un superlativo
-   *  no verificable — un dato contable convierte mejor y es defendible. */
   ratingHeadline?: string;
   rating?: { value?: string; count?: string };
   topbar?: string[];
@@ -36,17 +15,12 @@ interface Props {
 const {
   variant = 'seo',
   cta = PRIMARY_CTA,
-  // El default de antes ("500+ 5 Star Reviews") contradecía la cifra real
-  // que sale en el resto del sitio y en el JSON-LD.
-  // Number('1,247') es NaN: la coma del dato del cliente llegaba a pantalla.
-  // Se normaliza aquí para que ningún site.ts pueda romper la cabecera.
   ratingText = `${site.rating.value}/5 from ${Number(String(site.rating.count).replace(/,/g, "")).toLocaleString("en-US")} reviews`,
   ratingHeadline = (site as { ratingHeadline?: string }).ratingHeadline ?? "TOP RATED team",
   rating: ratingOpt, // override de página opcional
 } = Astro.props;
 
 const rating = ratingOpt ?? site.rating;
-// Opt-out: sin cifras de rating, el sello no se pinta.
 const ratingHasValue = Boolean(String(rating?.value ?? '').trim());
 
 const links = Astro.props.links ?? (variant === 'money' ? [] : MENU_LINKS);
@@ -63,12 +37,12 @@ const topbar = Astro.props.topbar ?? (variant === 'money' ? TOPBAR : undefined);
 
 <header class="nav">
   <div class="container nav__inner">
-    {/* La marca es el logotipo, no el nombre en texto. La barra ahora es
-        --brand-ink, así que va la versión para fondo oscuro (site.logoDark,
-        con site.logo como fallback para marcas sin versión dark) — y con
-        fondo TRANSPARENTE, sin el rectángulo pegado que traía el PNG
-        anterior. width/height reales del archivo para que el navegador
-        reserve el hueco y la cabecera no salte al cargar. */}
+    
+
+
+
+
+
     <a href="/" class="nav__brand">
       <img
         src={site.logoDark ?? site.logo}
@@ -81,10 +55,11 @@ const topbar = Astro.props.topbar ?? (variant === 'money' ? TOPBAR : undefined);
 
     {links.length > 0 && (
       <>
-        <input type="checkbox" id="nav-toggle" class="nav-toggle" aria-label="Open menu" />
+        <input type="checkbox" id="nav-toggle" class="nav-toggle" role="button"
+          aria-label="Open menu" aria-expanded="false" aria-controls="site-menu" />
         <label for="nav-toggle" class="nav-toggle-label" aria-hidden="true"><span></span></label>
 
-        <nav class="nav-center" aria-label="Main">
+        <nav class="nav-center" id="site-menu" aria-label="Main">
           <ul>
             {links.map((l) => <li><a href={l.href}>{l.text}</a></li>)}
           </ul>
@@ -92,11 +67,11 @@ const topbar = Astro.props.topbar ?? (variant === 'money' ? TOPBAR : undefined);
       </>
     )}
 
-    {/* Sello de reputación: columna propia entre el menú y el CTA (desktop). */}
-    {/* Opt-out: un sitio sin rating declarado (cifras sin respaldo aún) no
-        pinta el sello; los que sí lo tienen no cambian nada. */}
+    
+    
+
     {ratingHasValue && (
-    <div class="nav-rating" aria-label={`${ratingHeadline}, ${ratingText}`}>
+    <div class="nav-rating" role="group" aria-label={`${ratingHeadline}, ${ratingText}`}>
       <span class="nav-rating__stars" aria-hidden="true">★★★★★</span>
       <span class="nav-rating__text">
         <strong>{ratingHeadline}</strong>
@@ -104,20 +79,20 @@ const topbar = Astro.props.topbar ?? (variant === 'money' ? TOPBAR : undefined);
       </span>
     </div>
     )}
-    {/* Sin .pill: la barra es la pieza más compacta del sitio y el botón
-        grande no cabe. El radio lo pone .button (--radius). */}
+    
+
     <a href="#form-popup" class="button primary nav__cta">{cta}</a>
   </div>
 </header>
 
-{/* El popup: mismo mecanismo que el lightbox de la galería. */}
-<div class="lightbox" id="form-popup">
+
+<div class="lightbox" id="form-popup" role="dialog" aria-modal="true" aria-labelledby="form-popup-title">
   <a href="#!" class="lightbox-close" aria-label="Close">&times;</a>
   <div class="lightbox__panel">
-    {/* <p> y no <h2>: es el título de un modal, no una sección de la página —
-        como h2 se colaba en la jerarquía de encabezados (h1 → h2 fantasma)
-        y rompía la estructura SEO. La clase lleva el estilo igual. */}
-    <p class="popup-title">{cta}</p>
+    
+
+
+    <p class="popup-title" id="form-popup-title">{cta}</p>
     <p class="popup-sub">{(site as { formLabels?: { popupSub?: string } }).formLabels?.popupSub ?? "We'll contact you by WhatsApp within 24 hours."}</p>
     <ContactForm formId="popup" cta={cta} />
     <p class="popup-note text-center">
@@ -127,11 +102,11 @@ const topbar = Astro.props.topbar ?? (variant === 'money' ? TOPBAR : undefined);
 </div>
 
 <style>
-  /* Topbar: línea de confianza encima del header (landings SEM).
-     Va en el mismo --brand-ink que la barra de navegación: la guía pide
-     header sólido, y ese par es el de mayor contraste. En --brand-primary-on-dark
-     este texto de 13px se quedaba por debajo de AA. El borde inferior
-     separa las dos franjas sin romper el bloque. */
+  
+
+
+
+
   .topbar {
     background: var(--bg-dark);
     color: var(--ink-body-on-dark);
@@ -143,7 +118,7 @@ const topbar = Astro.props.topbar ?? (variant === 'money' ? TOPBAR : undefined);
     display: flex; flex-wrap: wrap; justify-content: center;
     gap: .8rem 2rem;
   }
-  /*"24/7 Patient Coordinator" — dot verde pulsante de disponible */
+  
   .topbar__inner > span:last-child {
     display: inline-flex;
     align-items: center;
@@ -159,10 +134,10 @@ const topbar = Astro.props.topbar ?? (variant === 'money' ? TOPBAR : undefined);
     animation: lx-pulse 2.4s ease-in-out infinite;
   }
 
-  /* MOBILE FIRST: el menú está oculto y se despliega con la casilla. A 900px
-     se convierte en barra horizontal y el botón hamburguesa desaparece. */
+  
+
   .nav {
-    position: sticky; top: 0; z-index: 100;
+    position: sticky; top: 0; z-index: var(--z-nav);
     background: var(--bg-dark);
     border-bottom: 1px solid rgb(255 255 255 / .12);
     color: var(--ink-body-on-dark);
@@ -173,8 +148,8 @@ const topbar = Astro.props.topbar ?? (variant === 'money' ? TOPBAR : undefined);
     min-height: 60px;
     flex-wrap: wrap;
   }
-  /* La altura la manda el alto, no el ancho: así el logotipo ocupa siempre
-     la misma franja de la barra aunque cambie la proporción del archivo. */
+  
+
   .nav__brand { display: flex; align-items: center; flex-shrink: 0; }
   .nav__brand img { display: block; width: auto; height: 34px; }
   .nav-toggle { position: absolute; opacity: 0; width: 1px; height: 1px; }
@@ -204,9 +179,9 @@ const topbar = Astro.props.topbar ?? (variant === 'money' ? TOPBAR : undefined);
     border-bottom: 1px solid rgb(255 255 255 / .14);
   }
   .nav-center li:last-child a { border-bottom: 0; }
-  /* min-height 44px lo hereda de .button (objetivo táctil); el padding
-     lateral es lo único que se aprieta. El centrado vertical ya no depende
-     del padding: .button es inline-flex. */
+  
+
+
   .nav__cta {
     order: 3;
     padding-inline: 2rem;
@@ -214,7 +189,7 @@ const topbar = Astro.props.topbar ?? (variant === 'money' ? TOPBAR : undefined);
     white-space: nowrap;
   }
 
-  /* Sello de reputación: oculto en móvil (el caso base), visible ≥900px. */
+  
   .nav-rating {
     display: none;
     align-items: center;
@@ -233,14 +208,14 @@ const topbar = Astro.props.topbar ?? (variant === 'money' ? TOPBAR : undefined);
     text-transform: uppercase;
     letter-spacing: .04em;
   }
-  /* El gris del sistema (#6B6B6B) es para fondo claro: sobre el verde
-     profundo cae a 1.5:1. Aquí manda la tinta clara al 72%. */
+  
+
   .nav-rating__text span {
     font-size: 1.1rem;
     color: rgb(255 255 255 / .72);
   }
 
-  /* Popup del formulario: encabezado, subtítulo y nota legal. */
+  
   .popup-title {
     font-family: var(--font-display);
     font-size: var(--text-xl);
@@ -270,7 +245,7 @@ const topbar = Astro.props.topbar ?? (variant === 'money' ? TOPBAR : undefined);
     .nav-center a { padding: 0; border-bottom: 0; }
     .nav-rating { order: 3; display: flex; }
     .nav__cta { order: 4; }
-    /* 4 columnas en una sola línea: brand · menú · rating · CTA */
+    
     .nav__inner { flex-wrap: nowrap; }
   }
 
@@ -278,3 +253,69 @@ const topbar = Astro.props.topbar ?? (variant === 'money' ? TOPBAR : undefined);
     .topbar__inner > span:last-child::before { animation: none; }
   }
 </style>
+
+<script>
+  const navToggle = document.getElementById('nav-toggle') as HTMLInputElement | null;
+  if (navToggle) {
+    const sync = () => navToggle.setAttribute('aria-expanded', String(navToggle.checked));
+    sync();
+    navToggle.addEventListener('change', sync);
+    navToggle.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter') return;
+      e.preventDefault();
+      navToggle.checked = !navToggle.checked;
+      navToggle.dispatchEvent(new Event('change'));
+    });
+  }
+
+  const popup = document.getElementById('form-popup');
+  if (popup) {
+    let opener: HTMLElement | null = null;
+    let wasOpen = location.hash === '#form-popup';
+
+    document.addEventListener('click', (e) => {
+      if (!(e.target instanceof Element)) return;
+      const link = e.target.closest('a[href="#form-popup"]');
+      if (link) opener = link as HTMLElement;
+    });
+
+    const focusFirst = () => {
+      (popup.querySelector<HTMLElement>('input:not([type="hidden"]), select, textarea') ??
+        popup.querySelector<HTMLElement>('button, a'))?.focus();
+    };
+
+    window.addEventListener('hashchange', () => {
+      const isOpen = location.hash === '#form-popup';
+      if (isOpen) focusFirst();
+      // Solo al cerrar ESTE popup: un ancla de la página no roba el foco.
+      else if (wasOpen && opener) opener.focus();
+      wasOpen = isOpen;
+    });
+
+    if (location.hash === '#form-popup') focusFirst();
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && location.hash === '#form-popup') {
+        history.replaceState(null, '', location.pathname + location.search);
+        wasOpen = false;
+        opener?.focus();
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Tab' || location.hash !== '#form-popup') return;
+      const list = [...popup.querySelectorAll<HTMLElement>('a[href], button, input, select, textarea')]
+        .filter((el) => el.offsetParent !== null && el.tabIndex >= 0);
+      if (!list.length) return;
+      const first = list[0];
+      const last = list[list.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    });
+  }
+</script>

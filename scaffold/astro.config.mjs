@@ -1,7 +1,5 @@
 import { defineConfig } from "astro/config";
 
-// Dominio canónico del cliente: PUBLIC_SITE_URL en producción. El placeholder
-// <cliente>.example.com solo sirve para que el primer build compile.
 const SITE_URL =
   process.env.PUBLIC_SITE_URL || process.env.SITE_URL || "https://sitio-<cliente>.example.com";
 
@@ -15,8 +13,6 @@ export default defineConfig({
   vite: {
     resolve: {
       alias: {
-        // Contrato de datos del kit: sus componentes consumen site vía
-        // '@agenciaweb/kit-site' y ESTE repo lo resuelve a su site.ts.
         "@agenciaweb/kit-site": new URL("./src/data/site.ts", import.meta.url).pathname,
       },
     },

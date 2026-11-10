@@ -1,72 +1,66 @@
-// site.ts — FUENTE ÚNICA de los datos del cliente.
-//
-// Todos los campos marcados con [BRAND] son OBLIGATORIOS: una marca nueva
-// los reemplaza todos antes de publicar (lista completa en
-// agenciaweb/docs/crm/MARCA-NUEVA.md §3). Los valores de este fichero son
-// placeholders DEMO neutros que compilan: NINGÚN valor proviene de un
-// negocio real. Precios, cifras, dirección y mensajes son inventados a
-// propósito; reemplazar todo [BRAND] antes de publicar.
-//
-// ============================================================
-// site.ts — única fuente de verdad del negocio (skill §2.4).
-//
-// Ningún dato del cliente se escribe dentro de un componente: el layout, el
-// grafo de datos estructurados y el widget de contacto leen todo de aquí.
-//
-// Cliente: Kit Demo Clinic — Demo City. PLACEHOLDER. `indexable` queda en
-// false: este sitio no debe indexarse jamás con datos demo.
-//
-// PROYECTO STANDALONE: el dominio canónico se lee de PUBLIC_SITE_URL en
-// build time. baseUrl alimenta canonical/og:url/JSON-LD y debe coincidir
-// con el dominio donde se sirve el sitio.
-// ============================================================
+// site.ts — única fuente de datos del cliente. Todo [BRAND] es obligatorio.
+// Placeholders neutros: no publicar sin reemplazarlos. indexable=false.
 
 /** Dominio canónico del cliente (sin barra final). */
 const BASE_URL = (
+  import.meta.env.PUBLIC_SITE_URL ||
+  import.meta.env.SITE_URL ||
   process.env.PUBLIC_SITE_URL ||
   process.env.SITE_URL ||
-  "https://sitio-demo.example.com"
+  (import.meta.env.DEV ? "http://localhost:4321" : "")
 ).replace(/\/+$/, "");
+
+// Fail-closed: un sitio publicado con canonical/JSON-LD apuntando a otro
+// dominio pierde SEO y credibilidad sin que nada falle. En dev se permite
+// localhost; en un build de producción, sin dominio no hay build.
+if (!BASE_URL) {
+  throw new Error(
+    "[site.ts] PUBLIC_SITE_URL sin definir en un build de producción.\n" +
+      "  canonical, og:url y el JSON-LD apuntarían a un dominio ajeno o vacío.\n" +
+      "  Define el dominio real antes de compilar:\n" +
+      "    PUBLIC_SITE_URL=https://cliente.com pnpm build",
+  );
+}
 
 export const site = {
   // ── Identidad ──
-  // [BRAND] required — replace for every new brand
+  // [BRAND]
   name: "Kit Demo Clinic",
-  // [BRAND] required — replace for every new brand
+  // [BRAND]
   legalName: "Kit Demo Clinic Demo City",
   /** Dominio canónico del sitio web (las llamadas al CRM usan __WACRM_API_URL__) */
-  // [BRAND] required — replace for every new brand
+  // [BRAND]
   baseUrl: BASE_URL,
   /** Logotipo para fondos claros. Alimenta el nodo del grafo (image/logo). */
-  // [BRAND] required — replace for every new brand
+  // [BRAND]
   logo: "/logo-light.png",
   /** Logotipo para fondos oscuros (header/footer). Placeholder demo incluido. */
-  // [BRAND] required — replace for every new brand
+  // [BRAND]
   logoDark: "/logo-dark.png",
   lang: "en-US",
 
   // ── Contacto ──
-  // [BRAND] required — replace for every new brand
+  // [BRAND]
   phone: "+52 555 000 0000",
   /** Teléfono en formato internacional para wa.me (solo dígitos) */
-  // [BRAND] required — replace for every new brand
+  // [BRAND]
   whatsappNumber: "525550000000",
   /** Mensaje pre-rellenado — el ref_code se inyecta al final (wa-ref.ts) */
-  // [BRAND] required — replace for every new brand
+  // [BRAND]
   whatsappText: "Hi, I'm visiting from your website and I'd like more information about your services.",
   /**
    * Consentimiento SMS del formulario (A2P 10DLC). Redacción legal EXACTA —
    * no parafrasear. {name} lo sustituye ContactFields por site.name; así el
    * texto es de esta marca sin incrustar la marca en el kit.
    */
-  // [BRAND] required — replace for every new brand
+  // [BRAND]
   smsConsentText:
     "By checking this box, I agree to receive SMS text messages and emails from {name} about your enquiry, updates and follow-ups. Message frequency varies. Msg & data rates may apply. Reply STOP to opt out at any time, or HELP for help. Consent is not a condition of purchase.",
-  // [BRAND] required — replace for every new brand
+  // [BRAND]
   email: "hello@sitio-demo.example.com",
 
   // ── Ubicación ──
-  // [BRAND] required — replace for every new brand
+  // [BRAND]
   address: {
     street: "123 Demo Street, Suite 100",
     locality: "Demo City",
@@ -74,27 +68,27 @@ export const site = {
     postalCode: "00000",
     country: "US",
   },
-  // [BRAND] required — replace for every new brand
+  // [BRAND]
   areaServed: ["US", "CA"],
 
   // ── Negocio (alimenta el nodo principal del grafo, skill §9.2) ──
-  // [BRAND] required — replace for every new brand
+  // [BRAND]
   schemaType: "LocalBusiness" as const,
-  // [BRAND] required — replace for every new brand
+  // [BRAND]
   priceRange: "$$",
-  // [BRAND] required — replace for every new brand
+  // [BRAND]
   currency: "USD",
-  // [BRAND] required — replace for every new brand
+  // [BRAND]
   openingHours: "Mo-Fr 08:00-19:00, Sa 09:00-14:00",
-  // [BRAND] required — replace for every new brand
+  // [BRAND]
   languages: ["English"],
-  // [BRAND] required — replace for every new brand
+  // [BRAND]
   paymentAccepted: ["Cash", "Credit Card", "Debit Card"],
 
   // ── Autoridad (E-E-A-T) ──
-  // [BRAND] required — replace for every new brand
+  // [BRAND]
   author: {
-    // [BRAND] required — replace for every new brand
+    // [BRAND]
     name: "Dr. Demo",
     url: `${BASE_URL}/#doctor`,
     image: "/equipo.webp",
@@ -109,13 +103,13 @@ export const site = {
   certifications: [] as string[],
 
   // ── Redes ──
-  // [BRAND] required — replace for every new brand
+  // [BRAND]
   social: [] as string[],
 
 
   // ── Medición ──
   /** Imagen Open Graph, 1200×630 (skill §20) */
-  // [BRAND] required — replace for every new brand
+  // [BRAND]
   ogImage: "/og.png",
   /** Google tag: ID de conversión de Google Ads (gtag.js), "AW-XXXXXXXXXX".
    *  [BRAND] opcional — Vacío o ausente = sin Google tag en el <head>. */
@@ -132,7 +126,7 @@ export const site = {
   ga4MeasurementId: "",
   /** ID de video testimonial (YouTube, fachada bajo demanda). Placeholder
    *  de dominio público (Big Buck Bunny — Blender Foundation). */
-  // [BRAND] required — replace for every new brand
+  // [BRAND]
   videoId: "aqz-KE-bpKQ",
   /** Vídeo de fondo del hero. ARCHIVOS PROPIOS, no YouTube.
    *
@@ -146,7 +140,7 @@ export const site = {
    *
    *  Los pósters SON EL LCP: locales, nunca miniaturas de YouTube. El demo
    *  usa PNG placeholder; una marca real debería comprimirlos a WebP. */
-  // [BRAND] required — replace for every new brand
+  // [BRAND]
   heroVideo: {
     mobile: "/video/hero",         // → /video/hero.webm  + .mp4   (9:16)
     desktop: "/video/hero-wide",   // → /video/hero-wide.webm + .mp4 (16:9)
@@ -156,11 +150,11 @@ export const site = {
   /** Indexación SEO. Por defecto NO (la plantilla trae datos genéricos).
    *  Se activa por env SITE_INDEXABLE=true. Gobierna la etiqueta
    *  <meta name="robots"> de cada página. */
-  // [BRAND] required — replace for every new brand
+  // [BRAND]
   indexable: process.env.SITE_INDEXABLE === "true",
 
   // ── Widget de contacto flotante (skill §7.7) ──
-  // [BRAND] required — replace for every new brand
+  // [BRAND]
   widget: {
     aria: "Contact channels",
     pill: "Customer care",
@@ -177,67 +171,67 @@ export const site = {
   // Precios DEMO placeholder, en USD. Sin relación con ningún negocio real.
   services: [
     {
-      // [BRAND] required — replace for every new brand
+      // [BRAND]
       name: "Demo Service One — 2 Steps",
       desc: "Phase 1 $1,900 + Phase 2 $1,000 = $2,900. Demo description for placeholder service one: includes accommodation placeholder and transfers. Replace every placeholder field before publishing.",
       price: "2900",
     },
     {
-      // [BRAND] required — replace for every new brand
+      // [BRAND]
       name: "Demo Service One — Phase 1",
       desc: "Demo description for placeholder service two: first phase of the demo service. Includes accommodation placeholder and transfers.",
       price: "1900",
     },
     {
-      // [BRAND] required — replace for every new brand
+      // [BRAND]
       name: "Demo Service One — Phase 2",
       desc: "Demo description for placeholder service three: second phase after a waiting period. Includes accommodation placeholder and transfers.",
       price: "1000",
     },
     {
-      // [BRAND] required — replace for every new brand
+      // [BRAND]
       name: "Demo Service Two — Full",
       desc: "Demo description for placeholder service four, single-step variant. Includes accommodation placeholder.",
       price: "2500",
     },
     {
-      // [BRAND] required — replace for every new brand
+      // [BRAND]
       name: "Demo Service Two — Partial",
       desc: "Demo description for placeholder service five, single-step partial variant. Includes accommodation placeholder.",
       price: "1500",
     },
     {
-      // [BRAND] required — replace for every new brand
+      // [BRAND]
       name: "Demo Add-on — Per Unit",
       desc: "Demo description for placeholder add-on unit. Determined clinically after Dr. Demo evaluates your case.",
       price: "250",
     },
     {
-      // [BRAND] required — replace for every new brand
+      // [BRAND]
       name: "Demo Advanced Option — Per Unit",
       desc: "Demo description for placeholder advanced option unit. Dr. Demo placeholder credential.",
       price: "1100",
     },
     {
-      // [BRAND] required — replace for every new brand
+      // [BRAND]
       name: "Demo Service C — Full",
       desc: "Demo description for placeholder option C.",
       price: "2200",
     },
     {
-      // [BRAND] required — replace for every new brand
+      // [BRAND]
       name: "Demo Service D — Full",
       desc: "Demo description for placeholder option D.",
       price: "2400",
     },
     {
-      // [BRAND] required — replace for every new brand
+      // [BRAND]
       name: "Demo Entry Service — Partial",
       desc: "Demo description for the entry-level placeholder option.",
       price: "900",
     },
     {
-      // [BRAND] required — replace for every new brand
+      // [BRAND]
       name: "Demo Single Unit — Add-on Included",
       desc: "Demo description for the single-unit placeholder option.",
       price: "600",
@@ -246,7 +240,7 @@ export const site = {
 
   // ── Rating agregado (visible en todas las páginas, respaldado por las
   // ── reseñas renderizadas). Cifras DEMO placeholder. ──
-  // [BRAND] required — replace for every new brand
+  // [BRAND]
   rating: {
     value: "4.9",
     count: "250",
@@ -312,7 +306,7 @@ export const site = {
 
 /** Acción principal. Se repite entre 3 y 5 veces con EXACTAMENTE este texto:
  *  variar el texto del botón fragmenta el reconocimiento (skill §15.2). */
-// [BRAND] required — replace for every new brand
+// [BRAND]
 export const PRIMARY_CTA = "Get My Quote";
 
 /** Enlace a WhatsApp con el mensaje pre-rellenado. */
@@ -323,7 +317,7 @@ export const whatsappHref = `https://wa.me/${site.whatsappNumber}?text=${encodeU
  * Menú del header. Solo destinos que EXISTEN: rutas reales de este sitio.
  * Si el slug se borra, el build canta el 404.
  */
-// [BRAND] required — replace for every new brand
+// [BRAND]
 export const MENU_LINKS = [
   { href: "/", text: "Home" },
   { href: "/privacy-policy/", text: "Privacy Policy" },
@@ -335,7 +329,7 @@ export const MENU_LINKS = [
  * El teléfono sale de site.phone: un número escrito a mano en veinte
  * páginas es un número que un día deja de coincidir con el real.
  */
-// [BRAND] required — replace for every new brand
+// [BRAND]
 export const TOPBAR = [
   "Demo site — placeholder data, not a real business",
   `Call us: ${site.phone}`,
@@ -363,7 +357,7 @@ export interface Plan {
   /** Qué implica ese número de viajes, en una línea. */
   tripsNote: string;
   eyebrow: string;
-  // [BRAND] required — replace for every new brand
+  // [BRAND]
   name: string;
   text: string;
   specs: string;
@@ -373,14 +367,14 @@ export interface Plan {
   dark?: boolean;
 }
 
-// [BRAND] required — replace for every new brand
+// [BRAND]
 export const PLANS: Plan[] = [
   {
     key: "one-step",
     trips: "1 step",
     tripsNote: "One step · everything delivered at once",
     eyebrow: "Most chosen",
-    // [BRAND] required — replace for every new brand
+    // [BRAND]
     name: "Demo Plan B",
     text: "Placeholder plan: the full demo service delivered in one step, made in our own lab. Travel included.",
     specs: "Demo service · 10 placeholder days · accommodation + transfers",
@@ -392,7 +386,7 @@ export const PLANS: Plan[] = [
     trips: "2 steps",
     tripsNote: "Two steps · phase one now, phase two later",
     eyebrow: "Demo Plan A",
-    // [BRAND] required — replace for every new brand
+    // [BRAND]
     name: "Demo Plan A",
     text: "Phase one $1,900 + phase two $1,000. The placeholder plan that demonstrates a two-phase offer.",
     specs: "Demo service · 6 + 6 placeholder days · accommodation + transfers",
@@ -403,7 +397,7 @@ export const PLANS: Plan[] = [
 ];
 
 /** Texto cuando un plan no tiene precio de lista para esa arcada. */
-// [BRAND] required — replace for every new brand
+// [BRAND]
 export const QUOTE_FALLBACK = "Written quote in 24 h";
 
 /**
@@ -411,11 +405,11 @@ export const QUOTE_FALLBACK = "Written quote in 24 h";
  * presupuesto de EE. UU. no hay resta que hacer, pero seguir enseñando el
  * precio y callar el ahorro desperdicia la página de gracias.
  */
-// [BRAND] required — replace for every new brand
+// [BRAND]
 export const AVG_SAVINGS = "50%";
 
 /** Opciones del desplegable de tratamiento. Mismo juego en todo el sitio. */
-// [BRAND] required — replace for every new brand
+// [BRAND]
 export const TREATMENT_OPTIONS = [
   { value: "", label: "Select service" },
   { value: "service-a-2900", label: "Demo Service One — $2,900" },
@@ -425,7 +419,7 @@ export const TREATMENT_OPTIONS = [
 ];
 
 /** Hasta cuándo se sostiene el precio de la página de gracias. */
-// [BRAND] required — replace for every new brand
+// [BRAND]
 export const PRICE_LOCK_UNTIL = "December 2026";
 
 /**
@@ -448,5 +442,5 @@ const rutasFooter = Object.keys(import.meta.glob("../pages/*.astro"))
   .map((r) => r.replace("../pages/","").replace(".astro",""))
   .filter((s) => !["index","404","thank-you","thank-you-download"].includes(s))
   .sort();
-export const HERRAMIENTAS = ["atomos", "showcase"];
+export const HERRAMIENTAS: string[] = [];
 export const PAGINAS = rutasFooter.filter((s) => !HERRAMIENTAS.includes(s));

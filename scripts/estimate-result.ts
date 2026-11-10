@@ -1,16 +1,3 @@
-// ============================================================
-// estimate-result.ts — ajusta el estimado de /thank-you con las respuestas.
-//
-// El servidor ya pintó los dos planes con los precios de lista de ambas
-// arcadas y el titular genérico. Este módulo solo AJUSTA: si el visitante
-// vino del cuestionario, cambia los precios a los de su arcada, calcula el
-// ahorro contra el presupuesto que trajo de EE. UU. y personaliza el
-// titular. Si no hay nada guardado, no toca nada y la página se queda con la
-// versión genérica — que es contenido válido, no un hueco.
-//
-// El traspaso viene por sessionStorage (lo escribe lead-form.ts). No por la
-// URL: la regla del proyecto es que la PII solo viaja en el POST original.
-// ============================================================
 
 import { ESTIMATE_KEY, type EstimateHandoff } from "./lead-form";
 
@@ -55,8 +42,6 @@ function render(root: HTMLElement, data: EstimateHandoff): void {
   const arch: ArchKey = data.arch || "both";
   const featuredPrice = plans[0]?.price?.[arch] ?? null;
 
-  // Titular. Solo hay AHORRO que enseñar si dejó su presupuesto de EE. UU.;
-  // sin él se muestra el precio a secas, que sigue siendo una respuesta.
   const firstName = (data.name || "").trim().split(/\s+/)[0] ?? "";
   setText(root, "[data-est-name]", firstName ? `${firstName}, your plan` : "Your plan");
 
@@ -81,7 +66,6 @@ function render(root: HTMLElement, data: EstimateHandoff): void {
     setText(root, "[data-est-quote]", ` Your US quote was ${money(data.quote)}.`);
   }
 
-  // Precio y ahorro de cada plan para la arcada elegida.
   root.querySelectorAll<HTMLElement>("[data-plan-index]").forEach((card) => {
     const i = Number(card.dataset.planIndex);
     const price = plans[i]?.price?.[arch] ?? null;
@@ -102,14 +86,13 @@ function init(): void {
   const root = document.querySelector<HTMLElement>("[data-estimate-result]");
   if (!root) return;
   const data = read();
-  // Sin cuestionario no hay nada que ajustar: el caso genérico ya está
-  // pintado y personalizarlo a medias sería peor que dejarlo.
   if (data?.quiz) render(root, data);
 
-  // El email del bloque de subida se rellena solo: es la clave con la que el
-  // CRM adjunta los archivos al lead, y un dedazo ahí los deja huérfanos.
+  // Solo en /thank-you: en otra página enseña el email del lead anterior.
   const emailField = document.querySelector<HTMLInputElement>("[data-upload-email]");
-  if (emailField && data?.email && !emailField.value) emailField.value = data.email;
+  if (location.pathname.startsWith("/thank-you") && emailField && data?.email && !emailField.value) {
+    emailField.value = data.email;
+  }
 }
 
 if (document.readyState === "loading") {

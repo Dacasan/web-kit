@@ -1,11 +1,17 @@
 {
   "name": "@agenciaweb/kit",
-  "version": "1.2.4",
+  "version": "1.4.0",
   "private": true,
   "type": "module",
   "description": "Framework de diseño de agencia: estilos, componentes y scripts del sitio. Se consume versionado; no se copia.",
   "scripts": {
-    "create-sitio": "node create-sitio.mjs"
+    "create-sitio": "node create-sitio.mjs",
+    "dev": "pnpm --dir demo dev",
+    "build": "export LANDING_API_URL=${LANDING_API_URL:-https://crm.example.com} && pnpm --dir demo build",
+    "check": "pnpm --dir demo exec astro check",
+    "audit:a11y": "node tools/audit-a11y.mjs demo/dist",
+    "version:sync": "node tools/sync-version.mjs",
+    "verify": "export LANDING_API_URL=https://crm.example.com && node tools/contract-check.mjs && pnpm check && pnpm build && pnpm audit:a11y"
   },
   "exports": {
     "./styles/*": "./styles/*",
@@ -17,5 +23,8 @@
   },
   "peerDependencies": {
     "astro": "^7.1.6"
+  },
+  "devDependencies": {
+    "playwright": "^1.65.0"
   }
 }

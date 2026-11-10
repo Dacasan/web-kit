@@ -1,18 +1,3 @@
-// ============================================================
-// upload-case.ts — subida de radiografía y presupuesto (UploadCase.astro).
-//
-// multipart/form-data contra {API}/api/uploads, el mismo host que
-// /api/events (getApiBase). El email va como clave para que el CRM adjunte
-// los archivos al lead recién creado.
-//
-// NO se pone Content-Type a mano: con FormData lo pone el navegador, y lo
-// pone con el `boundary` que ha generado. Escribirlo a mano es la forma
-// clásica de que el server reciba un cuerpo que no puede parsear.
-//
-// Si el POST falla, el bloque enseña la salida por WhatsApp en vez de
-// tragarse el error: alguien que ya se decidió a mandar su pano no se puede
-// quedar sin vía.
-// ============================================================
 
 import { getApiBase } from "../lib/api-base";
 import { ESTIMATE_KEY, type EstimateHandoff } from "./lead-form";
@@ -21,7 +6,6 @@ function bytesToMb(n: number): number {
   return n / (1024 * 1024);
 }
 
-/** Contexto del lead, si el visitante viene de un formulario de esta sesión. */
 function context(): Record<string, string> {
   try {
     const raw = sessionStorage.getItem(ESTIMATE_KEY);
@@ -60,8 +44,6 @@ function wire(root: HTMLElement): void {
     errorEl.focus();
   };
 
-  // Nombres de los archivos elegidos: sin esto el visitante no tiene forma
-  // de saber si cogió el archivo correcto antes de enviarlo.
   filesEl?.addEventListener("change", () => {
     const files = Array.from(filesEl.files ?? []);
     if (!list) return;
@@ -105,8 +87,6 @@ function wire(root: HTMLElement): void {
     for (const f of files) body.append("files", f, f.name);
 
     try {
-      // Sin cabecera Content-Type a propósito: la pone el navegador con su
-      // boundary. Ponerla a mano rompe el parseo en el server.
       const res = await fetch(`${getApiBase()}${endpoint}`, { method: "POST", body });
       if (!res.ok) throw new Error("upload failed");
 
