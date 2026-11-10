@@ -290,6 +290,13 @@ const topbar = Astro.props.topbar ?? (variant === 'money' ? TOPBAR : undefined);
     const sync = () => navToggle.setAttribute('aria-expanded', String(navToggle.checked));
     sync();
     navToggle.addEventListener('change', sync);
+    // role="button" promete Enter además de Space (el checkbox solo trae Space).
+    navToggle.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter') return;
+      e.preventDefault();
+      navToggle.checked = !navToggle.checked;
+      navToggle.dispatchEvent(new Event('change'));
+    });
   }
 
   const popup = document.getElementById('form-popup');
@@ -324,6 +331,7 @@ const topbar = Astro.props.topbar ?? (variant === 'money' ? TOPBAR : undefined);
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && location.hash === '#form-popup') {
         history.replaceState(null, '', location.pathname + location.search);
+        wasOpen = false;
         opener?.focus();
       }
     });
@@ -333,7 +341,7 @@ const topbar = Astro.props.topbar ?? (variant === 'money' ? TOPBAR : undefined);
     document.addEventListener('keydown', (e) => {
       if (e.key !== 'Tab' || location.hash !== '#form-popup') return;
       const list = [...popup.querySelectorAll<HTMLElement>('a[href], button, input, select, textarea')]
-        .filter((el) => el.offsetParent !== null);
+        .filter((el) => el.offsetParent !== null && el.tabIndex >= 0);
       if (!list.length) return;
       const first = list[0];
       const last = list[list.length - 1];

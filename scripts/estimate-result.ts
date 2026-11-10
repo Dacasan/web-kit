@@ -106,10 +106,13 @@ function init(): void {
   // pintado y personalizarlo a medias sería peor que dejarlo.
   if (data?.quiz) render(root, data);
 
-  // El email del bloque de subida se rellena solo: es la clave con la que el
-  // CRM adjunta los archivos al lead, y un dedazo ahí los deja huérfanos.
+  // El email del bloque de subida se rellena solo en la página de gracias:
+  // en el catálogo o en una landing con estimado, rellenarlo con el lead
+  // anterior enseña el email de otra persona en el formulario.
   const emailField = document.querySelector<HTMLInputElement>("[data-upload-email]");
-  if (emailField && data?.email && !emailField.value) emailField.value = data.email;
+  if (location.pathname.startsWith("/thank-you") && emailField && data?.email && !emailField.value) {
+    emailField.value = data.email;
+  }
 }
 
 if (document.readyState === "loading") {

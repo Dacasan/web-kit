@@ -20,7 +20,7 @@ const t = site.widget;
 <aside class="launcher" aria-label={t.aria}>
   <input type="checkbox" id="lx-open" class="lx-state" role="button"
     aria-label={t.aria} aria-expanded="false" aria-controls="lx-panel" />
-  <input type="checkbox" id="lx-support" class="lx-state" role="button"
+  <input type="checkbox" id="lx-support" class="lx-state" role="button" tabindex="-1"
     aria-label={t.support.title} aria-controls="lx-support-view" />
 
   <label for="lx-open" class="lx-pill" data-track="contact_widget_open">
@@ -98,16 +98,23 @@ const t = site.widget;
   const panel = document.getElementById('lx-panel');
   if (open && panel) {
     const sync = () => open.setAttribute('aria-expanded', String(open.checked));
+    const support = document.getElementById('lx-support');
     const close = () => {
       open.checked = false;
       sync();
+      support?.setAttribute('tabindex', '-1');
       open.focus();
     };
 
     sync();
     open.addEventListener('change', () => {
       sync();
-      if (open.checked) panel.querySelector<HTMLElement>('[data-lx-close]')?.focus();
+      if (open.checked) {
+        support?.removeAttribute('tabindex');
+        panel.querySelector<HTMLElement>('[data-lx-close]')?.focus();
+      } else {
+        support?.setAttribute('tabindex', '-1');
+      }
     });
 
     document.querySelector('[data-lx-close]')?.addEventListener('click', close);

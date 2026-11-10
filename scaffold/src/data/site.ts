@@ -462,5 +462,5 @@ const rutasFooter = Object.keys(import.meta.glob("../pages/*.astro"))
   .map((r) => r.replace("../pages/","").replace(".astro",""))
   .filter((s) => !["index","404","thank-you","thank-you-download"].includes(s))
   .sort();
-export const HERRAMIENTAS = ["atomos", "showcase"];
+export const HERRAMIENTAS: string[] = [];
 export const PAGINAS = rutasFooter.filter((s) => !HERRAMIENTAS.includes(s));

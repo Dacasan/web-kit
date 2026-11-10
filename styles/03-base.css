@@ -72,6 +72,10 @@ a:hover:not(.button) {
 input:focus, select:focus, textarea:focus {
   border-color: var(--border-field);
 }
-/* El error de validación se ve en el campo, no solo en el banner. */
-[aria-invalid="true"] { border-color: var(--color-error); }
+/* El error se pinta también con el campo enfocado: +especificidad que :focus. */
+input[aria-invalid="true"],
+select[aria-invalid="true"],
+textarea[aria-invalid="true"] {
+  border-color: var(--color-error);
+}
 label { display: block; margin-bottom: .4rem; font-weight: 500; }

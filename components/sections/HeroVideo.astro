@@ -113,7 +113,7 @@ const sources = [
 
 const posterWide = posterDesktop || poster;
 const stats = statsProp ?? site.proof.slice(0, 3);
-const Badge = `h${level}` as 'h1' | 'h2';
+const Heading = `h${level}` as 'h1' | 'h2';
 ---
 
 <header id="home" class="hero-video" itemscope itemtype="https://schema.org/WPHeader">
@@ -142,16 +142,13 @@ const Badge = `h${level}` as 'h1' | 'h2';
   <HalftoneFade direction="bottom" color="#1A1A1A" class="hero-video__fade" />
 
   <div class="container hero-video__content">
-    {/* H1 real: la chapita de disponibilidad, con su dot pulsante.
-        Nivel configurable: h1 solo cuando ES el hero de la página. */}
-    <Badge class="hero-avail-badge" itemprop="headline">
+    {/* H1 real: el titular grande, no la chapita. Mismo criterio que HeroLede. */}
+    <p class="hero-avail-badge">
       <span class="hero-avail-badge__dot" aria-hidden="true"></span>
       {badge}
-    </Badge>
+    </p>
 
-    {/* El claim visible NO es un encabezado: <p> con .hero-title (4rem→7rem,
-        tinta blanca sobre fondo oscuro — lo da la capa de componentes). */}
-    <p class="hero-title hero-title--video">{displayTitle}</p>
+    <Heading class="hero-title hero-title--video" itemprop="headline">{displayTitle}</Heading>
     <p class="lead hero-video__lead">{subtitle}</p>
 
     <div class="btn-row hero-video__btn-row">

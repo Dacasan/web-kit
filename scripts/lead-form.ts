@@ -213,7 +213,10 @@ function wire(form: HTMLFormElement): void {
 
     // El campo que falla se marca y recibe el foco: sin esto, el banner
     // anunciaba el error pero el usuario no sabía dónde corregirlo.
-    const field = (n: string) => form.elements.namedItem(n) as HTMLElement | null;
+    const field = (n: string) => {
+      const el = form.elements.namedItem(n);
+      return el instanceof HTMLElement ? el : null;
+    };
 
     if (!name) return showError(FL.errName ?? "Please enter your name.", field("name"));
     // `includes("@")` aceptaba "a@": el CRM se llenaba de correos muertos.
