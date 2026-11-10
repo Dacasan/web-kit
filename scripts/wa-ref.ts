@@ -1,8 +1,3 @@
-// ============================================================
-// wa-ref.ts — inyecta el ref_code persistido por god.js en los CTAs
-// click-to-WhatsApp (DAD §2.2): el código viaja en el texto pre-rellenado
-// para el puente offline. Se bundlea desde 'self' (respeta CSP).
-// ============================================================
 
 function readRefCode(): string | null {
   try {

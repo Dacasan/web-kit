@@ -1,4 +1,4 @@
-/* Base (skill §3.3). */
+
 body {
   background: var(--bg-page);
   color: var(--ink-body);
@@ -17,10 +17,10 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: -.01em;
   margin: .35em 0 .7em;
 }
-/* Jerarquía por escala y peso, no por color: la tinta es casi-negra. */
+
 h1, h2, h3 { color: var(--ink-body); }
 h1 em, h2 em { font-style: italic; color: var(--ink-primary); }
-/* Fraunces 300/400, fluido sin breakpoint tipográfico. */
+
 h1 { font-weight: 300; font-size: clamp(4rem, 7vw, 8rem); line-height: .95; letter-spacing: -.038em; }
 h2 { font-weight: 300; font-size: clamp(3rem, 4.2vw, 5rem); line-height: 1; letter-spacing: -.03em; }
 h3 { font-weight: 400; font-size: clamp(2rem, 2.2vw, 2.8rem); line-height: 1.15; letter-spacing: -.015em; }
@@ -36,24 +36,25 @@ a:hover:not(.button) {
   text-underline-offset: .25em;
 }
 
-/* Anillo de foco de DOS CAPAS: tinta clara + halo oscuro. Una sola capa
-   falla en algún fondo — `--border-field` es exactamente `--bg-dark`, así
-   que el anillo desaparecía en la barra, el menú y el pie (1:1). Con las
-   dos, se ve sobre claro y sobre oscuro sin saber dónde está. */
+
+
+
+
 :focus-visible {
   outline: 2px solid var(--ink-body-on-dark);
   outline-offset: 3px;
-  /* !important deliberado: varios componentes (.button.primary, .card) traen
-     su propia box-shadow con más especificidad y anulaban el halo. El
-     indicador de foco no compite con la decoración: se pisa siempre. */
+  
+
+
+  /* !important: los componentes traen box-shadow propia y anulan el halo. */
   box-shadow: 0 0 0 4px var(--ink-strong) !important;
 }
 :focus:not(:focus-visible) { outline: none; }
 
-/* Controles de formulario. El `:where()` es deliberado: baja la
-   especificidad a 0 para que `:focus` pueda cambiar el borde. Sin él, los
-   tres `:not([type=…])` (0,3,1) ganaban a `input:focus` (0,1,1) y el
-   campo no cambiaba NADA al enfocarse. */
+
+
+
+
 :where(
   input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]),
   select,
@@ -64,7 +65,7 @@ a:hover:not(.button) {
   padding: .8rem 1rem;
   min-height: 48px;
   font-size: 16px;
-  /* --ink-muted y no --border-field (#1A1A1A): un borde negro puro sobre */
+  
   border: 1px solid var(--ink-muted);
   border-radius: var(--radius);
   transition: border-color .2s ease;
@@ -72,7 +73,7 @@ a:hover:not(.button) {
 input:focus, select:focus, textarea:focus {
   border-color: var(--border-field);
 }
-/* El error se pinta también con el campo enfocado: +especificidad que :focus. */
+
 input[aria-invalid="true"],
 select[aria-invalid="true"],
 textarea[aria-invalid="true"] {

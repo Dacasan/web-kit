@@ -1,26 +1,12 @@
 ---
-// Gallery — mosaico 3x3 con lightbox. Cero JavaScript.
-//
-// EL LIGHTBOX ES `:target`: cada miniatura es un <a href="#lb-x"> y la capa
-// se abre sola cuando el hash coincide. Cerrar es <a href="#!">. Lo gobierna
-// .lightbox en 05-components.css, la misma clase que el popup del header.
-//
-// MOBILE FIRST: la rejilla es 3x3 DESDE EL MÓVIL —cada columna a 1fr, así
-// que las miniaturas se encogen— porque una galería de antes/después se lee
-// mejor como mosaico que apilada. Nueve fotos apiladas son nueve pantallas.
-//
-// `id` TIENE QUE SER ÚNICO EN LA PÁGINA: de ahí salen los hash del lightbox.
-// Dos galerías con el mismo id abren las dos a la vez.
 interface Item {
   src: string;
   alt: string;
-  /** Medidas REALES del archivo. Sin ellas, 600×600 (el hueco por defecto). */
   width?: number;
   height?: number;
 }
 
 interface Props {
-  /** Prefijo de los hash del lightbox. Único por página. */
   id?: string;
   images: Item[];
 }
@@ -31,9 +17,9 @@ const items = images.map((it, i) => ({ ...it, hash: `${id}-${i + 1}` }));
 ---
 
 <div class="gallery-3x3 mx-auto" itemscope itemtype="https://schema.org/ImageGallery">
-  {/* Sin `itemprop`: `contentUrl` exige dom=MediaObject y este nodo es
-      ImageGallery (⊂ CollectionPage ⊂ WebPage), además el valor era el
-      fragmento `#gal-1`, no una URL. */}
+  
+
+
   {items.map((it) => (
     <a class="frame" href={`#${it.hash}`} aria-label={`View larger: ${it.alt}`}>
       <img src={it.src} alt={it.alt} width={it.width} height={it.height} loading="lazy" decoding="async" />
@@ -41,8 +27,8 @@ const items = images.map((it, i) => ({ ...it, hash: `${id}-${i + 1}` }));
   ))}
 </div>
 
-{/* Las capas van al final del componente: son superposiciones a pantalla
-    completa (position: fixed), así que da igual dónde vivan en el árbol. */}
+
+
 {items.map((it) => (
   <div class="lightbox" id={it.hash} role="dialog" aria-modal="true" aria-label={`Image: ${it.alt}`}>
     <a href="#!" class="lightbox-close" aria-label="Close">&times;</a>
@@ -51,9 +37,6 @@ const items = images.map((it, i) => ({ ...it, hash: `${id}-${i + 1}` }));
 ))}
 
 <script>
-  // Las capas se abren por :target y el foco se quedaba fuera del diálogo.
-  // Esc cierra, y al abrir el foco entra en el botón de cierre. Se ignora
-  // #form-popup: ese diálogo lo gobierna Header.
   const galleryTarget = () =>
     document.querySelector<HTMLElement>('.lightbox:target:not(#form-popup)');
 
@@ -67,11 +50,9 @@ const items = images.map((it, i) => ({ ...it, hash: `${id}-${i + 1}` }));
     if (e.key === 'Escape') {
       const id = box.id;
       history.replaceState(null, '', location.pathname + location.search);
-      // Devuelve el foco a la miniatura que abrió la capa.
       document.querySelector<HTMLElement>(`a[href="#${CSS.escape(id)}"]`)?.focus();
       return;
     }
-    // Trampa de foco: el diálogo tiene dos controles (cerrar + imagen).
     if (e.key !== 'Tab') return;
     const list = [...box.querySelectorAll<HTMLElement>('a[href], button')]
       .filter((el) => el.offsetParent !== null);

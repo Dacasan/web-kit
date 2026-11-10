@@ -1,33 +1,11 @@
 ---
-// YouTubeLite — fachada de vídeo bajo demanda (skill §12.1) con proporción
-// mobile-first.
-//
-// LA REGLA: en móvil el vídeo es VERTICAL 9:16 siempre. El horizontal es la
-// excepción. Un vertical al lado de un formulario o dentro de una tarjeta
-// ocupa mejor la columna que un 16:9 aplastado; la única sección que exige
-// horizontal a pantalla completa en escritorio es la VSL.
-//
-// Dos ids de YouTube, no uno:
-//   id         → el vídeo VERTICAL (móvil). Obligatorio.
-//   desktopId  → el HORIZONTAL. Si falta, se reutiliza el vertical.
-//
-// El iframe no existe hasta el clic: ~1 KB en lugar de los ~540 KB del
-// reproductor, y 0 conexiones a Google antes de que el usuario decida.
 import { site } from '@agenciaweb/kit-site';
 
 interface Props {
-  /** Id del vídeo vertical (móvil). */
   id?: string;
-  /** Id del horizontal para escritorio. Opcional. */
   desktopId?: string;
-  /**
-   * 'auto'       vertical en móvil, horizontal en escritorio (por defecto)
-   * 'vertical'   vertical siempre — junto a un formulario, o en tarjeta
-   * 'horizontal' horizontal siempre — VSL
-   */
   ratio?: 'auto' | 'vertical' | 'horizontal';
   playlabel?: string;
-  /** Miniaturas propias. Si faltan, se usan las de YouTube. */
   thumbMobile?: string;
   thumbDesktop?: string;
 }
@@ -45,19 +23,10 @@ const ytThumb = (v: string) => `https://i.ytimg.com/vi/${v}/hqdefault.jpg`;
 const mobileThumb = thumbMobile ?? ytThumb(id);
 const desktopThumb = thumbDesktop ?? ytThumb(desktopId ?? id);
 
-// VideoObject (schema.org) — opt-in.
-//
-// Google exige `name` + `thumbnailUrl` + `uploadDate` (Video doc §VideoObject):
-// `uploadDate` NUNCA se inventa. La instancia del cliente declara en
-// `site.videos[id]` los datos verificados (nombre, uploadDate ISO-8601,
-// duración); si falta el registro o la fecha, NO se emite schema. El embed
-// declarado replica el runtime real: god.ts:295 YT_HOST = youtube-nocookie.
 interface VideoMeta {
   name: string;
   description?: string;
-  /** ISO 8601 con zona. Verificada contra YouTube (no copiada a ojo). */
   uploadDate: string;
-  /** ISO 8601 duration (PT1M13S). Opcional, recomendada. */
   duration?: string;
 }
 const registry = (site as { videos?: Record<string, VideoMeta> }).videos;
@@ -69,8 +38,6 @@ const contentUrl = `https://www.youtube-nocookie.com/embed/${id}`;
 <div
   class:list={[
     'youtube-video',
-    // .frame--exact: la proporción manda y el techo se aplica al ancho.
-    // Un iframe recortado no se recorta — se deforma.
     'frame', 'frame--exact',
     ratio === 'vertical' && 'ratio-vertical',
     ratio === 'horizontal' && 'ratio-horizontal',
@@ -78,17 +45,17 @@ const contentUrl = `https://www.youtube-nocookie.com/embed/${id}`;
   data-video-id={id}
   data-desktop-video-id={desktopId}
 >
-  {/* Mobile-first también en el marcado: el <img> lleva la miniatura vertical
-      y el <source> la horizontal, que solo entra a partir de 900px. */}
+  
+
   <picture>
     {desktopThumb !== mobileThumb && (
       <source media="(min-width: 900px)" srcset={desktopThumb} width="960" height="540" />
     )}
     <img src={mobileThumb} width="1080" height="1920" alt={playlabel} loading="lazy" decoding="async" />
   </picture>
-  {/* El disparador es el botón, no el bloque entero: god.js exige clic en
-      `.play-button`. `type=button` + aria-label lo hacen operable con teclado,
-      que es lo único que le añado a tu versión. */}
+  
+
+
   <button type="button" class="play-button" aria-label={playlabel}
           data-track="video_play" data-track-label={id}>
     <svg viewBox="0 0 24 24" width="68" height="48">
@@ -102,8 +69,8 @@ const contentUrl = `https://www.youtube-nocookie.com/embed/${id}`;
   <div class="youtube-iframe"></div>
 </div>
 
-{/* VideoObject solo si la instancia declaró el vídeo con uploadDate
-    verificado (patrón is:inline + set:html: SeoHead.astro:121). */}
+
+
 {videoMeta && (
   <script
     type="application/ld+json"
@@ -113,11 +80,7 @@ const contentUrl = `https://www.youtube-nocookie.com/embed/${id}`;
       "@type": "VideoObject",
       name: videoMeta.name,
       ...(videoMeta.description ? { description: videoMeta.description } : {}),
-      // Absoluto: todos los ejemplos de VideoObject de Google usan URLs
-      // absolutas, y thumbnailUrl es el campo con el que Google decide si
-      // indexa el vídeo. Solo se absolutiza el schema; el <img> de la
-      // fachada se queda relativo, como hasta ahora. Patrón de
-      // SeoHead.astro:69 (og:image).
+      // thumbnailUrl absoluta o Google no indexa el vídeo.
       thumbnailUrl: [mobileThumb, desktopThumb].map((t) =>
         t.startsWith("http") ? t : `${site.baseUrl}${t}`,
       ),
@@ -130,8 +93,8 @@ const contentUrl = `https://www.youtube-nocookie.com/embed/${id}`;
   />
 )}
 
-{/* Sin script propio: el diferido del vídeo vive en god.js
-    (wireYouTubeFacades), que ya se carga en todas las páginas. */}
+
+
 
 <style>
   .play-button {

@@ -1,21 +1,8 @@
 ---
-// Stars — la valoración en estrellas.
-//
-// Estaba escrita dentro del <style> de Reviews.astro, así que una tarjeta de
-// reseña de Google en cualquier otro sitio tenía que volver a inventarla.
-// Las clases .rating y .rating__off son ahora del sistema.
-//
-// Las estrellas apagadas se dibujan igual que las encendidas pero en gris de
-// borde: así la valoración se lee como "4 de 5" y no como "4", que es una
-// cifra sin escala.
 interface Props {
-  /** Estrellas encendidas, 0 a 5. */
   n?: number;
-  /** Total. Cinco salvo que alguien invente otra escala. */
   of?: number;
-  /** Cifra junto a las estrellas:"4.9". Sin ella, solo las estrellas. */
   score?: string;
-  /** Texto de apoyo:"1,247 reviews". */
   count?: string;
 }
 
@@ -23,8 +10,6 @@ const { n = 5, of = 5, score, count } = Astro.props;
 
 const on = Math.max(0, Math.min(of, Math.round(n)));
 
-// `role="img"` oculta el contenido interno: el score y el count visibles no
-// se anuncian si no van en el label. Antes decía "5 out of 5" y nada más.
 const label = `${score ?? on} out of ${of}${count ? `, ${count}` : ""}`;
 ---
 

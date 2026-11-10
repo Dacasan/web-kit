@@ -1,24 +1,8 @@
 ---
-// EstimateResult — el estimado, entregado en la página de gracias.
-//
-// Lo pinta el servidor con los precios de lista (ambas arcadas) y lo ajusta
-// el navegador con lo que el visitante respondió, que llega por
-// sessionStorage desde lead-form.ts. Dos consecuencias buenas de hacerlo en
-// ese orden: la página tiene contenido aunque el JS falle o el navegador
-// bloquee el almacenamiento, y la PII no viaja por la URL (la regla del
-// proyecto, escrita en thank-you.astro).
-//
-// Dos escenarios, misma sección:
-//   · Vino del estimado  → precios de SU arcada + el ahorro calculado contra
-//                          el presupuesto que trajo de EE. UU.
-//   · Vino de un formulario corto → los mismos dos planes y el ahorro medio.
-//     Enseñar el precio y callar el ahorro desaprovecha la única página que
-//     el visitante mira con calma.
 import { PLANS, QUOTE_FALLBACK, AVG_SAVINGS, site } from '@agenciaweb/kit-site';
 
 interface Props {
   label?: string;
-  /** Titular del caso genérico (sin cuestionario). */
   genericTitle?: string;
   includesNote?: string;
 }
@@ -29,9 +13,8 @@ const {
   includesNote = 'Everything detailed in your quote. No hidden fees.',
 } = Astro.props;
 
-const usd = (n: number) => `$${n.toLocaleString('en-US')}`;
+const usd = (n: number) => `${n.toLocaleString('en-US')}`;
 
-/** El script necesita los precios en el cliente: viajan como JSON en el DOM. */
 const planData = JSON.stringify(PLANS.map((p) => ({ key: p.key, price: p.price })));
 ---
 
@@ -40,8 +23,8 @@ const planData = JSON.stringify(PLANS.map((p) => ({ key: p.key, price: p.price }
     <div class="est-result">
       <p class="label">{label}</p>
 
-      {/* Tres huecos: nombre, verbo y cifra. El servidor pinta el caso
-          genérico; el navegador lo sustituye si hubo cuestionario. */}
+      
+
       <h2 class="est-result__title">
         <span data-est-name>{genericTitle}</span><span data-est-verb hidden></span>
         <em class="est-result__save" data-est-save hidden></em>
@@ -50,8 +33,8 @@ const planData = JSON.stringify(PLANS.map((p) => ({ key: p.key, price: p.price }
         Written quote guaranteed for 12 months · {site.rating.value}/5 from {Number(String(site.rating.count).replace(/,/g, "")).toLocaleString("en-US")} patients
       </p>
 
-      {/* Las dos rutas. La diferencia que manda es el número de viajes: va
-          arriba del todo, en grande, antes que el nombre y que el precio. */}
+      
+
       <div class="est-plans">
         {PLANS.map((p, i) => (
           <article
@@ -95,7 +78,7 @@ const planData = JSON.stringify(PLANS.map((p) => ({ key: p.key, price: p.price }
   .est-result__save[hidden], .est-result__meta[hidden] { display: none; }
   .est-result__meta { font-size: var(--text-sm); margin-bottom: 3.2rem; }
 
-  /* Las dos rutas, apiladas en móvil y en columnas a 900px. */
+  
   .est-plans { display: grid; gap: var(--gap-card); }
 
   .est-plan { display: grid; gap: .8rem; }
@@ -105,8 +88,8 @@ const planData = JSON.stringify(PLANS.map((p) => ({ key: p.key, price: p.price }
     color: var(--ink-body-on-dark);
   }
 
-  /* EL DATO QUE DISTINGUE A LOS DOS PLANES: el número de viajes va primero,
-     grande y en mayúsculas, antes que el nombre y antes que el precio. */
+  
+
   .est-plan__trips {
     margin: 0;
     font-family: var(--font-display);

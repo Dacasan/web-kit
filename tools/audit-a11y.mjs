@@ -1,39 +1,10 @@
 #!/usr/bin/env node
-// ════════════════════════════════════════════════════════════════════════
-// audit-a11y — la séptima regla del kit, hecha ejecutable.
-//
-//   node tools/audit-a11y.mjs <dist> [--pages N] [--json out.json]
-//
-// Las seis reglas de AGENTS.md se cumplen al 100 % porque son comprobables:
-// `grep -c '@media (max-width'` da 0 o no da 0. La accesibilidad no tenía
-// ninguna comprobación, así que se degradó en 33 sitios mientras las otras
-// seis aguantaban. Esto es esa comprobación.
-//
-// Se ejecuta sobre el HTML EMITIDO (dist/), en Chromium real, porque es lo
-// único que sabe qué color acaba pintado detrás de qué anillo de foco. Un
-// linter de CSS no puede: `outline: 2px solid var(--border-field)` es
-// correcto hasta que la marca pone --brand-dark igual a --border-field.
-//
-// Siete comprobaciones, todas con un umbral numérico y ninguna opinable:
-//
-//   1. FOCO-FANTASMA   elementos enfocables dentro de capas invisibles
-//   2. FOCO-INVISIBLE  anillo de foco con <3:1 contra el fondo que tiene detrás
-//   3. CONTRASTE       texto renderizado por debajo de 4.5:1 (3:1 si es grande)
-//   4. NOMBRE-PERDIDO  aria-label sobre un rol que prohíbe nombre
-//   5. ENCABEZADOS     h1 ausente/múltiple, saltos de nivel, encabezado invisible
-//   6. TACTIL          objetivos por debajo de 24 px (WCAG 2.2 AA)
-//   7. REFLOW          scroll horizontal a 320 px
-//
-// Salida: 1 si hay algún fallo BLOQUEANTE. Pensado para ir en el CI que ya
-// existe, justo después de `pnpm build`.
-// ════════════════════════════════════════════════════════════════════════
 
 import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-// ── Playwright: dependencia solo de desarrollo, se busca sin romper si falta
 let chromium;
 try {
   ({ chromium } = await import('playwright'));
@@ -42,12 +13,9 @@ try {
   process.exit(2);
 }
 
-// ── Argumentos ──────────────────────────────────────────────────────────
 const argv = process.argv.slice(2);
 const DIST = path.resolve(argv.find((a) => !a.startsWith('--')) ?? 'dist');
 const flag = (n, d) => { const i = argv.indexOf(`--${n}`); return i >= 0 ? argv[i + 1] : d; };
-// 0 = todas las páginas del dist (el default antiguo, 8, dejaba el resto sin
-// auditar en silencio cuando un sitio superaba esa cifra).
 const MAX_PAGES = Number(flag('pages', 0)) || Infinity;
 const JSON_OUT = flag('json', null);
 const STRICT = argv.includes('--strict');   // convierte los AVISOS en bloqueantes
@@ -57,7 +25,6 @@ if (!fs.existsSync(DIST)) {
   process.exit(2);
 }
 
-// ── Servidor estático mínimo ────────────────────────────────────────────
 const MIME = { '.html':'text/html', '.js':'text/javascript', '.css':'text/css', '.woff2':'font/woff2',
   '.woff':'font/woff', '.webp':'image/webp', '.png':'image/png', '.jpg':'image/jpeg', '.jpeg':'image/jpeg',
   '.svg':'image/svg+xml', '.ico':'image/x-icon', '.mp4':'video/mp4', '.webm':'video/webm', '.json':'application/json' };
@@ -72,7 +39,6 @@ const server = http.createServer((req, res) => {
 const PORT = await new Promise((r) => server.listen(0, () => r(server.address().port)));
 const BASE = `http://127.0.0.1:${PORT}`;
 
-// ── Descubrir páginas: index.html primero, luego el resto ───────────────
 function findPages(dir, out = []) {
   for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
     const p = path.join(dir, e.name);
@@ -84,18 +50,13 @@ function findPages(dir, out = []) {
 const ALL = findPages(DIST).sort((a, b) => a.length - b.length);
 const PAGES = Number.isFinite(MAX_PAGES) ? ALL.slice(0, MAX_PAGES) : ALL;
 
-// ════════════════════════════════════════════════════════════════════════
-// El navegador: todo lo que sigue se ejecuta DENTRO de la página.
-// ════════════════════════════════════════════════════════════════════════
 const PROBE = () => {
-  // ── utilidades de color ──
   const lin = (c) => ((c /= 255) <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
   const lum = ([r, g, b]) => 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
   const px = (s) => (String(s).match(/[\d.]+/g) ?? []).map(Number);
   const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)]; const [hi, lo] = x > y ? [x, y] : [y, x]; return (hi + 0.05) / (lo + 0.05); };
   const over = (fg, bg) => { const a = fg[3] ?? 1; return a >= 1 ? fg.slice(0, 3) : [0,1,2].map(i => Math.round(a * fg[i] + (1 - a) * bg[i])); };
 
-  // fondo efectivo: sube por los ancestros componiendo alfas hasta encontrar opaco
   function bgOf(el) {
     let n = el, stack = [];
     while (n && n !== document.documentElement) {
@@ -117,9 +78,6 @@ const PROBE = () => {
     const b = el.getBoundingClientRect();
     return b.right > -500 && b.bottom > -500;   // fuera de pantalla ≠ visible (honeypot, sr-only)
   };
-  // Objetivo real de un control: si lo envuelve o lo etiqueta un <label> mayor,
-  // el objetivo es el label. Sin esto, toda casilla de consentimiento es un
-  // falso positivo — y un chequeo con falsos positivos se desactiva en una semana.
   const targetBox = (el) => {
     let b = el.getBoundingClientRect();
     const lbl = el.closest('label') ??
@@ -137,7 +95,6 @@ const PROBE = () => {
 
   const R = { ghost: [], ring: [], contrast: [], lostName: [], headings: [], target: [] };
 
-  // ── 1. FOCO-FANTASMA ──────────────────────────────────────────────────
   for (const el of document.querySelectorAll(FOCUSABLE)) {
     let n = el, faded = null, gone = false;
     while (n && n !== document.body) {
@@ -151,9 +108,6 @@ const PROBE = () => {
     if (!gone && faded && !srOnly) R.ghost.push({ el: where(el), name: name(el), inside: where(faded) });
   }
 
-  // ── 2. FOCO-INVISIBLE ─────────────────────────────────────────────────
-  // El indicador puede ser el outline, el borde o la sombra. Se compara el
-  // estado en REPOSO con el estado ENFOCADO y se mide lo que de verdad cambia.
   const seenRing = new Set();
   for (const el of document.querySelectorAll(FOCUSABLE)) {
     if (!visible(el)) continue;
@@ -172,15 +126,10 @@ const PROBE = () => {
     if (cs.outlineStyle !== 'none' && parseFloat(cs.outlineWidth) > 0)
       cand.push({ via: 'outline ' + cs.outlineColor, r: ratio(over(px(cs.outlineColor), behind), behind) });
 
-    // borde que cambia al enfocar: es un indicador legítimo (patrón de campos)
     if (cs.borderTopColor !== reposo.borde || cs.borderTopWidth !== reposo.ancho) {
       const fondoCampo = bgOf(el);
       cand.push({ via: 'borde ' + cs.borderTopColor, r: ratio(over(px(cs.borderTopColor), fondoCampo), fondoCampo) });
     }
-    // sombra que aparece al enfocar: se mide su PRIMER color. El parseo va
-    // por el rgb(...) completo: `px()` capturaba también los offsets y el
-    // 4.º número (0) se leía como alfa, así que un halo opaco se medía como
-    // transparente y el checker lo descartaba.
     if (cs.boxShadow !== reposo.sombra && cs.boxShadow !== 'none') {
       const m = cs.boxShadow.match(/rgba?\(([^)]+)\)/);
       const col = m ? m[1].split(',').map(Number) : [];
@@ -193,7 +142,6 @@ const PROBE = () => {
   }
   document.activeElement?.blur?.();
 
-  // ── 3. CONTRASTE de texto renderizado ─────────────────────────────────
   const seenC = new Set();
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
   for (let t; (t = walker.nextNode());) {
@@ -218,8 +166,6 @@ const PROBE = () => {
                       size: Math.round(size), weight, ratio: +r.toFixed(2), need });
   }
 
-  // ── 4. NOMBRE-PERDIDO: aria-label sobre roles que prohíben nombre ─────
-  // (ARIA in HTML: role=generic y role=paragraph no admiten nombre accesible)
   const MUDOS = { DIV:'generic', SPAN:'generic', P:'paragraph', B:'generic', I:'generic',
                   EM:'emphasis', STRONG:'strong', BDO:'generic', BDI:'generic', PRE:'generic' };
   for (const el of document.querySelectorAll('[aria-label], [aria-labelledby]')) {
@@ -230,7 +176,6 @@ const PROBE = () => {
                                 label: (el.getAttribute('aria-label') ?? '').slice(0, 50) });
   }
 
-  // ── 5. ENCABEZADOS ────────────────────────────────────────────────────
   const hs = [...document.querySelectorAll('h1,h2,h3,h4,h5,h6')].map((h) => ({
     lvl: +h.tagName[1], text: h.textContent.trim().replace(/\s+/g, ' ').slice(0, 46),
     px: Math.round(parseFloat(getComputedStyle(h).fontSize)), vis: visible(h), el: where(h),
@@ -246,12 +191,10 @@ const PROBE = () => {
   for (let i = 1; i < hs.length; i++)
     if (hs[i].lvl - hs[i - 1].lvl > 1)
       R.headings.push({ tipo: 'salto-de-nivel', detalle: `h${hs[i-1].lvl} → h${hs[i].lvl}: "${hs[i].text}"` });
-  // el h1 no debería ser el encabezado más pequeño de la página
   if (h1s.length === 1 && hs.some((h) => h.lvl > 1 && h.vis && h.px > h1s[0].px * 1.6))
     R.headings.push({ tipo: 'h1-empequeñecido',
       detalle: `el h1 se pinta a ${h1s[0].px}px y hay encabezados menores mucho mayores (hasta ${Math.max(...hs.filter(h=>h.vis).map(h=>h.px))}px)` });
 
-  // ── 6. TACTIL (se evalúa solo en el pase móvil) ───────────────────────
   if (innerWidth <= 480) {
     const grupos = {};
     for (const el of document.querySelectorAll('a[href], button, input:not([type=hidden]), select, summary')) {
@@ -269,11 +212,6 @@ const PROBE = () => {
   return { ...R, scrollW: document.documentElement.scrollWidth, clientW: document.documentElement.clientWidth };
 };
 
-// ════════════════════════════════════════════════════════════════════════
-// Ejecución
-// ════════════════════════════════════════════════════════════════════════
-// Navegador: CHROME_PATH manda; si no, el Chromium del sistema (Linux sin
-// descargar 150 MB); si no existe, el que haya instalado Playwright.
 const CANDIDATOS = [
   process.env.CHROME_PATH,
   '/usr/bin/chromium',
@@ -284,10 +222,6 @@ const exe = CANDIDATOS.find((p) => fs.existsSync(p));
 const browser = await chromium.launch(exe ? { executablePath: exe } : {});
 const results = [];
 
-// Lo que está cerrado no se puede medir. Un panel oculto con visibility:hidden
-// —el widget de contacto, el menú móvil, el popup— queda fuera del chequeo de
-// contraste justo por hacer bien lo de ocultarse. Así que se abre todo lo que
-// se abra sin JavaScript (casillas ocultas y :target) y se vuelve a medir.
 const ABRIR = () => {
   for (const cb of document.querySelectorAll('input[type=checkbox], input[type=radio]')) {
     const b = cb.getBoundingClientRect();
@@ -302,15 +236,10 @@ const ABRIR = () => {
 async function run(url, viewport, mobile = false, abrir = false) {
   const ctx = await browser.newContext({ viewport, isMobile: mobile, hasTouch: mobile });
   const page = await ctx.newPage();
-  // Terceros fuera: no están en dist/ y no cambian el veredicto
   await page.route('**', (r) => (new URL(r.request().url()).host === `127.0.0.1:${PORT}` ? r.continue() : r.abort()));
   await page.goto(BASE + url, { waitUntil: 'load', timeout: 30000 });
   await page.waitForTimeout(250);
   if (abrir) { await page.evaluate(ABRIR); await page.waitForTimeout(350); }
-  // Sin transiciones: el estado de foco se mide en su valor FINAL. Con
-  // `transition: box-shadow .15s` el computed style justo después de
-  // focus() seguía siendo el de reposo, y el halo se descartaba como si no
-  // existiera. No es maquillaje: se audita el indicador terminado.
   await page.addStyleTag({ content: '*,*::before,*::after{transition:none!important;animation:none!important}' });
   const r = await page.evaluate(PROBE);
   await ctx.close();
@@ -327,7 +256,6 @@ for (const url of PAGES) {
   const s = await run(url, { width: 320, height: 640 }, true);            // reflow mínimo
   results.push({
     url, ...d,
-    // lo que solo aparece con el panel abierto se suma, sin duplicar
     contrast: [...d.contrast, ...a.contrast.filter((x) => !d.contrast.some((y) => y.el === x.el))],
     ring:     [...d.ring,     ...a.ring    .filter((x) => !d.ring    .some((y) => y.el === x.el))],
     target: m.target,
@@ -339,13 +267,11 @@ for (const url of PAGES) {
 await browser.close();
 server.close();
 
-// ── Informe ─────────────────────────────────────────────────────────────
 const C = { rst:'\x1b[0m', dim:'\x1b[2m', red:'\x1b[31m', yel:'\x1b[33m', grn:'\x1b[32m', b:'\x1b[1m' };
 const isTTY = process.stdout.isTTY;
 const c = (k, s) => (isTTY ? C[k] + s + C.rst : s);
 const H = (s) => console.log('\n' + c('b', s) + '\n' + '─'.repeat(Math.min(s.length + 20, 78)));
 
-// agrega por firma: el mismo defecto en 25 páginas es UN defecto
 const agg = (key, sig) => {
   const m = new Map();
   for (const r of results) for (const x of r[key] ?? []) {
@@ -421,7 +347,6 @@ H('7 · REFLOW a 320px (WCAG 1.4.10)');
 if (!reflow.length) console.log(c('grn', `  ✓ sin scroll horizontal en ${PAGES.length} páginas`));
 else for (const r of reflow) { console.log(`  ${c('red','✗')} ${r.url}  scrollWidth ${r.reflow.scroll} > viewport ${r.reflow.w}`); bloqueantes++; }
 
-// ── Veredicto ───────────────────────────────────────────────────────────
 console.log('\n' + '═'.repeat(78));
 const total = bloqueantes + avisos;
 if (!total) console.log(c('grn', c('b', '  ✓ sin hallazgos.')));

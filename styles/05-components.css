@@ -1,8 +1,8 @@
-/* Componentes base (skill §6) + widget de contacto flotante (§7.7). */
 
-/* ── Botones — tema acero: menos píldora, más borde ── */
+
+
 .button {
-  /* inline-flex y NO inline-block: con min-height el sobrante se añadía */
+  
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -13,7 +13,7 @@
   line-height: 1;
   text-align: center;
   text-decoration: none;
-  /* TERCIARIO (el caso base) */
+  
   color: var(--ink-body);
   background: var(--surface-primary-soft);
   border: 1px solid transparent;
@@ -21,22 +21,22 @@
   cursor: pointer;
   transition: transform .15s ease, box-shadow .15s ease, background-color .15s ease;
 }
-/* PRIMARIO — la acción que la página existe para provocar */
+
 .button.primary {
   color: var(--ink-on-primary);
   background: var(--cta-bg);
   box-shadow: var(--shadow-sm);
 }
 
-/* ACENTO — la jerarquía suprema: UN botón por pantalla, el del hero o el del
-   header. Si aparece tres veces deja de destacar y ya solo es otro primario. */
+
+
 .button.accent {
   color: var(--ink-on-accent);
   background: var(--accent);
   box-shadow: var(--shadow-sm);
 }
 
-/* Sobre fondo oscuro la placa negra sería un botón invisible: se invierte a */
+
 :where(.section--cta, .bg-dark) .button.primary {
   color: var(--ink-body);
   background: var(--ink-body-on-dark);
@@ -45,7 +45,7 @@
   color: var(--ink-on-primary);
   background: var(--cta-bg);
 }
-/* ── SECUNDARIO — contorno verde profundo sobre fondo claro ── */
+
 .button.outline {
   background: transparent;
   border-color: var(--border-field);
@@ -53,7 +53,7 @@
   box-shadow: none;
 }
 
-/* UN SOLO GESTO PARA TODOS LOS BOTONES */
+
 .button:hover,
 .button:active {
   background: var(--bg-dark);
@@ -61,21 +61,21 @@
   color: var(--ink-body-on-dark);
 }
 .button:hover { transform: translateY(-1px); }
-/* Pulsado no levanta: el botón se hunde bajo el dedo. */
+
 .button:active { transform: none; }
 
-/* .pill es "botón grande" (más aire a los lados). El redondeo ya no lo pone */
+
 .button.pill { padding: 1.2rem 3rem; }
 .button[disabled] { opacity: .6; cursor: not-allowed; transform: none; }
 .btn-row { display: flex; justify-content: center; gap: 1.2rem; flex-wrap: wrap; }
 
-/* Tarjeta */
+
 .card {
   padding: 1.4rem;
-  /* El par completo, no solo el fondo: una tarjeta clara dentro de una
-     sección oscura heredaba --ink-body-on-dark y --ink-title y pintaba blanco
-     sobre blanco. Declarando la tinta junto a la superficie, la ficha se
-     re-declara para todo lo que va dentro. Mismo patrón que .bg-dark. */
+  
+
+
+
   background: var(--surface-card);
   color: var(--ink-body);
   --ink-title: var(--ink-body);
@@ -84,12 +84,12 @@
   box-shadow: var(--shadow-sm);
 }
 
-/* Cards con vídeo (testimonios): el bloque de estrellas iba PRIMERO en el
-   DOM —encima del vídeo, sin sentido visual— porque el microdato
-   reviewRating pide esa posición. En vez de reordenar ~36 tarjetas a mano
-   en 13 páginas, la card que contiene un vídeo se vuelve flex y el rating
-   baja tras el vídeo: vídeo → estrellas → cita → autor. Las cards sin
-   vídeo (:has solo la activa con .youtube-video directo) quedan igual. */
+
+
+
+
+
+
 .card:has(> .youtube-video) {
   display: flex;
   flex-direction: column;
@@ -98,15 +98,15 @@
 .card:has(> .youtube-video) > .youtube-video { order: 0; }
 .card:has(> .youtube-video) > [itemprop="reviewRating"] { order: 1; }
 
-/* Card con IMAGEN ARRIBA (design de tech/two-cases): la imagen va a sangre
-   (top/izq/der) y el padding del Card es solo para el texto — con el marco
-   blanco el arte quedaba encuadrado. Se aplica al <picture> primer hijo: el
-   bloque es de ancho auto, así que los márgenes negativos lo hacen crecer a
-   los dos lados (img width:100% + reset max-width solo no bastaban). */
+
+
+
+
+
 .card:not(.bg) > picture:first-child {
   margin: -1.4rem -1.4rem 1.2rem;
-  /* el reset pone max-width:100% también en <picture> — sin estos dos la
-     caja solo se desplazaba y dejaba hueco a la derecha. */
+  
+
   width: calc(100% + 2.8rem);
   max-width: none;
 }
@@ -119,14 +119,14 @@
   :root { --gap-card: 1.6rem; }
 }
 
-/* Rejilla de N columnas. No apila en móvil: dos columnas caben en 360px. */
+
 .grid {
   display: grid;
   grid-template-columns: repeat(var(--cols, 2), minmax(0, 1fr));
   gap: var(--gap-card);
 }
 
-/* ── Insignias y micro-elementos ── */
+
 .badge {
   display: inline-flex;
   align-items: center;
@@ -137,7 +137,7 @@
   border: 1px solid var(--border-control);
   border-radius: var(--radius);
 }
-/* Punto de estado dentro de la insignia: "Respondemos ahora" en verde. El */
+
 .badge__dot {
   width: 8px;
   height: 8px;
@@ -162,8 +162,8 @@
   flex-shrink: 0;
 }
 
-/* Texto de contenido (antes 06-utilities.css) */
-/* Estrellas de valoración */
+
+
 .rating {
   font-size: var(--text-lg);
   line-height: 1;
@@ -174,16 +174,16 @@
 
 .lead  { font-size: var(--text-lg); color: var(--ink-muted); line-height: var(--leading-normal); }
 .label { text-transform: uppercase; letter-spacing: .1em; font-size: var(--text-xs); color: var(--ink-primary); }
-/* .text-body va PRIMERO y los colores después, y el orden ES la regla:
-   los cuatro pesan (0,1,0), así que con `class="text-body text-white"` gana
-   la última del archivo. Al revés, .text-body pisaba a .text-white y el
-   texto salía verde oscuro sobre fondo verde oscuro: contraste 1:1. */
+
+
+
+
 .text-body    { font-size: var(--font-size); color: var(--ink-body); line-height: var(--leading-relaxed); }
 .text-primary { color: var(--ink-primary); }
 .text-grey    { color: var(--ink-muted); }
 .text-white   { color: var(--ink-body-on-dark); }
 
-/* Franja de credibilidad */
+
 .proof-strip { display: flex; flex-direction: column; }
 .proof-strip__item {
   display: flex; align-items: center;
@@ -206,7 +206,7 @@
   .proof-strip__item:last-child { border-right: 0; }
 }
 
-/* ── Lista de pasos — el número se contornea en vez de rellenarse ── */
+
 .step-list { display: flex; flex-direction: column; gap: 1.2rem; list-style: none; padding: 0; }
 .step-list li { display: flex; align-items: flex-start; gap: 1.2rem; font-size: var(--text-sm); color: var(--ink-muted); }
 .step-num {
@@ -221,7 +221,7 @@
 }
 .step-index { font-family: var(--font-display); font-size: var(--text-2xl); font-weight: 300; color: var(--ink-primary); line-height: 1; font-variant-numeric: tabular-nums; }
 
-/* ── Estadísticas en línea ── */
+
 .inline-stats { display: flex; gap: 3.2rem; flex-wrap: wrap; }
 .inline-stat  { display: flex; align-items: center; gap: 1rem; }
 .inline-stat__num   { font-size: 2rem; font-weight: 700; line-height: var(--leading-tight); color: var(--ink-primary); }
@@ -229,7 +229,7 @@
 .stat-num   { font-size: 3.5rem; font-weight: 800; color: var(--ink-primary); line-height: 1; }
 .stat-label { font-size: var(--text-sm); color: var(--ink-muted); margin-top: .5rem; }
 
-/* ── Tablas ── */
+
 .table { width: 100%; border-collapse: collapse; }
 .table th, .table td {
   padding: 1.2rem .8rem;
@@ -243,7 +243,7 @@
   border-bottom: 1px solid var(--border-hairline);
 }
 
-/* ── Acordeón / preguntas frecuentes (skill §7.1) ── */
+
 .accordion { border-top: 1px solid var(--border-hairline); }
 .accordion__item { border-bottom: 1px solid var(--border-hairline); }
 .accordion__summary {
@@ -269,10 +269,10 @@
 .accordion__item[open] > .accordion__summary::after { transform: rotate(45deg); }
 .accordion__panel { padding-bottom: 1.6rem; color: var(--ink-muted); }
 
-/* Formulario */
+
 .field { margin-bottom: 1.6rem; }
 
-/* Etiqueta de campo: versalitas, gris a 5:1. */
+
 .form-label {
   display: block;
   margin-bottom: .8rem;
@@ -283,7 +283,7 @@
   color: var(--ink-muted);
 }
 
-/* Prefijo pegado a un campo: el +1 del teléfono, el $ del presupuesto. */
+
 .form-prefix { display: flex; align-items: stretch; gap: .8rem; }
 .form-prefix__sign {
   flex-shrink: 0;
@@ -293,7 +293,7 @@
   color: var(--ink-muted);
 }
 
-/* Consentimiento: obligatorio en todos los formularios. */
+
 .form-consent {
   display: flex;
   align-items: flex-start;
@@ -320,7 +320,7 @@
   background: color-mix(in srgb, var(--color-error) 8%, transparent);
   border-radius: var(--radius);
 }
-/* [hidden] explícito: la capa de componentes gana al display del navegador. */
+
 .form__error[hidden] { display: none; }
 
 .form__trust {
@@ -332,7 +332,7 @@
 .form .button { width: 100%; }
 .form--compact .field { margin-bottom: .8rem; }
 
-/* Campo trampa: fuera de pantalla y fuera del orden de tabulación. */
+
 .form__trap {
   position: absolute;
   left: -9999px;
@@ -340,7 +340,7 @@
   overflow: hidden;
 }
 
-/* Widget de contacto flotante (skill §7.7) — cero JavaScript. */
+
 .launcher {
   position: fixed;
   right: 16px;
@@ -348,7 +348,7 @@
   z-index: var(--z-launcher);
 }
 
-/* Casillas: invisibles pero enfocables con teclado */
+
 .lx-state {
   position: absolute;
   width: 1px; height: 1px;
@@ -356,7 +356,7 @@
   pointer-events: none;
 }
 
-/* ── Píldora ── */
+
 .lx-pill {
   display: flex;
   align-items: center;
@@ -379,7 +379,7 @@
   background: var(--color-whatsapp);
   border-radius: 50%;
 }
-/* Punto de aviso */
+
 .lx-pill__icon::after {
   content: '';
   position: absolute;
@@ -412,7 +412,7 @@
   50% { opacity: .35; }
 }
 
-/* Panel */
+
 .lx-panel {
   position: fixed;
   right: 8px; left: 8px;
@@ -437,8 +437,8 @@
   justify-content: space-between;
   gap: 1rem;
   padding: 1rem 1.25rem;
-  /* El verde de WhatsApp no aguanta texto blanco (1.98:1). El verde se
-     queda en el icono; la superficie del panel es la oscura del sistema. */
+  
+
   background: var(--bg-dark);
   color: var(--ink-body-on-dark);
 }
@@ -468,7 +468,7 @@
   color: var(--ink-muted);
 }
 
-/* ── Opciones ── */
+
 .lx-option {
   display: flex;
   align-items: center;
@@ -508,7 +508,7 @@
   cursor: pointer;
 }
 
-/* ── Máquina de estados ── */
+
 .lx-view--support { display: none; }
 
 #lx-open:checked ~ .lx-pill {
@@ -525,10 +525,10 @@
 #lx-support:checked ~ .lx-panel .lx-view--menu    { display: none; }
 #lx-support:checked ~ .lx-panel .lx-view--support { display: block; }
 
-/* Foco visible sobre el control real, no sobre la casilla oculta */
+
 #lx-open:focus-visible ~ .lx-pill,
 #lx-support:focus-visible ~ .lx-panel .lx-option:first-of-type {
-  /* Sobre la píldora blanca el anillo blanco era invisible (1:1). */
+  
   outline: 3px solid var(--ink-strong);
   outline-offset: 2px;
 }
@@ -548,34 +548,34 @@
   .lx-pill__status::before { animation: none; }
 }
 
-/* Fachada de video (skill §12.1) — el sistema real es YouTubeLite.astro */
 
-/* .rail — carril horizontal en móvil, columnas en escritorio. */
+
+
 .rail {
   display: flex;
   gap: var(--grid-gutter);
   overflow-x: auto;
   overflow-y: hidden;
 
-  /* El deslizamiento se detiene encuadrando cada tarjeta. */
+  
   scroll-snap-type: x mandatory;
   scroll-padding-inline: calc(var(--grid-gutter) / 2);
 
-  /* Sangrado a los bordes de la pantalla: el carril se sale del container */
+  
   padding-inline: calc(var(--grid-gutter) / 2);
   margin-inline: calc(var(--grid-gutter) / -2);
   padding-block: .4rem;
 
-  /* Que el gesto no dispare el "atrás" del navegador ni arrastre la página. */
+  
   overscroll-behavior-x: contain;
   -webkit-overflow-scrolling: touch;
 
-  /* Ocultar la barra en los tres motores. */
-  scrollbar-width: none;        /* Firefox */
-  -ms-overflow-style: none;     /* Edge antiguo */
+  
+  scrollbar-width: none;        
+  -ms-overflow-style: none;     
 }
 
-/* Pista visual opcional bajo el carril, solo en móvil. */
+
 .rail-hint {
   margin-top: .8rem;
   font-size: var(--text-xs);
@@ -586,7 +586,7 @@
   .rail-hint { display: none; }
 }
 
-/* .chips — fila de píldoras que se desliza */
+
 .chips {
   display: flex;
   gap: .8rem;
@@ -603,9 +603,9 @@
 .chip {
   display: inline-flex;
   align-items: center;
-  flex-shrink: 0;          /* sin esto flex las encoge y deja de haber carril */
+  flex-shrink: 0;          
   padding: .8rem 1.8rem;
-  min-height: 44px;        /* objetivo táctil mínimo (WCAG 2.5.8) */
+  min-height: 44px;        
   white-space: nowrap;
   font-size: var(--text-sm);
   color: var(--ink-body);
@@ -614,14 +614,14 @@
   border: 1px solid var(--border-control);
   border-radius: var(--radius-pill);
 }
-/* El estado activo lo marca aria-current, no una clase. */
+
 .chip[aria-current]:not([aria-current='false']) {
   background: var(--ink-strong);
   border-color: transparent;
   color: var(--ink-body-on-dark);
 }
 
-/* Vídeo — MOBILE FIRST: vertical 9:16 por defecto. */
+
 .youtube-video {
   position: relative;
   display: block;
@@ -632,17 +632,17 @@
   cursor: pointer;
   background: var(--ink-strong);
   border-radius: var(--radius-media);
-  /* .frame — proporción + techo de altura. --frame y --frame-max. */
+  
   --frame: 9/16;
 }
 
-/* Forzados, cuando la sección lo pide */
+
 .youtube-video.ratio-horizontal { --frame: 16/9; }
 
 .youtube-video picture { position: absolute; inset: 0; display: block; }
 .youtube-video img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-/* Vertical sin recorte: se ve el encuadre completo. */
+
 .youtube-video.ratio-vertical img {
   object-fit: contain;
   background: var(--ink-strong);
@@ -650,15 +650,15 @@
 
 .youtube-video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
 .youtube-iframe { position: absolute; inset: 0; width: 100%; height: 100%; }
-/* El disparador es un <button> de verdad para que funcione con teclado: hay */
+
 .play-button { appearance: none; border: 0; padding: 0; font: inherit; color: inherit; cursor: pointer; }
 
-/* Solo el que NO declara proporción pasa a horizontal en escritorio. */
+
 @media (min-width: 900px) {
   .youtube-video:not(.ratio-vertical):not(.ratio-horizontal) { --frame: 16/9; }
 }
 
-/* Galería 3x3 + lightbox — portado de chota-god.css:253-261. */
+
 .gallery-3x3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
 .gallery-3x3 a { display: block; overflow: hidden; }
 .gallery-3x3 img { width: 100%; height: 100%; object-fit: cover; transition: transform .3s ease; }
@@ -669,10 +669,11 @@
   background: rgb(0 0 0 / .92);
   z-index: var(--z-overlay);
   display: flex; align-items: center; justify-content: center;
-  /* visibility, NO solo opacity: una capa con opacity:0 sigue en el orden de
-     tabulación y el formulario cerrado se tabula entero (20 paradas por
-     página). visibility:hidden lo saca del árbol de accesibilidad y del
-     foco; la transición se retrasa para que el fade de salida se vea. */
+  
+
+
+
+  /* visibility, no solo opacity: opacity deja la capa en el tab order. */
   opacity: 0; pointer-events: none;
   visibility: hidden;
   transition: opacity .2s ease, visibility 0s linear .2s;
@@ -687,7 +688,7 @@
   width: 44px; height: 44px;
   display: grid; place-items: center; line-height: 1;
 }
-/* Variante del lightbox que contiene un formulario, no una imagen. */
+
 .lightbox__panel {
   width: min(480px, 100%);
   max-height: 90vh;
@@ -701,18 +702,18 @@
   .gallery-3x3 img { transition: none; }
 }
 
-/* Scroller infinito — portado de chota-god.css:264-310. */
+
 .scroller {
   overflow: hidden;
   --gap: var(--grid-gutter);
   --speed: 30s;
-  /* Centrado. Sin esto el carril nace pegado al borde izquierdo del viewport */
+  
   width: 90%;
   max-width: 1536px;
   margin-inline: auto;
 }
 
-/* El fundido de los extremos. */
+
 .scroller--h {
   mask-image: linear-gradient(to right, transparent, #000 20%, #000 80%, transparent);
   -webkit-mask-image: linear-gradient(to right, transparent, #000 20%, #000 80%, transparent);
@@ -733,27 +734,27 @@
 .scroller--fast { --speed: 15s; }
 .scroller--slow { --speed: 60s; }
 
-/* Sin !important: esta regla va después, así que gana por orden. */
+
 @media (prefers-reduced-motion: reduce) {
   .scroller-track { animation: none; }
 }
 @keyframes scroll-h { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 @keyframes scroll-v { from { transform: translateY(0); } to { transform: translateY(-50%); } }
 
-/* Envoltorio de tabla — portado de chota-god.css:597-607. */
+
 .table-wrap { margin-bottom: 2.4rem; overflow-x: auto; }
 .pricing-table { width: 100%; border-collapse: separate; border-spacing: 0 5px; font-size: var(--text-sm); }
-/* --cta-bg + --ink-on-primary, no --primary + --ink-body. El caption son
-   20px en negrita —texto grande, exige 3:1— y la tinta casi-negra sobre el
-   primario daba 2.99:1 con la marca por defecto del kit: fallaba de serie.
-   Este par pasa para cualquier marca por contrato: --brand-primary-strong
-   está definido como el primario que aguanta texto. */
+
+
+
+
+
 .pricing-table caption {
   background: var(--cta-bg); color: var(--ink-on-primary);
   padding: 1rem; font-weight: 700; font-size: var(--text-lg);
   border-radius: var(--radius) var(--radius) 0 0;
 }
-/* Tema acero: reglas horizontales, ninguna fila rellena. */
+
 .pricing-table thead th {
   color: var(--ink-primary);
   padding: .8rem .6rem; text-align: left;
@@ -762,9 +763,9 @@
 }
 .pricing-table thead th:last-child { text-align: right; }
 .pricing-table tbody td { padding: .8rem .6rem; border-bottom: 1px solid var(--border-hairline); }
-/* A la derecha, igual que su cabecera. Estaba a la izquierda: la columna de
-   precio quedaba desalineada respecto al `Price` de arriba en todas las
-   tablas. Además las cifras se comparan alineadas por la derecha. */
+
+
+
 .pricing-table tbody td:last-child { text-align: right; font-weight: 600; }
 .pricing-table-category td {
   color: var(--ink-primary);
@@ -772,7 +773,7 @@
   border-bottom: 1px solid var(--ink-primary);
 }
 
-/* ── Micro-elementos que faltaban ── */
+
 .circle {
   display: inline-flex; align-items: center; justify-content: center;
   width: 28px; height: 28px;
@@ -782,7 +783,7 @@
 }
 .text-quote { font-size: var(--text-sm); font-style: italic; }
 
-/* Hero: insignia de disponibilidad y tarjeta flotante */
+
 .hero-avail-badge {
   display: inline-flex; align-items: center; gap: .6rem;
   padding: .5rem 1.2rem; margin-bottom: 1.6rem;
@@ -802,7 +803,7 @@
   .hero-avail-badge__dot { animation: none; }
 }
 
-/* ── Fake h1: el claim grande se comporta 100% como un h1 real ── */
+
 .hero-title {
   font-family: var(--font-display);
   font-weight: 300;
@@ -812,13 +813,13 @@
   color: var(--ink-body);
   margin: 0;
 }
-.hero-title.tinted { color: #55534E; }  /* hex dedicado — JAMÁS opacity */
+.hero-title.tinted { color: #55534E; }  
 .hero-title.color  { color: var(--ink-primary); }
 .hero-title em { font-style: italic; color: var(--ink-primary); }
 .bg-dark .hero-title { color: var(--ink-title-on-dark); }
 .bg-dark .hero-title.tinted { color: rgba(245,239,230,0.6); }
 
-/* Hero title sobre video/fondo oscuro: compacto, <em> dorado. */
+
 .hero-title--video {
   font-size: 3rem;
   color: var(--ink-body-on-dark);
@@ -836,24 +837,24 @@
 .bg-dark .tinted { color: rgba(245,239,230,0.6); }
 .bg-dark .tinted.gold { color: var(--ink-primary-on-dark); }
 
-/* ── Micro-texto legal y de navegación: 12px fijo, nunca 11px ── */
+
 .footer-legal, .crumbs, .table-note, .pricing-note, .cta-note,
 .form__trust, .proof-strip__label, .inline-stat__label {
   font-size: 1.2rem;
 }
 
-/* Links DENTRO de un bloque de texto (consent y legal): nunca se
-   distinguen solo por color — subrayado obligatorio (Lighthouse
-   link-in-text-block) y sobrevive a los lectores de pantalla.
-   El color hereda del párrafo: en el footer oscuro esto corrige el
-   contraste real — el a global({--ink-primary} #245551) daba ~1.4:1
-   sobre #1A1A1A. */
+
+
+
+
+
+
 .form-consent a, .footer-legal a {
   color: inherit;
   text-decoration: underline;
   text-underline-offset: .2em;
 }
 
-/* MOBILE FIRST: las tarjetas flotantes se apilan bajo la imagen; solo a */
+
 .hero-col-img { position: relative; }
 

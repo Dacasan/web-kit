@@ -1,13 +1,5 @@
 ---
 import '../styles/index.css';
-// showcase.astro — recetario del sistema atómico.
-//
-// /atomos enseña las PIEZAS (Section, Card, Text, Image…). Esto enseña las
-// RECETAS: cómo se monta con esas piezas cada bloque del catálogo viejo.
-// Es el compañero práctico de docs/PLAN-MIGRACION.md §3.
-//
-// Cada apartado lleva el nombre del componente que sustituye, para poder
-// buscarlo cuando toque migrar una página.
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import Header from '../../../components/sections/Header.astro';
 import Breadcrumb from '../../../components/sections/Breadcrumb.astro';
@@ -65,7 +57,7 @@ const viejos = Object.keys(import.meta.glob('../../../components/sections/*.astr
     </div>
   </Section>
 
-  {/* ── HeroFakeH1 ── */}
+  
   <Section heading="HeroFakeH1" sub="Section pad=&quot;hero&quot; align + HeroLede + Image + Stars" bg="soft" />
   <Section pad="hero" align>
     <div class="col-7-md">
@@ -83,7 +75,7 @@ const viejos = Object.keys(import.meta.glob('../../../components/sections/*.astr
     </div>
   </Section>
 
-  {/* ── SocialProof ── */}
+  
   <Section heading="SocialProof" sub="Section pad=&quot;tight&quot; bordered + col-3 + .stat-num / .stat-label" bg="soft" />
   <Section pad="tight" bordered center label="Our numbers">
     {site.proof.slice(0, 4).map((p) => (
@@ -94,7 +86,7 @@ const viejos = Object.keys(import.meta.glob('../../../components/sections/*.astr
     ))}
   </Section>
 
-  {/* ── Scroller ── */}
+  
   <Section heading="Scroller" sub="Section full + Marquee. Se mueve sola en bucle; no la desliza el usuario." bg="soft" />
   <Section pad="tight" bg="secondary" bordered full label="Certifications">
     <div class="col-12">
@@ -102,7 +94,7 @@ const viejos = Object.keys(import.meta.glob('../../../components/sections/*.astr
     </div>
   </Section>
 
-  {/* ── Features / Specialties ── */}
+  
   <Section heading="Features · Specialties" sub="Section + col-3 o col-4 + Card + Text" bg="soft" />
   <Section>
     <div class="col-3"><Card class="h-100"><Text level={3} title="Cuatro en cuartos" text="col-3. Quitar uno y pasar a col-4 deja tres tercios." /></Card></div>
@@ -111,7 +103,7 @@ const viejos = Object.keys(import.meta.glob('../../../components/sections/*.astr
     <div class="col-3"><Card class="h-100"><Text level={3} title="Con precio" text="Specialties es esto con una cifra en el slot." /><p class="text-body"><strong>$9,000</strong></p></Card></div>
   </Section>
 
-  {/* ── Comparison ── */}
+  
   <Section heading="Comparison" sub="Section + dos col-6 + Card (la buena con featured) + ul.step-list" bg="soft" />
   <Section>
     <div class="col-6">
@@ -136,7 +128,7 @@ const viejos = Object.keys(import.meta.glob('../../../components/sections/*.astr
     </div>
   </Section>
 
-  {/* ── PricingTable / DataTable ── */}
+  
   <Section heading="PricingTable · DataTable" sub="Section + col-12 + Card + table.table dentro de .table-wrap" bg="soft" />
   <Section>
     <div class="col-12">
@@ -155,7 +147,7 @@ const viejos = Object.keys(import.meta.glob('../../../components/sections/*.astr
     </div>
   </Section>
 
-  {/* ── HowItWorks ── */}
+  
   <Section heading="HowItWorks" sub="Section scroll + Card + .step-index + Text" bg="soft" />
   <Section scroll item="80%" hint="Swipe →" label="Process">
     {site.steps.slice(0, 4).map((s, i) => (
@@ -168,7 +160,7 @@ const viejos = Object.keys(import.meta.glob('../../../components/sections/*.astr
     ))}
   </Section>
 
-  {/* ── VideoTestimonials ── */}
+  
   <Section heading="VideoTestimonials" sub="Section scroll + Card + YouTubeLite ratio=&quot;vertical&quot;" bg="soft" />
   <Section scroll item="80%" hint="Swipe →" label="Video testimonials">
     <div class="col-4"><Card class="h-100" itemtype="https://schema.org/Review"><YouTubeLite id="aqz-KE-bpKQ" ratio="vertical" playlabel="Demo video one" /><Text level={3} text="“La cita va debajo del vídeo, dentro de la misma Card.”" /><p class="text-body"><strong>Demo location one</strong></p></Card></div>
@@ -176,7 +168,7 @@ const viejos = Object.keys(import.meta.glob('../../../components/sections/*.astr
     <div class="col-4"><Card class="h-100" itemtype="https://schema.org/Review"><YouTubeLite id="aqz-KE-bpKQ" ratio="vertical" playlabel="Demo video three" /><Text level={3} text="“En móvil se desliza; en escritorio son tres columnas.”" /><p class="text-body"><strong>Demo location three</strong></p></Card></div>
   </Section>
 
-  {/* ── Reviews ── */}
+  
   <Section heading="Reviews" sub="Section scroll + Card + Stars" bg="soft" />
   <Section scroll item="80%" hint="Swipe →" label="Reviews">
     <div class="col-4"><Card class="h-100" itemtype="https://schema.org/Review"><Stars n={5} /><Text level={3} text="Las estrellas son un átomo: Stars n={5}." /><p class="text-body"><strong>Demo Person One</strong></p></Card></div>
@@ -184,7 +176,7 @@ const viejos = Object.keys(import.meta.glob('../../../components/sections/*.astr
     <div class="col-4"><Card class="h-100" itemtype="https://schema.org/Review"><Stars n={4} /><Text level={3} text="Las apagadas se pintan en gris de borde: se lee 4 de 5." /><p class="text-body"><strong>Demo Person Three</strong></p></Card></div>
   </Section>
 
-  {/* ── Cards con fondo ── */}
+  
   <Section heading="Cards · CardItem" sub="Card con background: una ruta es foto (lleva velo), un nombre es color" bg="soft" />
   <Section>
     <div class="col-3"><Card background="/gallery/gallery-2.webp" alt="" ratio="4/5"><Text level={3} title="foto" /></Card></div>
@@ -193,7 +185,7 @@ const viejos = Object.keys(import.meta.glob('../../../components/sections/*.astr
     <div class="col-3"><Card background="soft" ratio="4/5"><Text level={3} title="soft" text="Fondo claro: la tinta se invierte sola." /></Card></div>
   </Section>
 
-  {/* ── TextSection / Video ── */}
+  
   <Section heading="TextSection · Video" sub="Section align (+ reverse) + Text + Image o YouTubeLite" bg="soft" />
   <Section align>
     <div class="col-6"><Text level={2} title="Texto e imagen" text="align centra las columnas entre sí. reverse intercambia los lados solo a partir de 900px: en móvil manda el marcado." /></div>
@@ -204,7 +196,7 @@ const viejos = Object.keys(import.meta.glob('../../../components/sections/*.astr
     <div class="col-6"><YouTubeLite ratio="auto" playlabel="Demo" /></div>
   </Section>
 
-  {/* ── Gallery ── */}
+  
   <Section heading="Gallery" sub="Section + col-12 + Gallery. Mosaico 3x3 y lightbox con :target, cero JS." bg="soft" />
   <Section>
     <div class="col-12">
@@ -218,7 +210,7 @@ const viejos = Object.keys(import.meta.glob('../../../components/sections/*.astr
     </div>
   </Section>
 
-  {/* ── About ── */}
+  
   <Section heading="About" sub="Section align + Image + Text + ul.step-list" bg="soft" />
   <Section align itemtype="https://schema.org/Person">
     <div class="col-5-md"><Image src="/equipo.webp" alt="" ratio="4/5" /></div>
@@ -233,7 +225,7 @@ const viejos = Object.keys(import.meta.glob('../../../components/sections/*.astr
     </div>
   </Section>
 
-  {/* ── Faq ── */}
+  
   <Section heading="Faq" sub="Section + col-12 + details.accordion__item. Nativo, sin JavaScript." bg="soft" />
   <Section>
     <div class="col-12">
@@ -248,7 +240,7 @@ const viejos = Object.keys(import.meta.glob('../../../components/sections/*.astr
     </div>
   </Section>
 
-  {/* ── LeadSection / LeadMagnet ── */}
+  
   <Section heading="LeadSection · LeadMagnet" sub="Section align + Text + Card + ContactForm. El imán añade BookCover y cambia thankYou." bg="soft" />
   <Section align bg="secondary">
     <div class="col-5-md"><BookCover title="The Demo Guide 2026" /></div>
@@ -262,7 +254,7 @@ const viejos = Object.keys(import.meta.glob('../../../components/sections/*.astr
     <div class="col-6"><Card><ContactForm formId="showcase" /></Card></div>
   </Section>
 
-  {/* ── Cta ── */}
+  
   <Section heading="Cta" sub="Section bg=&quot;dark&quot; center + Text + .btn-row. Y toda sección de venta cierra con la prop cta, que abre el modal." bg="soft" cta="Get My Quote" />
   <Section bg="dark" center>
     <div class="col-12">
@@ -271,7 +263,7 @@ const viejos = Object.keys(import.meta.glob('../../../components/sections/*.astr
     </div>
   </Section>
 
-  {/* ── RelatedPages ── */}
+  
   <Section heading="RelatedPages" sub="Section + col-4 + Card href. Los textos salen del meta de cada página." bg="soft" />
   <Section>
     <div class="col-4"><Card class="h-100" href="/atomos"><Text level={3} title="Las piezas →" text="Section, Card, Text, Image, Stars, Gallery, Marquee, HeroLede." /></Card></div>

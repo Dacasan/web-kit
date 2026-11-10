@@ -1,11 +1,4 @@
 #!/usr/bin/env node
-// create-sitio — scaffolder de sitios de cliente (PLAN-WEB-KIT §8).
-//
-//   pnpm create-sitio <cliente>
-//
-// Genera clientes/<cliente>/sitio-<cliente>/ con SOLO composición:
-// site.ts marcado con [BRAND], brand.css, 5 páginas, public/ con robots.txt
-// y la dependencia del kit. Nunca emite /atomos ni /showcase.
 import { cpSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -27,11 +20,8 @@ if (existsSync(target)) {
 
 mkdirSync(join(root, "clientes", name), { recursive: true });
 cpSync(join(kit, "scaffold"), target, { recursive: true });
-// public/fonts/ se pide en los pasos y en brand.css: si no existe, el primer
-// @font-face apunta a un 404 que nadie ve hasta que la fuente no carga.
 mkdirSync(join(target, "public", "fonts"), { recursive: true });
 
-// Sustituye el placeholder <cliente> en los ficheros que lo llevan.
 for (const rel of ["package.json", "astro.config.mjs"]) {
   const p = join(target, rel);
   writeFileSync(p, readFileSync(p, "utf8").replaceAll("<cliente>", name));

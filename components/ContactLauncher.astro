@@ -1,16 +1,4 @@
 ---
-// ContactLauncher — widget de contacto flotante (skill §7.7). Cero JavaScript.
-//
-// Sustituye a Intercom/Tawk/Crisp, que añaden entre 200 y 600 KB de JS de
-// terceros y degradan el LCP en móvil. Dos casillas gobiernan las tres
-// vistas; el CSS vive en 05-components.css.
-//
-// La raíz es <aside> y no <section> porque es cromo del sitio, no un bloque
-// de contenido: no debe entrar en el esquema semántico ni llevar itemtype.
-//
-// Separar Ventas de Soporte en el primer clic es calificación, no estética:
-// quien viene de un anuncio quiere hablar ya y elige WhatsApp; quien quiere
-// cita deja sus datos y entra por el mismo /api/events de siempre.
 import { site, whatsappHref } from '@agenciaweb/kit-site';
 import ContactForm from"./ContactForm.astro";
 
@@ -90,10 +78,6 @@ const t = site.widget;
 </aside>
 
 <script>
-  // El panel se abría con una casilla oculta: el lector anunciaba "casilla,
-  // no marcada" y el foco se quedaba en una píldora que ya no se ve. Ahora
-  // el estado va en aria-expanded, el foco entra al panel al abrir y vuelve
-  // a la píldora al cerrar (botón real, Escape o el mismo control).
   const open = document.getElementById('lx-open') as HTMLInputElement | null;
   const panel = document.getElementById('lx-panel');
   if (open && panel) {

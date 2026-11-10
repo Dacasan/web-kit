@@ -1,17 +1,9 @@
 ---
-// Pie — datos de contacto. El nodo del negocio ya viaja en el grafo JSON-LD,
-// así que aquí no se repiten microdatos: duplicar la entidad entre JSON-LD y
-// microdatos es un error de datos estructurados (skill §20).
 import { site, whatsappHref, PAGINAS, HERRAMIENTAS } from '@agenciaweb/kit-site';
 
-// El índice del pie es COMPOSICIÓN del cliente y llega por el contrato de
-// datos (PAGINAS / HERRAMIENTAS): una página nueva aparece por existir y
-// una borrada desaparece sola. Escrito a mano se queda viejo a la primera,
-// y un enlace roto en el pie está en las 27 páginas a la vez.
 const titulo = (slug: string) =>
   slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
-// Textos del pie por sitio — opt-in (mismo patrón que formLabels).
 const F = (site as { legalNote?: string; footerTitles?: Record<string, string> });
 const legalNote = F.legalNote ?? "Results vary depending on each case. This page is informational and does not replace a professional consultation.";
 const footTitle = (slug: string) => F.footerTitles?.[slug] ?? titulo(slug);
@@ -24,9 +16,9 @@ const termsLabel = F.footerTitles?.["terms"] ?? "Terms and Conditions";
 
 <footer class="section section--tight bg-dark">
   <div class="container">
-    {/* Mapa del sitio. En el pie porque es donde un rastreador espera
-        encontrar el enlazado completo, y porque un visitante que llega al
-        final sin convertir todavía puede estar buscando otra página. */}
+    
+
+
     <nav class="footer-map" aria-label="All pages">
       <ul class="footer-map__list">
         <li><a href="/" class="text-white">{homeLabel}</a></li>
@@ -42,11 +34,11 @@ const termsLabel = F.footerTitles?.["terms"] ?? "Terms and Conditions";
     </nav>
 
   <div class="text-center">
-    {/* Misma marca que la cabecera, versión para fondo oscuro (site.logoDark,
-        con site.logo como fallback). El PNG va con fondo TRANSPARENTE: antes
-        traía un rectángulo #111111 pegado que pasaba desapercibido sobre el
-        pie negro, pero sobre el verde profundo --brand-ink se vería como una
-        caja alrededor del logotipo. */}
+    
+
+
+
+
     <p class="footer-name">
       <img
         src={site.logoDark ?? site.logo}
@@ -125,8 +117,8 @@ const termsLabel = F.footerTitles?.["terms"] ?? "Terms and Conditions";
     font-size: var(--text-xs);
     margin-top: 2.4rem;
   }
-  /* Objetivo táctil de 24px (WCAG 2.5.8): los enlaces del mapa medían
-     43×20 y los legales 34×17. El padding sube el área sin mover el texto. */
+  
+
   .footer-map__list a,
   .footer-legal a,
   .footer-contact a,

@@ -1,7 +1,4 @@
 #!/usr/bin/env node
-// Contrato de campos: los `name` que lead-form.ts lee deben existir en algún
-// componente del formulario. Es la frontera que pierde datos SIN error:
-// añadir un campo en un lado y no en el otro no rompe nada, solo deja de llegar.
 import { readFileSync } from "node:fs";
 
 const DECLARAN = [
@@ -15,9 +12,7 @@ const declared = new Set(
 );
 const read = new Set([...form.matchAll(/readField\(form,\s*"([^"]+)"\)/g)].map((m) => m[1]));
 
-// Pares [input, clave] de GADS_FIELDS: el input es el contrato, la clave no.
 for (const m of form.matchAll(/\[\s*"([^"]+)"\s*,\s*"([^"]+)"\s*\]/g)) read.add(m[1]);
-// CLICK_IDS es una lista de strings.
 for (const block of form.matchAll(/const CLICK_IDS[^=]*=\s*\[([\s\S]*?)\]/g)) {
   for (const m of block[1].matchAll(/"([^"]+)"/g)) read.add(m[1]);
 }

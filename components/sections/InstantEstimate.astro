@@ -1,45 +1,18 @@
 ---
-// InstantEstimate — el formulario largo: cuestionario + datos.
-//
-// Mismo bloque de datos que el resto del sitio (ContactFields.astro) más las
-// cuatro preguntas que hacen falta para poner una cifra: arcadas, situación,
-// hueso y cuándo quiere viajar, con el presupuesto de EE. UU. que convierte
-// el ahorro en una resta y no en una promesa.
-//
-// El cuestionario y los datos van dentro del MISMO <form> — un envío, un
-// lead. Por eso los campos vienen de ContactFields y no de ContactForm: un
-// <form> no se puede anidar dentro de otro.
-//
-// El estimado YA NO se revela aquí. Se entrega en /thank-you, igual que
-// cualquier otro envío del sitio: un solo camino, una sola página donde se
-// registra la conversión, y el visitante que refresca no pierde el
-// resultado. Las respuestas viajan por sessionStorage (lead-form.ts), nunca
-// por la URL.
-//
-// MOBILE FIRST: una columna; a 900px el cuestionario y la tarjeta de datos
-// se reparten mitad y mitad (.row + .col-6-md, como LeadSection).
-//
-// NADA DE ESTILOS NUEVOS: superficies con .card, botones con .button,
-// pastillas con .badge, campos con .field/.form-label/.form-prefix. El
-// scoped de abajo solo resuelve el estado "opción marcada", que el sistema
-// no tenía.
 import ContactFields from '../ContactFields.astro';
 import { site, PLANS, type ArchKey } from '@agenciaweb/kit-site';
 
 interface ArchOption {
   value: ArchKey;
   label: string;
-  /** Segunda línea de la opción. Si falta, se usa el precio del plan. */
   note?: string;
 }
 
 interface Props {
   id?: string;
-  /** Sufijo de los id de campo: dos instancias en la página no chocan. */
   formId?: string;
   label?: string;
   title?: string;
-  /** Cola del titular, en cursiva. */
   titleAccent?: string;
   sub?: string;
   cardTitle?: string;
@@ -74,14 +47,11 @@ const {
 } = Astro.props;
 
 const fid = (name: string) => `${formId}-${name}`;
-const usd = (n: number) => `$${n.toLocaleString('en-US')}`;
+const usd = (n: number) => `${n.toLocaleString('en-US')}`;
 
-/** Inicial del apellido para el avatar ("Dr. Ana Torrens " →"T"). */
 const doctorInitial = site.author.name.trim().split(/\s+/).pop()?.charAt(0) ?? '';
-/**"Dr. Ana Torrens " →"Dr. Torrens": en una línea de confianza sobra el nombre. */
 const doctorShort = `Dr. ${site.author.name.trim().split(/\s+/).pop() ?? ''}`;
 
-/** Precio de referencia por arcada del plan destacado (1 viaje). */
 const archNote = (value: ArchKey): string => {
   const p = PLANS[0]?.price?.[value];
   return typeof p === 'number' ? usd(p) : '';
@@ -106,12 +76,12 @@ const archNote = (value: ArchKey): string => {
         </h2>
         <p class="lead est-sub">{sub}</p>
 
-        {/* Arcadas — la marcada se rellena en oscuro. */}
+        
         <fieldset class="est-fieldset">
           <legend class="form-label est-legend">How many arches?</legend>
-          {/* MOBILE FIRST: apiladas; la fila de tres es la excepción de 900px.
-              --cols lo pone el scoped, no el atributo style: un style inline
-              le ganaría al media query y la fila nunca se abriría. */}
+          
+
+
           <div class="grid est-arches">
             {arches.map((a, i) => (
               <label class="card est-opt est-opt--fill">
@@ -129,7 +99,7 @@ const archNote = (value: ArchKey): string => {
           </div>
         </fieldset>
 
-        {/* Situación — lista apilada con punto de radio visible. */}
+        
         <fieldset class="est-fieldset">
           <legend class="form-label est-legend">Current situation?</legend>
           <div class="est-stack">
@@ -149,7 +119,7 @@ const archNote = (value: ArchKey): string => {
           </div>
         </fieldset>
 
-        {/* Pérdida ósea — chips de selección múltiple sobre .badge. */}
+        
         <fieldset class="est-fieldset">
           <legend class="form-label est-legend">Bone loss?</legend>
           <div class="est-chips">
@@ -188,7 +158,7 @@ const archNote = (value: ArchKey): string => {
         </div>
       </div>
 
-      {/* Tarjeta de datos: el estimado se entrega a cambio de esto. */}
+      
       <div class="col-6-md">
         <div class="card">
           <h3 class="est-card-title">{cardTitle}</h3>
@@ -215,26 +185,26 @@ const archNote = (value: ArchKey): string => {
 </section>
 
 <style>
-  /* ── Titular ── */
+  
   .est-title { margin-top: 0; }
   .est-sub { margin-bottom: 3.2rem; max-width: 38ch; }
 
-  /* ── Cuestionario ── */
-  /* min-width: 0 — el fieldset trae min-inline-size: min-content del
-     navegador y desborda la rejilla en pantallas estrechas. */
+  
+  
+
   .est-fieldset { border: 0; padding: 0; margin: 0 0 2.4rem; min-width: 0; }
   .est-legend { padding: 0; }
   .est-stack { display: grid; gap: .8rem; }
   .est-arches { --cols: 1; align-items: stretch; }
 
-  /* Opción = etiqueta con radio dentro. El radio real se queda para el
-     teclado y los lectores de pantalla; lo que se ve es la caja.
-     Superficie, borde, radio y el hover dorado los pone `card card--link`
-     en el marcado: aquí solo queda la maqueta de la fila y el estado
-     marcado. Antes esto redeclaraba fondo, borde y radio por su cuenta —
-     tres propiedades copiadas del sistema que ya iban por libre. */
+  
+
+
+
+
+
   .est-opt {
-    position: relative;   /* el radio oculto se queda dentro de su caja */
+    position: relative;   
     display: flex;
     align-items: center;
     gap: 1rem;
@@ -245,8 +215,8 @@ const archNote = (value: ArchKey): string => {
     cursor: pointer;
     transition: border-color .15s ease, background .15s ease, color .15s ease;
   }
-  /* El control real sigue ahí para teclado y lector de pantalla; lo que se
-     ve es la caja. El anillo de foco se traslada a la caja. */
+  
+
   .est-opt__input { position: absolute; opacity: 0; width: 1px; height: 1px; }
   .est-opt:has(.est-opt__input:focus-visible),
   .est-chip:has(.est-opt__input:focus-visible) {
@@ -260,17 +230,17 @@ const archNote = (value: ArchKey): string => {
     color: var(--ink-muted);
   }
 
-  /* Punto de radio dibujado (lista de situación). */
+  
   .est-opt__dot {
     width: 20px; height: 20px;
     flex-shrink: 0;
     border: 1px solid var(--ink-muted);
     border-radius: 50%;
   }
-  /* Marcada = borde dorado doblado. Antes era negro sobre negro (borde +
-     inset del mismo color), que se leía como un 2px de reja y era justo lo
-     que hacía pesado el formulario. El dorado dice lo mismo sin gritar, y
-     es el mismo color con el que responde todo lo pulsable del sitio. */
+  
+
+
+
   .est-opt:has(.est-opt__input:checked) {
     border-color: var(--primary);
     box-shadow: inset 0 0 0 1px var(--primary);
@@ -280,7 +250,7 @@ const archNote = (value: ArchKey): string => {
       radial-gradient(circle at center, var(--ink-strong) 0 4px, transparent 5px);
   }
 
-  /* Variante rellena: la arcada elegida se pinta en oscuro. */
+  
   .est-opt--fill { align-items: flex-start; flex-direction: column; gap: .4rem; }
   .est-opt--fill .est-opt__note { margin-left: 0; }
   .est-opt--fill:has(.est-opt__input:checked) {
@@ -291,7 +261,7 @@ const archNote = (value: ArchKey): string => {
   }
   .est-opt--fill:has(.est-opt__input:checked) .est-opt__note { color: var(--ink-title-on-dark); }
 
-  /* Chips de pérdida ósea, sobre .badge. */
+  
   .est-chips { display: flex; flex-wrap: wrap; gap: .8rem; }
   .est-chip {
     position: relative;
@@ -306,7 +276,7 @@ const archNote = (value: ArchKey): string => {
     color: var(--ink-body-on-dark);
   }
 
-  /* ── Tarjeta de datos ── */
+  
   .est-card-title { margin: 0 0 .8rem; font-size: var(--text-2xl); }
   .est-card-sub { font-size: var(--text-sm); margin-bottom: 2.4rem; }
   .est-sep { border-top: 1px solid var(--border-hairline); margin: 2.4rem 0 1.2rem; }
