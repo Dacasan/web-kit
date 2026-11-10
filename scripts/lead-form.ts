@@ -146,17 +146,34 @@ function wire(form: HTMLFormElement): void {
   // el del imán de leads a /thank-you-download, que dispara la descarga.
   const thankYou = form.dataset.thankYou ?? "/thank-you";
 
-  const showError = (msg: string) => {
-    if (!errorEl) return;
-    errorEl.textContent = msg;
-    errorEl.hidden = false;
-    // El mensaje es role="alert" y recibe el foco (skill §20).
-    errorEl.focus();
+  const showError = (msg: string, field?: HTMLElement | null) => {
+    // El banner es opcional; el campo que falla, no. Si un formulario no
+    // declara .form__error, el aria-invalid y el foco siguen ocurriendo.
+    if (errorEl) {
+      errorEl.textContent = msg;
+      errorEl.hidden = false;
+    }
+    // El mensaje es role="alert": se anuncia solo. El foco va al CAMPO que
+    // falló (WCAG 3.3.1); llevar el foco al banner dejaba al usuario sin
+    // saber qué corregir.
+    if (field) {
+      field.setAttribute("aria-invalid", "true");
+      field.focus();
+    } else {
+      errorEl?.focus();
+    }
+  };
+
+  const clearInvalid = () => {
+    for (const el of form.querySelectorAll<HTMLElement>("[aria-invalid]")) {
+      el.removeAttribute("aria-invalid");
+    }
   };
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     if (errorEl) errorEl.hidden = true;
+    clearInvalid();
 
     // WebMCP: el submit puede venir de un agente de IA (la persona confirmó
     // el envío). Viaja al CRM como flag del payload y ahí el contacto se
@@ -169,8 +186,16 @@ function wire(form: HTMLFormElement): void {
     const agentInvoked = (e as SubmitEvent).agentInvoked === true;
 
     // Campo trampa: si viene relleno es un bot. Se finge éxito para no
-    // enseñarle al bot cuál fue el motivo del rechazo.
-    if (readField(form, "company_website").trim()) return;
+    // enseñarle al bot cuál fue el motivo del rechazo. El descarte NO puede
+    // ser mudo: se mide por dataLayer (si el sitio tiene gtag) y por un
+    // evento propio que god.js puede reenviar. La cuarentena en el CRM
+    // exige un campo nuevo en /api/events: contrato two-PR, no unilateral.
+    if (readField(form, "company_website").trim()) {
+      const w = window as Window & { dataLayer?: unknown[] };
+      w.dataLayer?.push({ event: "lead_discarded_honeypot" });
+      window.dispatchEvent(new CustomEvent("wacrm:lead-discarded", { detail: { reason: "honeypot" } }));
+      return;
+    }
 
     const name = readField(form, "name").trim();
     const email = readField(form, "email").trim();
@@ -186,16 +211,23 @@ function wire(form: HTMLFormElement): void {
     const quote = parseMoney(readField(form, "us_quote"));
     const hasQuiz = Boolean(arch || situation || bone.length || quote);
 
-    if (!name) return showError(FL.errName ?? "Please enter your name.");
-    if (!email.includes("@")) return showError(FL.errEmail ?? "Please enter a valid email.");
-    if (!phone) return showError(FL.errPhone ?? "Please enter your phone number.");
+    // El campo que falla se marca y recibe el foco: sin esto, el banner
+    // anunciaba el error pero el usuario no sabía dónde corregirlo.
+    const field = (n: string) => form.elements.namedItem(n) as HTMLElement | null;
+
+    if (!name) return showError(FL.errName ?? "Please enter your name.", field("name"));
+    // `includes("@")` aceptaba "a@": el CRM se llenaba de correos muertos.
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+      return showError(FL.errEmail ?? "Please enter a valid email.", field("email"));
+    }
+    if (!phone) return showError(FL.errPhone ?? "Please enter your phone number.", field("phone"));
     for (const f of EXTRA_FIELDS) {
       if (f.required && !readField(form, f.name).trim()) {
-        return showError(`Please fill in: ${f.label}.`);
+        return showError(`Please fill in: ${f.label}.`, field(f.name));
       }
     }
     if (!isChecked(form, "consent")) {
-      return showError(FL.errConsent ?? "Please accept being contacted so we can send your plan.");
+      return showError(FL.errConsent ?? "Please accept being contacted so we can send your plan.", field("consent"));
     }
 
     const button = form.querySelector<HTMLButtonElement>("button[type=submit]");

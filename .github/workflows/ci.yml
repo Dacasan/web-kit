@@ -1,10 +1,15 @@
 name: CI
+
 on:
   push:
     branches: [main]
   pull_request:
+  # Un tag no demuestra nada por sí solo: el gate es el build del catálogo,
+  # del scaffold y la auditoría a11y. Se corre igual antes de tagear.
+  workflow_dispatch:
+
 jobs:
-  demo-build:
+  demo:
     runs-on: ubuntu-latest
     env:
       LANDING_API_URL: https://crm.example.com
@@ -14,5 +19,36 @@ jobs:
         with: { version: 11 }
       - uses: actions/setup-node@v4
         with: { node-version: 24, cache: pnpm, cache-dependency-path: demo/pnpm-lock.yaml }
-      - run: pnpm --dir demo install --no-frozen-lockfile
+      - run: pnpm --dir demo install --frozen-lockfile
+      - run: node tools/contract-check.mjs
+      - run: pnpm --dir demo exec astro check
       - run: pnpm --dir demo build
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm audit:a11y
+
+  scaffold:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: 11 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 24 }
+      # create-sitio espera el layout agenciaweb/{web-kit,clientes}. Se
+      # replica en /tmp para compilar el sitio que nace, que es el producto.
+      - name: Genera un sitio desde el scaffold
+        run: |
+          mkdir -p /tmp/ci/agenciaweb/clientes
+          rsync -a --exclude node_modules --exclude dist ./ /tmp/ci/agenciaweb/web-kit/
+          cd /tmp/ci/agenciaweb/web-kit
+          node create-sitio.mjs ci-smoke
+      - name: Compila el sitio generado
+        run: |
+          cd /tmp/ci/agenciaweb/clientes/ci-smoke/sitio-ci-smoke
+          pnpm install
+          pnpm add -D @astrojs/check typescript@6.0.3 @types/node
+          PUBLIC_SITE_URL=https://ci-smoke.example.com LANDING_API_URL=https://crm.example.com pnpm exec astro check
+          PUBLIC_SITE_URL=https://ci-smoke.example.com LANDING_API_URL=https://crm.example.com pnpm build
+          test -f dist/index.html
+          grep -q 'class="button primary"' dist/index.html

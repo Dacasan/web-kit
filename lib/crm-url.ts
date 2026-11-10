@@ -10,11 +10,10 @@
 // Orden de resolución:
 //   1. import.meta.env — recoge los ficheros .env (dev local sin exportar nada).
 //   2. process.env     — CI/despliegue, donde la variable llega del entorno.
-//   3. Fallback: en dev, el CRM local (:3000); en build de producción,
-//      site.baseUrl, que NO sirve /api/* — por eso avisa por consola.
-//
-// El fallback de producción es el que rompía el formulario: apuntaba al
-// propio dominio del sitio estático, y ahí no existe /api/events.
+//   3. Fallback: solo en dev, el CRM local (:3000). En build de producción
+//      sin variable el build FALLA: el fallback apuntaba al dominio del
+//      sitio estático, donde no existe /api/events, y el formulario se
+//      publicaba roto sin que nada lo dijera.
 // ============================================================
 
 import { site } from '@agenciaweb/kit-site';
@@ -37,9 +36,12 @@ export const CRM_URL = (fromEnv || fallback).replace(/\/+$/, "");
 // leads. Por eso el segundo ROMPE el build en vez de avisar.
 
 if (!fromEnv && !import.meta.env.DEV) {
-  console.warn(
-    "[crm-url] LANDING_API_URL sin definir: el build apunta /api/events y god.js a " +
-      `${site.baseUrl}, que no sirve la API del CRM. El formulario no enviará leads.`,
+  throw new Error(
+    "[crm-url] LANDING_API_URL sin definir en un build de producción.\n" +
+      "  El formulario y la atribución apuntarían a " +
+      `${site.baseUrl}, que no sirve la API del CRM: cero leads, sin error.\n` +
+      "  Define el dominio real antes de compilar:\n" +
+      "    LANDING_API_URL=https://crm.example.com pnpm build",
   );
 }
 

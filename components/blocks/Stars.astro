@@ -22,9 +22,13 @@ interface Props {
 const { n = 5, of = 5, score, count } = Astro.props;
 
 const on = Math.max(0, Math.min(of, Math.round(n)));
+
+// `role="img"` oculta el contenido interno: el score y el count visibles no
+// se anuncian si no van en el label. Antes decía "5 out of 5" y nada más.
+const label = `${score ?? on} out of ${of}${count ? `, ${count}` : ""}`;
 ---
 
-<p class="stars" role="img" aria-label={`${on} out of ${of}`}>
+<p class="stars" role="img" aria-label={label}>
   <span class="rating" aria-hidden="true">
     {'★'.repeat(on)}<span class="rating__off">{'★'.repeat(of - on)}</span>
   </span>

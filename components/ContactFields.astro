@@ -47,6 +47,7 @@ interface Props {
 // que no los declara conserva los textos por defecto (inglés) byte a byte.
 interface FormLabels {
   name?: string; email?: string; phone?: string; selectLabel?: string;
+  selectPlaceholder?: string;
   namePh?: string; emailPh?: string; phonePh?: string; phonePrefix?: string;
   consentLinks?: string;
 }
@@ -132,6 +133,11 @@ const id = (name: string) => `${formId}-${name}`;
 <div class="field">
   <label class="form-label" for={id("package")}>{selectLabel}</label>
   <select id={id("package")} name="package" toolparamdescription="Service the contact is interested in">
+    {/* Opción vacía a propósito: sin ella el navegador envía la primera
+        opción aunque el usuario no la haya mirado, y el CRM recibe un
+        tratamiento que nadie eligió. No es `required`: la conversión no se
+        bloquea, pero el dato que llega es el que el usuario eligió. */}
+    <option value="">{FL.selectPlaceholder ?? "Select a service"}</option>
     {selectOptions.map((o) => <option value={o.value}>{o.label}</option>)}
   </select>
 </div>

@@ -18,8 +18,10 @@ const t = site.widget;
 ---
 
 <aside class="launcher" aria-label={t.aria}>
-  <input type="checkbox" id="lx-open" class="lx-state" aria-label={t.aria} />
-  <input type="checkbox" id="lx-support" class="lx-state" aria-label={t.support.title} />
+  <input type="checkbox" id="lx-open" class="lx-state" role="button"
+    aria-label={t.aria} aria-expanded="false" aria-controls="lx-panel" />
+  <input type="checkbox" id="lx-support" class="lx-state" role="button"
+    aria-label={t.support.title} aria-controls="lx-support-view" />
 
   <label for="lx-open" class="lx-pill" data-track="contact_widget_open">
     <span class="lx-pill__icon" aria-hidden="true">
@@ -33,16 +35,16 @@ const t = site.widget;
     </span>
   </label>
 
-  <div class="lx-panel">
+  <div class="lx-panel" id="lx-panel" role="dialog" aria-label={t.heading}>
     <header class="lx-head">
       <p class="lx-head__title">{t.heading}</p>
-      <label for="lx-open" class="lx-x" data-track="contact_widget_close">
+      <button type="button" class="lx-x" data-lx-close data-track="contact_widget_close">
         <span class="sr-only">{t.close}</span>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
              width="20" height="20" aria-hidden="true">
           <path d="M18 6 6 18M6 6l12 12"></path>
         </svg>
-      </label>
+      </button>
     </header>
 
     <div class="lx-body">
@@ -79,10 +81,38 @@ const t = site.widget;
         </label>
       </div>
 
-      <div class="lx-view lx-view--support">
+      <div class="lx-view lx-view--support" id="lx-support-view">
         <label for="lx-support" class="lx-back">← {t.back}</label>
         <ContactForm formId="widget" cta="Request a call" />
       </div>
     </div>
   </div>
 </aside>
+
+<script>
+  // El panel se abría con una casilla oculta: el lector anunciaba "casilla,
+  // no marcada" y el foco se quedaba en una píldora que ya no se ve. Ahora
+  // el estado va en aria-expanded, el foco entra al panel al abrir y vuelve
+  // a la píldora al cerrar (botón real, Escape o el mismo control).
+  const open = document.getElementById('lx-open') as HTMLInputElement | null;
+  const panel = document.getElementById('lx-panel');
+  if (open && panel) {
+    const sync = () => open.setAttribute('aria-expanded', String(open.checked));
+    const close = () => {
+      open.checked = false;
+      sync();
+      open.focus();
+    };
+
+    sync();
+    open.addEventListener('change', () => {
+      sync();
+      if (open.checked) panel.querySelector<HTMLElement>('[data-lx-close]')?.focus();
+    });
+
+    document.querySelector('[data-lx-close]')?.addEventListener('click', close);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && open.checked) close();
+    });
+  }
+</script>

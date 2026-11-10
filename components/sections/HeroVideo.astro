@@ -135,11 +135,11 @@ const Badge = `h${level}` as 'h1' | 'h2';
   </div>
 
   {/* Tramado de puntos que disuelve el vídeo en el fondo sólido.
-      Aquí SÍ va el hex literal y no var(--bg-dark): el color entra
-      dentro de un <svg> serializado en un data: URI, y ahí una custom
-      property no se resuelve — saldría el atributo fill="var(...)" tal cual
-      y los puntos se pintarían negros. Debe seguir a --bg-dark. */}
-  <HalftoneFade direction="bottom" color="#101010" class="hero-video__fade" />
+      El hex entra dentro de un <svg> serializado en un data: URI, donde
+      una custom property no se resuelve. El default es el --brand-dark del
+      kit (#1A1A1A): si la marca cambia de oscuro, pasa el color por prop
+      para que el tramado no corte con una costura. */}
+  <HalftoneFade direction="bottom" color="#1A1A1A" class="hero-video__fade" />
 
   <div class="container hero-video__content">
     {/* H1 real: la chapita de disponibilidad, con su dot pulsante.

@@ -44,13 +44,18 @@
   --bg-alt: var(--brand-neutral);
   --bg-soft: var(--brand-primary-soft);
   --surface-card: var(--brand-light);
-  /* Fondos del sistema: normal, dark y cta. */
+  /* Fondos del sistema: normal y dark. (--bg-cta era un alias exacto de
+     --bg-dark; se fusionó para no tener dos nombres para el mismo valor.) */
   --bg-dark: var(--brand-dark);
-  --bg-cta: var(--brand-dark);
   /* Dos fichas de borde, y la distinción es funcional (WCAG 1.4.11 exige 3:1 */
   --border-hairline: color-mix(in srgb, var(--brand-primary) 18%, var(--brand-light)); /* borde decorativo */
   --border-field: var(--brand-dark);       /* interfaz real: borde de campos */
-  --ink-muted: #6B6B6B;          /* 5:1 sobre el fondo */
+  /* Bordes de controles interactivos (opciones, chips, badges): 1.24:1 no
+     basta para identificar un control (WCAG 1.4.11 pide 3:1). Gris neutro
+     fijo: 4.5:1 sobre blanco y >3:1 sobre las tres superficies claras,
+     independientemente de la marca. */
+  --border-control: #767676;
+  --ink-muted: #666666;          /* 5.7:1 sobre blanco; 4.6:1 sobre --bg-alt */
   --ink-strong: var(--brand-dark);
   --color-error: #d43939;
   --color-star: #FBBC04;          /* estrellas: amarillo Google (única excepción) */
@@ -85,7 +90,7 @@
   --ink-body: var(--brand-dark);
   --font-size: 1.7rem;
 
-  --text-xs:  1.1rem;
+  --text-xs:  1.2rem;
   --text-sm:  1.5rem;
   --text-lg:  2rem;
   --text-xl:  2.4rem;
@@ -102,17 +107,36 @@
   --grid-maxWidth: 128rem;
   --grid-gutter: 2rem;
 
+  /* ── Escala de espaciado ──
+     Los cuatro valores más repetidos del CSS (1.2, 1.6, 1, 2.4rem) ya eran
+     una escala de facto; aquí tiene nombre. Los usos existentes se migran
+     cuando se toca el archivo, no en un barrido a ciegas. */
+  --space-1: .4rem;
+  --space-2: .8rem;
+  --space-3: 1.2rem;
+  --space-4: 1.6rem;
+  --space-5: 2.4rem;
+  --space-6: 3.2rem;
+  --space-7: 4.8rem;
+  --space-8: 6.4rem;
+
+  /* ── Elevación / orden de capas ── */
+  --z-nav: 100;
+  --z-launcher: 120;
+  --z-overlay: 9999;
+
   /* Techo de los bloques verticales */
   --v-block: 75vh;
   --v-block: 75svh;
   /* Lo que se reserva para el texto de DEBAJO del vídeo (cita + nombre) */
   --v-caption: 13rem;
 
-  /* ── Radios — todo el sistema redondea igual: 20px ── */
+  /* ── Radios: 2px en medios, 4px en controles, pill para píldoras ── */
   --radius: 4px;
   --radius-media: 2px;
   --radius-pill: 999px;
 
-  /* ── Elevación — sin sombras: la separación la hace el borde ── */
+  /* ── Elevación — la separación la hace el borde; esta sombra es SOLO del
+     widget flotante, que necesita despegarse del contenido. ── */
   --shadow-sm: 0 1px 2px rgb(0 0 0 / .05), 0 4px 10px rgb(0 0 0 / .04);
 }

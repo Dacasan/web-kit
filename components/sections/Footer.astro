@@ -9,7 +9,7 @@ import { site, whatsappHref, PAGINAS, HERRAMIENTAS } from '@agenciaweb/kit-site'
 // una borrada desaparece sola. Escrito a mano se queda viejo a la primera,
 // y un enlace roto en el pie está en las 27 páginas a la vez.
 const titulo = (slug: string) =>
-  slug.replace(/-/g,"").replace(/\b\w/g, (c) => c.toUpperCase());
+  slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
 // Textos del pie por sitio — opt-in (mismo patrón que formLabels).
 const F = (site as { legalNote?: string; footerTitles?: Record<string, string> });
@@ -124,5 +124,14 @@ const termsLabel = F.footerTitles?.["terms"] ?? "Terms and Conditions";
   .footer-legal {
     font-size: var(--text-xs);
     margin-top: 2.4rem;
+  }
+  /* Objetivo táctil de 24px (WCAG 2.5.8): los enlaces del mapa medían
+     43×20 y los legales 34×17. El padding sube el área sin mover el texto. */
+  .footer-map__list a,
+  .footer-legal a,
+  .footer-contact a,
+  .footer-wa a {
+    display: inline-block;
+    padding-block: .4rem;
   }
 </style>

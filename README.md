@@ -81,6 +81,10 @@ el origen del cliente.
 
 ## Antes de taggear una release
 
-`cd demo && LANDING_API_URL=https://crm.example.com pnpm build` en verde, con
-`/atomos` y `/showcase` renderizando cada pieza. Luego tag semver (`v1.x.y`) —
-los sitios consumen `#semver:^1`.
+`pnpm verify` en verde: contrato de campos, `astro check`, build del demo con
+`LANDING_API_URL` y auditoría a11y en Chromium (0 bloqueantes). Luego
+`pnpm version:sync` y tag semver (`v1.x.y`) — los sitios consumen `#semver:^1`.
+
+Sin `LANDING_API_URL` (CRM) o `PUBLIC_SITE_URL` (dominio propio) el build de
+producción falla a propósito: las dos ausencias pierden leads o canonical en
+silencio.

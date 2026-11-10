@@ -1,22 +1,22 @@
 ---
-// HeroLede — la columna de texto del hero con H1 falso.
+// HeroLede — la columna de texto del hero.
 //
-// EL TRUCO (se mantiene tal cual): el <h1> de verdad es la chapita de
-// disponibilidad, con su punto pulsante — es la primera línea que ve el
-// visitante y tiene sentido visual. El titular grande que PARECE un H1 es
-// un <p> con la escala de h1: es un claim publicitario, no un encabezado,
-// y ponerlo como h1 dejaba la página con la consulta SEO enterrada.
+// JERARQUÍA REAL: el titular grande es el <h1> (o <h2> donde la página ya
+// tiene uno) y la chapita de disponibilidad es un <p>. Antes era al revés
+// —chapita de 11 px como h1, claim de 80 px como p— y el documento abría
+// con un encabezado que nadie lee como encabezado. La keyword sigue en el
+// <title>, en el primer h2 y en el copy; no depende de un h1 de 11 px.
 //
 // Va dentro de una <Section pad="hero">. No trae fondo ni ancho propios.
 import { site, PRIMARY_CTA, whatsappHref } from '@agenciaweb/kit-site';
 
 interface Props {
-  /** El H1 real: la chapita de disponibilidad. */
+  /** La chapita de disponibilidad. Es un <p>, no un encabezado. */
   badge?: string;
-  /** Nivel de la chapa. 1 en una landing —es EL h1—; 2 en un catálogo,
-      donde el h1 ya lo pone la página y no puede haber dos. */
+  /** Nivel del titular. 1 en una landing; 2 en un catálogo, donde el h1
+      ya lo pone la página y no puede haber dos. */
   level?: 1 | 2;
-  /** El titular visible, grande. Va como <p>. Admite <em> dorado. */
+  /** El titular visible, grande. Admite <em> dorado. */
   displayTitle?: string;
   subtitle?: string;
   /** Texto del CTA principal. */
@@ -39,16 +39,16 @@ const {
   stats = site.proof.slice(0, 2),
 } = Astro.props;
 
-const Badge = `h${level}` as 'h1' | 'h2';
+const Heading = `h${level}` as 'h1' | 'h2';
 ---
 
 <div class="hero-lede">
-  <Badge class="hero-avail-badge" itemprop="headline">
+  <p class="hero-avail-badge">
     <span class="hero-avail-badge__dot" aria-hidden="true"></span>
     {badge}
-  </Badge>
+  </p>
 
-  <p class="hero-title" set:html={displayTitle} />
+  <Heading class="hero-title" itemprop="headline" set:html={displayTitle} />
   {subtitle && <p class="lead hero-sub">{subtitle}</p>}
 
   <div class="btn-row">
@@ -77,10 +77,10 @@ const Badge = `h${level}` as 'h1' | 'h2';
   /* .btn-row global centra; en el hero los botones van a la izquierda,
      alineados con el titular. */
   .btn-row { justify-content: flex-start; }
-  /* La capa base le da al h1 letter-spacing y margen de titular. La chapita
-     no es un titular: se normaliza. El estilo visual (sans, versalitas,
-     borde) lo pone .hero-avail-badge global. */
-  :is(h1, h2).hero-avail-badge { margin: 0 0 1.6rem; }
+  /* La capa base le da al h1 letter-spacing y margen de titular; el
+     .hero-title global ya los normaliza. La chapita es un párrafo: el
+     margen lo pone .hero-avail-badge. */
+  :is(h1, h2).hero-title { margin: 0; }
   .hero-sub { margin: 1.6rem 0 2.4rem; }
   .hero-stats { margin-top: 2.4rem; }
 </style>

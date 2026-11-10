@@ -23,10 +23,24 @@
 
 /** Dominio canónico del cliente (sin barra final). */
 const BASE_URL = (
+  import.meta.env.PUBLIC_SITE_URL ||
+  import.meta.env.SITE_URL ||
   process.env.PUBLIC_SITE_URL ||
   process.env.SITE_URL ||
-  "https://sitio-demo.example.com"
+  (import.meta.env.DEV ? "http://localhost:4321" : "")
 ).replace(/\/+$/, "");
+
+// Fail-closed: un sitio publicado con canonical/JSON-LD apuntando a otro
+// dominio pierde SEO y credibilidad sin que nada falle. En dev se permite
+// localhost; en un build de producción, sin dominio no hay build.
+if (!BASE_URL) {
+  throw new Error(
+    "[site.ts] PUBLIC_SITE_URL sin definir en un build de producción.\n" +
+      "  canonical, og:url y el JSON-LD apuntarían a un dominio ajeno o vacío.\n" +
+      "  Define el dominio real antes de compilar:\n" +
+      "    PUBLIC_SITE_URL=https://cliente.com pnpm build",
+  );
+}
 
 export const site = {
   // ── Identidad ──

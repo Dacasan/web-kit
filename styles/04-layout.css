@@ -56,9 +56,9 @@
 .hero { padding-block: var(--hero-y); }
 .section--tight { padding-block: clamp(3.6rem, 4vw, 4.8rem); }
 .section--flush { padding-block: 0; }
-/* Sección del CTA: su propio fondo (--bg-cta). Título lila, texto */
+/* Sección del CTA: fondo oscuro del sistema. Título claro, texto claro. */
 .section--cta {
-  background: var(--bg-cta);
+  background: var(--bg-dark);
   color: var(--ink-body-on-dark);
   --ink-title: var(--ink-title-on-dark);
   text-align: center;
@@ -114,7 +114,7 @@ main { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
 .is-full-width   { width: 100%; }
 .obj-cover       { object-fit: cover; }
 .obj-contain     { object-fit: contain; }
-.radius-20       { border-radius: var(--radius-media); }
+.radius-media     { border-radius: var(--radius-media); }
 
 /* Tipografía de sección contextual */
 

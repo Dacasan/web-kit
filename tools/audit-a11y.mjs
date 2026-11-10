@@ -2,7 +2,7 @@
 // ════════════════════════════════════════════════════════════════════════
 // audit-a11y — la séptima regla del kit, hecha ejecutable.
 //
-//   node scripts/audit/audit-a11y.mjs <dist> [--pages N] [--json out.json]
+//   node tools/audit-a11y.mjs <dist> [--pages N] [--json out.json]
 //
 // Las seis reglas de AGENTS.md se cumplen al 100 % porque son comprobables:
 // `grep -c '@media (max-width'` da 0 o no da 0. La accesibilidad no tenía
@@ -46,7 +46,9 @@ try {
 const argv = process.argv.slice(2);
 const DIST = path.resolve(argv.find((a) => !a.startsWith('--')) ?? 'dist');
 const flag = (n, d) => { const i = argv.indexOf(`--${n}`); return i >= 0 ? argv[i + 1] : d; };
-const MAX_PAGES = Number(flag('pages', 8));
+// 0 = todas las páginas del dist (el default antiguo, 8, dejaba el resto sin
+// auditar en silencio cuando un sitio superaba esa cifra).
+const MAX_PAGES = Number(flag('pages', 0)) || Infinity;
 const JSON_OUT = flag('json', null);
 const STRICT = argv.includes('--strict');   // convierte los AVISOS en bloqueantes
 
@@ -80,7 +82,7 @@ function findPages(dir, out = []) {
   return out;
 }
 const ALL = findPages(DIST).sort((a, b) => a.length - b.length);
-const PAGES = ALL.slice(0, MAX_PAGES);
+const PAGES = Number.isFinite(MAX_PAGES) ? ALL.slice(0, MAX_PAGES) : ALL;
 
 // ════════════════════════════════════════════════════════════════════════
 // El navegador: todo lo que sigue se ejecuta DENTRO de la página.
@@ -175,9 +177,13 @@ const PROBE = () => {
       const fondoCampo = bgOf(el);
       cand.push({ via: 'borde ' + cs.borderTopColor, r: ratio(over(px(cs.borderTopColor), fondoCampo), fondoCampo) });
     }
-    // sombra que aparece al enfocar: se mide su primer color
+    // sombra que aparece al enfocar: se mide su PRIMER color. El parseo va
+    // por el rgb(...) completo: `px()` capturaba también los offsets y el
+    // 4.º número (0) se leía como alfa, así que un halo opaco se medía como
+    // transparente y el checker lo descartaba.
     if (cs.boxShadow !== reposo.sombra && cs.boxShadow !== 'none') {
-      const col = px(cs.boxShadow.slice(cs.boxShadow.indexOf('rgb')));
+      const m = cs.boxShadow.match(/rgba?\(([^)]+)\)/);
+      const col = m ? m[1].split(',').map(Number) : [];
       if (col.length >= 3) cand.push({ via: 'sombra', r: ratio(over(col, behind), behind) });
     }
 
@@ -266,7 +272,16 @@ const PROBE = () => {
 // ════════════════════════════════════════════════════════════════════════
 // Ejecución
 // ════════════════════════════════════════════════════════════════════════
-const browser = await chromium.launch();
+// Navegador: CHROME_PATH manda; si no, el Chromium del sistema (Linux sin
+// descargar 150 MB); si no existe, el que haya instalado Playwright.
+const CANDIDATOS = [
+  process.env.CHROME_PATH,
+  '/usr/bin/chromium',
+  '/usr/bin/google-chrome',
+  '/usr/bin/chromium-browser',
+].filter(Boolean);
+const exe = CANDIDATOS.find((p) => fs.existsSync(p));
+const browser = await chromium.launch(exe ? { executablePath: exe } : {});
 const results = [];
 
 // Lo que está cerrado no se puede medir. Un panel oculto con visibility:hidden
@@ -292,6 +307,11 @@ async function run(url, viewport, mobile = false, abrir = false) {
   await page.goto(BASE + url, { waitUntil: 'load', timeout: 30000 });
   await page.waitForTimeout(250);
   if (abrir) { await page.evaluate(ABRIR); await page.waitForTimeout(350); }
+  // Sin transiciones: el estado de foco se mide en su valor FINAL. Con
+  // `transition: box-shadow .15s` el computed style justo después de
+  // focus() seguía siendo el de reposo, y el halo se descartaba como si no
+  // existiera. No es maquillaje: se audita el indicador terminado.
+  await page.addStyleTag({ content: '*,*::before,*::after{transition:none!important;animation:none!important}' });
   const r = await page.evaluate(PROBE);
   await ctx.close();
   return r;

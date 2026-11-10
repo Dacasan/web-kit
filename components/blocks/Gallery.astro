@@ -14,6 +14,9 @@
 interface Item {
   src: string;
   alt: string;
+  /** Medidas REALES del archivo. Sin ellas, 600×600 (el hueco por defecto). */
+  width?: number;
+  height?: number;
 }
 
 interface Props {
@@ -32,8 +35,8 @@ const items = images.map((it, i) => ({ ...it, hash: `${id}-${i + 1}` }));
       ImageGallery (⊂ CollectionPage ⊂ WebPage), además el valor era el
       fragmento `#gal-1`, no una URL. */}
   {items.map((it) => (
-    <a class="frame" href={`#${it.hash}`} aria-label={it.alt}>
-      <img src={it.src} alt={it.alt} width="600" height="600" loading="lazy" decoding="async" />
+    <a class="frame" href={`#${it.hash}`} aria-label={`View larger: ${it.alt}`}>
+      <img src={it.src} alt={it.alt} width={it.width ?? 600} height={it.height ?? 600} loading="lazy" decoding="async" />
     </a>
   ))}
 </div>
@@ -41,8 +44,46 @@ const items = images.map((it, i) => ({ ...it, hash: `${id}-${i + 1}` }));
 {/* Las capas van al final del componente: son superposiciones a pantalla
     completa (position: fixed), así que da igual dónde vivan en el árbol. */}
 {items.map((it) => (
-  <div class="lightbox" id={it.hash}>
+  <div class="lightbox" id={it.hash} role="dialog" aria-modal="true" aria-label={`Image: ${it.alt}`}>
     <a href="#!" class="lightbox-close" aria-label="Close">&times;</a>
-    <img src={it.src} alt={it.alt} width="600" height="600" loading="lazy" decoding="async" />
+    <img src={it.src} alt={it.alt} width={it.width ?? 600} height={it.height ?? 600} loading="lazy" decoding="async" />
   </div>
 ))}
+
+<script>
+  // Las capas se abren por :target y el foco se quedaba fuera del diálogo.
+  // Esc cierra, y al abrir el foco entra en el botón de cierre. Se ignora
+  // #form-popup: ese diálogo lo gobierna Header.
+  const galleryTarget = () =>
+    document.querySelector<HTMLElement>('.lightbox:target:not(#form-popup)');
+
+  window.addEventListener('hashchange', () => {
+    galleryTarget()?.querySelector<HTMLElement>('.lightbox-close')?.focus();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    const box = galleryTarget();
+    if (!box) return;
+    if (e.key === 'Escape') {
+      const id = box.id;
+      history.replaceState(null, '', location.pathname + location.search);
+      // Devuelve el foco a la miniatura que abrió la capa.
+      document.querySelector<HTMLElement>(`a[href="#${CSS.escape(id)}"]`)?.focus();
+      return;
+    }
+    // Trampa de foco: el diálogo tiene dos controles (cerrar + imagen).
+    if (e.key !== 'Tab') return;
+    const list = [...box.querySelectorAll<HTMLElement>('a[href], button')]
+      .filter((el) => el.offsetParent !== null);
+    if (!list.length) return;
+    const first = list[0];
+    const last = list[list.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  });
+</script>

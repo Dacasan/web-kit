@@ -18,29 +18,35 @@ o uno del kit desde un sitio, es frontera cruzada.
 
 ## Reglas que cuestan dinero
 
-1. **`demo/` es el release gate.** `pnpm --dir demo install && pnpm --dir demo
-   build` (con `LANDING_API_URL`, como CI: `.github/workflows/ci.yml`) en
-   verde antes de tagear. CI lo corre en push a `main` y en PRs — crear un tag
-   no dispara nada. Cobertura real: los 13 bloques (`atomos.astro:16-28`),
-   Header/Breadcrumb/Footer, Section, YouTubeLite, ContactForm/ContactFields,
-   SeoHead y ContactLauncher. **No** cubre HeroVideo, InstantEstimate,
-   EstimateResult, UploadCase ni HalftoneFade: un build verde no prueba esos
-   cinco; verifícalos a mano al tocarlos.
+1. **`demo/` es el release gate.** `pnpm verify` (check de tipos +
+   `LANDING_API_URL` + build + `audit:a11y`) en verde antes de tagear. CI lo
+   corre en push a `main` y en PRs — crear un tag no dispara nada. Además
+   compila un sitio recién salido del scaffolder: lo que no se compila, se
+   entrega roto.
+   **No** cubre HeroVideo (necesita vídeo y póster reales): verifícalo a mano
+   al tocarlo.
 2. **Versiones por tag, no por rama.** Los sitios resuelven `semver:^X.Y.Z`
-   contra tags de git (último: `v1.2.25`, 2026-10-05). Un cambio debe salir
-   con tag (`vX.Y.Z`) o ningún sitio lo verá. `package.json.version` está
-   desincronizado (`1.2.4`) y **no** se usa para resolver — jamás lo tomes
-   como versión del kit. `private: true`: no se publica a npm.
+   contra tags de git. Un cambio debe salir con tag (`vX.Y.Z`) o ningún sitio
+   lo verá. `package.json.version` se sincroniza con el tag con
+   `pnpm version:sync` — no lo edites a mano. `private: true`: no se publica
+   a npm.
 3. **Mobile-first literal, un breakpoint: `900px`.** Cero
    `@media (max-width` — todas las `@media` de maqueta son
    `(min-width: 900px)`. Únicos `max-width` legítimos: atributos `media=` de
    precarga/`<source>` (`SeoHead.astro`, `YouTubeLite.astro`) — aritmética de
    preload, no maqueta.
 4. **Sin dependencias nuevas.** `astro` como peer dep (`^7.1.6`) y nada más;
-   cero dependencias propias. Ni Tailwind, ni React, ni librería de iconos.
+   cero dependencias de runtime. `playwright` es devDep del raíz para el
+   audit; `@astrojs/check` + `typescript@6` son devDeps del demo/scaffold
+   para el typecheck (`typescript@7` rompe `astro check`).
 5. **Los datos del negocio nunca entran al kit.** El kit consume
    `@agenciaweb/kit-site`; cada sitio lo resuelve a su `site.ts` en
    `astro.config.mjs` (alias explícito, grep-able).
+6. **Un build de producción no se publica sin destino.** Sin
+   `LANDING_API_URL` el build falla (`lib/crm-url.ts`); sin
+   `PUBLIC_SITE_URL` también (`scaffold/src/data/site.ts`). Ambas fallas son
+   silenciosas en producción si se dejan pasar: cero leads y canonical a un
+   dominio ajeno.
 
 ## Opt-ins de `site.ts` — el kit emite solo si el sitio lo declara
 
@@ -82,8 +88,14 @@ o uno del kit desde un sitio, es frontera cruzada.
 ## Verify
 
 ```bash
-pnpm --dir demo install && LANDING_API_URL=https://crm.example.com pnpm --dir demo build  # release gate (como CI)
-grep -c 'metaPixelId' components/SeoHead.astro       # >0: opt-in presente
+pnpm verify   # tipos + build del demo + audit a11y (0 bloqueantes)
+pnpm --dir demo build                                   # build solo
+CHROME_PATH=/usr/bin/chromium pnpm audit:a11y           # sin navegador propio
+grep -c 'aria-expanded' components/sections/Header.astro components/ContactLauncher.astro
 grep -n 'googleAdsConversionId\|metaPixelId\|ga4MeasurementId' demo/src/site-stub.ts scaffold/src/data/site.ts  # todos: ""
 grep -o 'googletagmanager\|connect\.facebook' demo/dist/atomos/index.html | wc -l     # 0 tras build (dist/ no versionado)
 ```
+
+Un build verde no prueba accesibilidad: `pnpm audit:a11y` corre sobre
+`demo/dist` en Chromium real y sale con código 1 si hay bloqueantes. Es la
+séptima regla, hecha ejecutable.

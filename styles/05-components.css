@@ -134,9 +134,8 @@
   padding: .6rem 1.6rem;
   font-size: var(--text-xs);
   background: var(--bg-page);
-  border: 1px solid var(--border-hairline);
+  border: 1px solid var(--border-control);
   border-radius: var(--radius);
-  box-shadow: var(--shadow-sm);
 }
 /* Punto de estado dentro de la insignia: "Respondemos ahora" en verde. El */
 .badge__dot {
@@ -346,7 +345,7 @@
   position: fixed;
   right: 16px;
   bottom: max(16px, env(safe-area-inset-bottom));
-  z-index: 120;
+  z-index: var(--z-launcher);
 }
 
 /* Casillas: invisibles pero enfocables con teclado */
@@ -438,7 +437,9 @@
   justify-content: space-between;
   gap: 1rem;
   padding: 1rem 1.25rem;
-  background: var(--color-whatsapp);
+  /* El verde de WhatsApp no aguanta texto blanco (1.98:1). El verde se
+     queda en el icono; la superficie del panel es la oscura del sistema. */
+  background: var(--bg-dark);
   color: var(--ink-body-on-dark);
 }
 .lx-head__title { margin: 0; font-size: var(--text-lg); font-weight: 700; }
@@ -448,6 +449,9 @@
   margin: -.5rem -.75rem -.5rem 0;
   color: inherit;
   cursor: pointer;
+  background: none;
+  border: 0;
+  padding: 0;
   border-radius: var(--radius);
 }
 .lx-x:hover { background: rgb(0 0 0 / .12); }
@@ -474,7 +478,7 @@
   margin-bottom: .75rem;
   min-height: 48px;
   background: var(--surface-card);
-  border: 1px solid var(--border-hairline);
+  border: 1px solid var(--border-control);
   border-radius: var(--radius);
   cursor: pointer;
   transition: border-color .15s ease, background .15s ease;
@@ -524,8 +528,8 @@
 /* Foco visible sobre el control real, no sobre la casilla oculta */
 #lx-open:focus-visible ~ .lx-pill,
 #lx-support:focus-visible ~ .lx-panel .lx-option:first-of-type {
-  /* -ink y no --color-accent: un anillo de foco es un componente de interfaz */
-  outline: 3px solid var(--ink-on-primary);
+  /* Sobre la píldora blanca el anillo blanco era invisible (1:1). */
+  outline: 3px solid var(--ink-strong);
   outline-offset: 2px;
 }
 
@@ -607,7 +611,7 @@
   color: var(--ink-body);
   text-decoration: none;
   background: var(--surface-card);
-  border: 1px solid var(--border-hairline);
+  border: 1px solid var(--border-control);
   border-radius: var(--radius-pill);
 }
 /* El estado activo lo marca aria-current, no una clase. */
@@ -663,14 +667,19 @@
 .lightbox {
   position: fixed; inset: 0;
   background: rgb(0 0 0 / .92);
-  z-index: 9999;
+  z-index: var(--z-overlay);
   display: flex; align-items: center; justify-content: center;
+  /* visibility, NO solo opacity: una capa con opacity:0 sigue en el orden de
+     tabulación y el formulario cerrado se tabula entero (20 paradas por
+     página). visibility:hidden lo saca del árbol de accesibilidad y del
+     foco; la transición se retrasa para que el fade de salida se vea. */
   opacity: 0; pointer-events: none;
-  transition: opacity .2s ease;
+  visibility: hidden;
+  transition: opacity .2s ease, visibility 0s linear .2s;
   padding: 1rem;
   overflow-y: auto;
 }
-.lightbox:target { opacity: 1; pointer-events: auto; }
+.lightbox:target { opacity: 1; pointer-events: auto; visibility: visible; transition: opacity .2s ease; }
 .lightbox img { max-width: 90vw; max-height: 85vh; object-fit: contain; border-radius: var(--radius); }
 .lightbox-close {
   position: absolute; top: 1.5rem; right: 1.5rem;

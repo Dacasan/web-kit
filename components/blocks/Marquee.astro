@@ -44,7 +44,7 @@ const {
   ],
   images,
   speed = 'normal',
-  label = 'Certifications',
+  label,
 } = Astro.props;
 
 const useImages = Boolean(images && images.length > 0);
@@ -61,6 +61,7 @@ const loop = [...source, ...source];
     speed === 'fast' && 'scroller--fast',
     speed === 'slow' && 'scroller--slow',
   ]}
+  role={label ? 'group' : undefined}
   aria-label={label}
 >
   <div class="scroller-track">

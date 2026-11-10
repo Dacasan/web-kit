@@ -6,15 +6,13 @@ import Text from '@agenciaweb/kit/components/blocks/Text.astro';
 import '../styles/index.css';
 ---
 
-<BaseLayout title="Página no encontrada" description="La página que buscas no existe." noindex>
+<BaseLayout title="Page not found" description="The page you are looking for does not exist." noindex>
   <Section>
-    <div class="row">
-      <div class="col-12">
-        <Card>
-          <Text level={1} title="404 — página no encontrada" />
-          <Text>Vuelve a la <a href="/">home</a> o escríbenos por WhatsApp.</Text>
-        </Card>
-      </div>
+    <div class="col-12">
+      <Card>
+        <Text level={1} title="404 — Page not found" />
+        <Text text='Go back to the <a href="/">home page</a> or message us on WhatsApp.' />
+      </Card>
     </div>
   </Section>
 </BaseLayout>

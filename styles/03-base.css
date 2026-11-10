@@ -36,16 +36,29 @@ a:hover:not(.button) {
   text-underline-offset: .25em;
 }
 
-/* Anillo de foco visible para teclado, invisible para ratón. */
-a:focus-visible, button:focus-visible, summary:focus-visible {
-  outline: 2px solid var(--border-field); /* oscuro: visible sobre cualquier fondo */
+/* Anillo de foco de DOS CAPAS: tinta clara + halo oscuro. Una sola capa
+   falla en algún fondo — `--border-field` es exactamente `--bg-dark`, así
+   que el anillo desaparecía en la barra, el menú y el pie (1:1). Con las
+   dos, se ve sobre claro y sobre oscuro sin saber dónde está. */
+:focus-visible {
+  outline: 2px solid var(--ink-body-on-dark);
   outline-offset: 3px;
+  /* !important deliberado: varios componentes (.button.primary, .card) traen
+     su propia box-shadow con más especificidad y anulaban el halo. El
+     indicador de foco no compite con la decoración: se pisa siempre. */
+  box-shadow: 0 0 0 4px var(--ink-strong) !important;
 }
 :focus:not(:focus-visible) { outline: none; }
 
-/* Controles de formulario. */
-input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]),
-select, textarea {
+/* Controles de formulario. El `:where()` es deliberado: baja la
+   especificidad a 0 para que `:focus` pueda cambiar el borde. Sin él, los
+   tres `:not([type=…])` (0,3,1) ganaban a `input:focus` (0,1,1) y el
+   campo no cambiaba NADA al enfocarse. */
+:where(
+  input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]),
+  select,
+  textarea
+) {
   width: 100%;
   display: block;
   padding: .8rem 1rem;
@@ -54,11 +67,11 @@ select, textarea {
   /* --ink-muted y no --border-field (#1A1A1A): un borde negro puro sobre */
   border: 1px solid var(--ink-muted);
   border-radius: var(--radius);
-  transition: border-color .2s ease, box-shadow .2s ease;
+  transition: border-color .2s ease;
 }
 input:focus, select:focus, textarea:focus {
-  outline: none;
-  border-color: var(--border-field); /* oscuro: indicador de foco visible */
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 18%, transparent);
+  border-color: var(--border-field);
 }
+/* El error de validación se ve en el campo, no solo en el banner. */
+[aria-invalid="true"] { border-color: var(--color-error); }
 label { display: block; margin-bottom: .4rem; font-weight: 500; }

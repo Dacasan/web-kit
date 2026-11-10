@@ -9,14 +9,12 @@ import '../styles/index.css';
 
 <BaseLayout title={`${site.name} — home`} description={`Placeholder value proposition of ${site.name} in one sentence.`} path="/">
   <Section>
-    <div class="row">
-      <div class="col-12 col-8">
-        <Card>
-          <Text level={1} title={site.name} />
-          <Text>El h1 de arriba es el que lleva el peso: repite el lenguaje del anuncio que trajo el clic (guía demo).</Text>
-          <p><a class="btn" href={whatsappHref}>{PRIMARY_CTA}</a></p>
-        </Card>
-      </div>
+    <div class="col-12">
+      <Card>
+        <Text level={1} title={site.name} />
+        <Text text="The h1 above carries the weight: repeat the language of the ad that brought the click (demo guide)." />
+        <p><a class="button primary" href={whatsappHref}>{PRIMARY_CTA}</a></p>
+      </Card>
     </div>
   </Section>
 </BaseLayout>

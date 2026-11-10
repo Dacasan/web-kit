@@ -119,7 +119,7 @@ const archNote = (value: ArchKey): string => {
                   type="radio"
                   name="arches"
                   value={a.value}
-                  checked={i === 0}
+                  required
                   class="est-opt__input"
                 />
                 <span class="est-opt__label">{a.label}</span>
@@ -139,7 +139,7 @@ const archNote = (value: ArchKey): string => {
                   type="radio"
                   name="situation"
                   value={s}
-                  checked={i === 0}
+                  required
                   class="est-opt__input"
                 />
                 <span class="est-opt__dot" aria-hidden="true"></span>

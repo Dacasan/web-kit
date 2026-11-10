@@ -28,6 +28,10 @@ import Gallery from '../../../components/blocks/Gallery.astro';
 import BookCover from '../../../components/blocks/BookCover.astro';
 import YouTubeLite from '../../../components/YouTubeLite.astro';
 import ContactForm from '../../../components/ContactForm.astro';
+import HalftoneFade from '../../../components/HalftoneFade.astro';
+import InstantEstimate from '../../../components/sections/InstantEstimate.astro';
+import EstimateResult from '../../../components/sections/EstimateResult.astro';
+import UploadCase from '../../../components/sections/UploadCase.astro';
 import { getCollection } from 'astro:content';
 
 // Las preguntas del acordeón de abajo. En una página real este array es el
@@ -621,6 +625,20 @@ const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
     </div>
     <div class="col-6">
       <Card><ContactForm formId="atomos" /></Card>
+    </div>
+  </Section>
+
+  {/* ── Composites con layout propio ──
+      Se montan sin envolver en Section: cada uno trae su sección, y anidarla
+      duplicaría el ritmo. HeroVideo no está aquí a propósito: necesita un
+      vídeo y un póster reales del cliente; sin assets, el catálogo mentiría. */}
+  <InstantEstimate />
+  <EstimateResult label="Your estimate" />
+  <UploadCase label="Share your case" />
+
+  <Section bg="secondary" heading="HalftoneFade" sub="Trama de puntos que disuelve un bloque en el color siguiente.">
+    <div class="col-12" style="position:relative;height:10rem;overflow:hidden;background:var(--bg-soft)">
+      <HalftoneFade direction="bottom" color="#1A1A1A" />
     </div>
   </Section>
 </BaseLayout>
