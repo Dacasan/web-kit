@@ -195,7 +195,7 @@
 .bg-dark .label { color: var(--ink-primary-on-dark); }
 /* Enlaces de texto sobre oscuro: el primario de la marca no siempre contrasta.
    Solo enlaces sueltos de párrafo/lista; consentimiento y footer ya heredan. */
-:is(.bg-dark, .section--cta) :is(p, li) > a:not(.button):not(.text-white) {
+:is(.bg-dark, .section--cta) :is(p, li) a:not(.button):not(.text-white) {
   color: var(--ink-primary-on-dark);
 }
 .text-white   { color: var(--ink-body-on-dark); }
