@@ -16,6 +16,8 @@ const BG = {
 } as const;
 
 interface Props extends HTMLAttributes<'section'> {
+  // `id` explícito: el checker de CI no lo hereda de HTMLAttributes.
+  id?: string;
   bg?: keyof typeof BG;
   scroll?: boolean;
   full?: boolean;
