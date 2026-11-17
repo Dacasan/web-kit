@@ -20,6 +20,8 @@ const {
   cta = 'Send my files',
   fine = `Up to ${UPLOAD.maxFiles} files, ${UPLOAD.maxSizeMb} MB each. X-rays, photos or a PDF of your quote. HIPAA-aware intake — used only to price your case.`,
 } = Astro.props;
+
+const uid = id ?? "upload-case";
 ---
 
 <section
@@ -43,12 +45,12 @@ const {
 
       <div class="col-6-md">
         <form class="upload-form" data-upload-form novalidate>
-          <p class="form__error" id="upload-error" role="alert" tabindex="-1" hidden></p>
+          <p class="form__error" id={`${uid}-error`} role="alert" tabindex="-1" hidden></p>
 
           <div class="field">
-            <label class="form-label upload-label" for="upload-email">Your email *</label>
+            <label class="form-label upload-label" for={`${uid}-email`}>Your email *</label>
             <input
-              id="upload-email"
+              id={`${uid}-email`}
               name="email"
               type="email"
               autocomplete="email"
@@ -62,9 +64,9 @@ const {
           </div>
 
           <div class="field">
-            <label class="form-label upload-label" for="upload-files">Pano, X-rays or your quote *</label>
+            <label class="form-label upload-label" for={`${uid}-files`}>Pano, X-rays or your quote *</label>
             <input
-              id="upload-files"
+              id={`${uid}-files`}
               name="files"
               type="file"
               multiple

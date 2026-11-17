@@ -20,5 +20,6 @@ const { items } = Astro.props;
   .crumbs li + li::before { content: '›'; margin-right: .5rem; }
   
 
-  .crumbs a { color: var(--ink-muted); text-decoration: underline; display: inline-block; padding-block: .4rem; }
+  .crumbs a { color: var(--ink-muted); text-decoration: underline; }
+  .crumbs a, .crumbs span { display: inline-block; padding-block: .4rem; }
 </style>

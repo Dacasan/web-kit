@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="Hero poster de demostración">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f172a"/>
+      <stop offset="0.55" stop-color="#134e4a"/>
+      <stop offset="1" stop-color="#0e3d3c"/>
+    </linearGradient>
+    <radialGradient id="r" cx="0.7" cy="0.35" r="0.55">
+      <stop offset="0" stop-color="#5eead4" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#5eead4" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#g)"/>
+  <rect width="1600" height="900" fill="url(#r)"/>
+  <g fill="none" stroke="#99f6e4" stroke-opacity="0.18" stroke-width="2">
+    <circle cx="1180" cy="300" r="240"/>
+    <circle cx="1180" cy="300" r="340"/>
+    <circle cx="1180" cy="300" r="440"/>
+  </g>
+  <text x="120" y="760" fill="#f0fdfa" font-family="Georgia, serif" font-size="72">Kit Demo — HeroVideo</text>
+  <text x="122" y="820" fill="#99f6e4" font-family="system-ui, sans-serif" font-size="28" letter-spacing="6">PÓSTER DE DEMOSTRACIÓN</text>
+</svg>

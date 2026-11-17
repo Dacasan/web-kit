@@ -23,6 +23,7 @@ import HalftoneFade from '../../../components/HalftoneFade.astro';
 import InstantEstimate from '../../../components/sections/InstantEstimate.astro';
 import EstimateResult from '../../../components/sections/EstimateResult.astro';
 import UploadCase from '../../../components/sections/UploadCase.astro';
+import HeroVideo from '../../../components/sections/HeroVideo.astro';
 import { getCollection } from 'astro:content';
 
 const FAQ_DEMO = [
@@ -619,6 +620,14 @@ const totalPaginas = Object.keys(import.meta.glob('../pages/*.astro')).length;
 
 
 
+  <HeroVideo
+    src="/video/demo.mp4"
+    poster="/hero-poster.svg"
+    badge="Demo hero"
+    displayTitle="Hero con vídeo y póster <em>real</em>"
+    subtitle="El póster es el LCP; el vídeo entra después. El archivo de vídeo no viaja en el catálogo."
+    waText=""
+  />
   <InstantEstimate />
   <EstimateResult label="Your estimate" />
   <UploadCase label="Share your case" />

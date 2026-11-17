@@ -1,15 +1,6 @@
 ---
 import { TREATMENT_OPTIONS, site } from '@agenciaweb/kit-site';
-
-interface SelectOption { value: string; label: string }
-
-interface LeadExtraField {
-  type: 'date' | 'select' | 'number' | 'text';
-  name: string;
-  label: string;
-  required?: boolean;
-  options?: SelectOption[];
-}
+import type { LeadExtraField, SelectOption } from '../lib/types';
 
 interface Props {
   formId: string;

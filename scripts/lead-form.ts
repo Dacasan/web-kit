@@ -1,13 +1,7 @@
 
 import { getApiBase } from "../lib/api-base";
+import type { LeadExtraField } from "../lib/types";
 import { site } from "@agenciaweb/kit-site";
-
-interface LeadExtraField {
-  type: 'date' | 'select' | 'number' | 'text';
-  name: string;
-  label: string;
-  required?: boolean;
-}
 const FL = (site as {
   formLabels?: {
     errName?: string; errEmail?: string; errPhone?: string; errConsent?: string;

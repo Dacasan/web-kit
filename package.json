@@ -1,6 +1,6 @@
 {
   "name": "@agenciaweb/kit",
-  "version": "1.4.5",
+  "version": "1.4.6",
   "private": true,
   "type": "module",
   "description": "Framework de diseño de agencia: estilos, componentes y scripts del sitio. Se consume versionado; no se copia.",

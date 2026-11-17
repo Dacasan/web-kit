@@ -40,9 +40,22 @@ const items = images.map((it, i) => ({ ...it, hash: `${id}-${i + 1}` }));
   const galleryTarget = () =>
     document.querySelector<HTMLElement>('.lightbox:target:not(#form-popup)');
 
+  // inert en el resto: aria-modal promete que el fondo no es navegable.
+  const resto = document.querySelectorAll('main, header, footer, aside');
+  const bloquearFondo = (on: boolean) => {
+    for (const el of resto) {
+      if (on) el.setAttribute('inert', '');
+      else el.removeAttribute('inert');
+    }
+  };
+
   window.addEventListener('hashchange', () => {
-    galleryTarget()?.querySelector<HTMLElement>('.lightbox-close')?.focus();
+    const box = galleryTarget();
+    bloquearFondo(Boolean(box));
+    box?.querySelector<HTMLElement>('.lightbox-close')?.focus();
   });
+
+  if (galleryTarget()) bloquearFondo(true);
 
   document.addEventListener('keydown', (e) => {
     const box = galleryTarget();
@@ -50,6 +63,7 @@ const items = images.map((it, i) => ({ ...it, hash: `${id}-${i + 1}` }));
     if (e.key === 'Escape') {
       const id = box.id;
       history.replaceState(null, '', location.pathname + location.search);
+      bloquearFondo(false);
       document.querySelector<HTMLElement>(`a[href="#${CSS.escape(id)}"]`)?.focus();
       return;
     }
