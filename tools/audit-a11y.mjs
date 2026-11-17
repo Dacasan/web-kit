@@ -53,7 +53,16 @@ const PAGES = Number.isFinite(MAX_PAGES) ? ALL.slice(0, MAX_PAGES) : ALL;
 const PROBE = () => {
   const lin = (c) => ((c /= 255) <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
   const lum = ([r, g, b]) => 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
-  const px = (s) => (String(s).match(/[\d.]+/g) ?? []).map(Number);
+  const px = (s) => {
+    const str = String(s);
+    // Chrome moderno devuelve `color(srgb 1 1 1 / .7)` para blanco al 70%.
+    // Sin escalar, 1/255 se leía como casi negro y el contraste salía 1:1.
+    if (str.startsWith("color(srgb")) {
+      const v = (str.match(/[\d.]+/g) ?? []).map(Number);
+      return [Math.round(v[0] * 255), Math.round(v[1] * 255), Math.round(v[2] * 255), v[3] ?? 1];
+    }
+    return (str.match(/[\d.]+/g) ?? []).map(Number);
+  };
   const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)]; const [hi, lo] = x > y ? [x, y] : [y, x]; return (hi + 0.05) / (lo + 0.05); };
   const over = (fg, bg) => { const a = fg[3] ?? 1; return a >= 1 ? fg.slice(0, 3) : [0,1,2].map(i => Math.round(a * fg[i] + (1 - a) * bg[i])); };
 
@@ -78,8 +87,24 @@ const PROBE = () => {
     const b = el.getBoundingClientRect();
     return b.right > -500 && b.bottom > -500;   // fuera de pantalla ≠ visible (honeypot, sr-only)
   };
-  const targetBox = (el) => {
-    let b = el.getBoundingClientRect();
+
+  // Texto sobre foto o vídeo: el contraste no se puede calcular sin el píxel.
+  // Se declara no medible en vez de asumir blanco (falso positivo de 1:1).
+  const sobreMedia = (el) => {
+    let n = el;
+    for (let i = 0; n && i < 5; i++, n = n.parentElement) {
+      const cs = getComputedStyle(n);
+      if (cs.backgroundImage !== 'none') return true;
+      if (getComputedStyle(n, '::before').backgroundImage !== 'none') return true;
+      for (const m of n.querySelectorAll('video, picture, img')) {
+        const pos = getComputedStyle(m).position;
+        if (pos === 'absolute' || pos === 'fixed') return true;
+      }
+    }
+    return false;
+  };
+
+  const targetBox = (el) => {    let b = el.getBoundingClientRect();
     const lbl = el.closest('label') ??
       (el.id ? document.querySelector(`label[for="${CSS.escape(el.id)}"]`) : null);
     if (lbl) { const l = lbl.getBoundingClientRect(); if (l.width * l.height > b.width * b.height) b = l; }
@@ -150,6 +175,7 @@ const PROBE = () => {
     const el = t.parentElement;
     if (!el || !visible(el)) continue;
     if (el.closest('[aria-hidden="true"]')) continue;
+    if (sobreMedia(el)) continue;
     const caja = el.getBoundingClientRect();
     if (caja.width <= 1 || caja.height <= 1) continue;   // .sr-only: no se pinta, no se mide
     const cs = getComputedStyle(el);

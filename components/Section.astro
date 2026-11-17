@@ -38,7 +38,7 @@ interface Props extends HTMLAttributes<'section'> {
 }
 
 const {
-  bg = 'white',
+  bg,
   scroll = false,
   full = false,
   pad = 'normal',
@@ -73,7 +73,14 @@ const plain = (s: string) =>
 ---
 
 <section
-  class:list={[PAD[pad], BG[bg], bordered && 'bordered', center && 'text-center', cls]}
+  class:list={[
+    PAD[pad],
+    // Sin `bg`, blanco; salvo que la clase ya traiga su fondo (section--cta).
+    bg ? BG[bg] : cls?.includes('section--cta') ? undefined : 'bg-white',
+    bordered && 'bordered',
+    center && 'text-center',
+    cls,
+  ]}
   itemscope={itemtype ? true : undefined}
   itemtype={itemtype}
   aria-label={!heading ? label : undefined}

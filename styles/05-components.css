@@ -52,6 +52,14 @@
   color: var(--ink-body);
   box-shadow: none;
 }
+:where(.section--cta, .bg-dark) .button.outline {
+  color: var(--ink-body-on-dark);
+  border-color: var(--ink-body-on-dark);
+}
+:where(.section--cta, .bg-dark) .button.outline:hover {
+  color: var(--ink-body);
+  background: var(--ink-body-on-dark);
+}
 
 
 .button:hover,
@@ -181,6 +189,10 @@
 .text-body    { font-size: var(--font-size); color: var(--ink-body); line-height: var(--leading-relaxed); }
 .text-primary { color: var(--ink-primary); }
 .text-grey    { color: var(--ink-muted); }
+/* En la capa components (no layout): aquí viven las clases que pisan el color. */
+.bg-dark .text-body { color: var(--ink-body-on-dark); }
+.bg-dark .lead { color: var(--ink-title-on-dark); }
+.bg-dark .label { color: var(--ink-primary-on-dark); }
 .text-white   { color: var(--ink-body-on-dark); }
 
 
