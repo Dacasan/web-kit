@@ -5,6 +5,7 @@ body {
   font-family: var(--font-family-sans);
   font-size: var(--font-size);
   line-height: var(--leading-normal);
+  overflow-wrap: anywhere;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -16,6 +17,7 @@ h1, h2, h3, h4, h5, h6 {
   line-height: var(--leading-tight);
   letter-spacing: -.01em;
   margin: .35em 0 .7em;
+  overflow-wrap: break-word;
 }
 
 h1, h2, h3 { color: var(--ink-body); }
