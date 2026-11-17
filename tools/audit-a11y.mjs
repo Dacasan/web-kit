@@ -89,20 +89,15 @@ const PROBE = () => {
   };
 
   // Texto sobre foto o vídeo: el contraste no se puede calcular sin el píxel.
-  // Se declara no medible en vez de asumir blanco (falso positivo de 1:1).
-  const sobreMedia = (el) => {
-    let n = el;
-    for (let i = 0; n && i < 5; i++, n = n.parentElement) {
-      const cs = getComputedStyle(n);
-      if (cs.backgroundImage !== 'none') return true;
-      if (getComputedStyle(n, '::before').backgroundImage !== 'none') return true;
-      for (const m of n.querySelectorAll('video, picture, img')) {
-        const pos = getComputedStyle(m).position;
-        if (pos === 'absolute' || pos === 'fixed') return true;
-      }
-    }
-    return false;
-  };
+  // Se resuelve por intersección de rectángulos, una lista por página: hacer
+  // getComputedStyle por ancestro y nodo colgaba el audit en sitios grandes.
+  const MEDIA_RECTS = [...document.querySelectorAll('video, picture, img')]
+    .filter((m) => ['absolute', 'fixed'].includes(getComputedStyle(m).position))
+    .map((m) => m.getBoundingClientRect());
+  const sobreMedia = (caja) =>
+    MEDIA_RECTS.some(
+      (r) => !(caja.right < r.left || caja.left > r.right || caja.bottom < r.top || caja.top > r.bottom),
+    );
 
   const targetBox = (el) => {    let b = el.getBoundingClientRect();
     const lbl = el.closest('label') ??
@@ -175,8 +170,8 @@ const PROBE = () => {
     const el = t.parentElement;
     if (!el || !visible(el)) continue;
     if (el.closest('[aria-hidden="true"]')) continue;
-    if (sobreMedia(el)) continue;
     const caja = el.getBoundingClientRect();
+    if (sobreMedia(caja)) continue;
     if (caja.width <= 1 || caja.height <= 1) continue;   // .sr-only: no se pinta, no se mide
     const cs = getComputedStyle(el);
     const size = parseFloat(cs.fontSize);
@@ -226,6 +221,11 @@ const PROBE = () => {
     for (const el of document.querySelectorAll('a[href], button, input:not([type=hidden]), select, summary')) {
       if (!visible(el)) continue;
       if (el.closest('[aria-hidden="true"]')) continue;      // trampa de bots y demás
+      // 2.5.8 exime los objetivos inline dentro de una frase: si el enlace
+      // comparte párrafo con más texto, su tamaño lo manda la línea.
+      const p = el.parentElement;
+      if (el.matches('a[href]') && p?.matches('p, li, span, label') &&
+          (p.textContent?.trim().length ?? 0) > (el.textContent?.trim().length ?? 0)) continue;
       const b = targetBox(el);                                // el <label> cuenta como objetivo
       if (!b.width || !b.height) continue;
       if (Math.min(b.width, b.height) >= 24) continue;
